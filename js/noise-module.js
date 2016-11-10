@@ -206,7 +206,8 @@
 			var $divEl 			= $( template );
 
 			// append content
-			this._appendContentToModule( $divEl, nodeType, audioNode );
+			var $content 		= $( $divEl ).find( '.nm-content' );
+			this._appendContentToModule( $content, nodeType, audioNode );
 
 			$divEl.appendTo( this.$containerEl );
 			$divEl.show();
@@ -470,7 +471,43 @@
 
 		},
 
+		_createSliderDiv			: function ( label, min, max, step, units ) {
+
+			var template 	= '\
+			<div>\
+				<div class="nm-slider-info" min="' + min + '" max="' + max + '">\
+					<span class="nm-label">' + label + '</span>\
+					<span class="nm-value" units="' + units + '"></span>\
+				</div>\
+				<input min="' + min + '" max="' + max + '" step="' + step + '" type="range"></input>\
+			</div>';
+
+			return $( template );
+
+		},
+
 		_createOscillatorDiv		: function ( $moduleEl, audioNode ) {
+
+			var $freqDiv		= this._createSliderDiv( 'frequency', 0, 8000, 1, "Hz" );
+			var $detuDiv		= this._createSliderDiv( 'detune', -1200, 1200, 1, "cents" );
+
+			// var $valueSpan	= $( $divEl ).find( '.nm-value' );
+			// var $input 		= $( $divEl ).find( 'input' );
+
+			// $input[0].value = audioNode.gain.value;
+			// $valueSpan.text( audioNode.gain.value );
+
+			// $input[0].addEventListener( 'change', function() {
+
+			// 	audioNode.gain.value = this.value;
+			// 	$valueSpan.text( this.value );
+
+			// } );
+
+			// console.log( $valueSpan );
+
+			$freqDiv.appendTo( $moduleEl );
+			$detuDiv.appendTo( $moduleEl );
 
 		},
 
@@ -535,16 +572,7 @@
 
 		_createGainDiv				: function ( $moduleEl, audioNode ) {
 
-			var template 	= '\
-			<div>\
-				<div class="nm-slider-info" min="0" max="1">\
-					<span class="nm-label">gain</span>\
-					<span class="nm-value" units="1">1</span>\
-				</div>\
-				<input min="0" max="1" step="0.01" type="range"></input>\
-			</div>';
-
-			var $divEl		= $( template );
+			var $divEl		= this._createSliderDiv( 'gain', 0, 1, 0.01, '' );
 
 			var $valueSpan	= $( $divEl ).find( '.nm-value' );
 			var $input 		= $( $divEl ).find( 'input' );
