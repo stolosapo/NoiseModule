@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+	<head>
+		<meta name="google-site-verification" content="aWnFW9ANqq2ol3aezR94kmBsejE41AqJaZh7fWqPD4o" />
+	    <meta name="description" content="Internet Noise Radio. Find a lot of Noise Schematics and listen on Noise." />
+	    <meta name="keywords" content="internet radio, noise, noise internet radio, schematics, circuits, circuit, schematic, noise shematics, noise circuits, the first kube" />
+	    <meta name="verify-v1" content="S52KT7LaKp/Y8okvmoPvjLEAZGDjVU6qNyRkjhrAwfk=" />
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+		
+		<title>The First Kube :: Radio</title> 
+
+		<link rel="stylesheet" type="text/css" href="css/noise-module.css" />
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+		<script src="js/noise-radio.js"></script>
+		<script src="js/noise-module.js"></script>
+
+		<script type="text/javascript">	
+			
+			$(document).ready(function() {
+
+				/* Create a new Singleton Noise Module */
+				$( 'body' ).noiseModule( {
+
+					modules 				: [
+
+						{ name: "WhiteNoise", nodeType: "noise", type: "white" },
+						{ name: "SineWave", nodeType: "oscillator", type: "sine" },
+						{ name: "Gain", nodeType: "gain", type: "" }
+
+					],
+
+					connections				: [
+
+						{ srcNode: "WhiteNoise", destNode: "Gain" },
+						// { srcNode: "Gain", destNode: "output" }
+
+					],
+
+				} );
+					
+			});
+
+		</script>
+
+	</head>
+
+	<body>
+		
+	</body>
+</html>
