@@ -149,7 +149,7 @@
 		_createModules				: function ( ) {
 
 			// create container for all modules
-			this.$containerEl = $( '<div id="noise-module-container" class="noise-module-container"></div>' );
+			this.$containerEl = $( '<section id="noise-module-container" class="noise-module-container"></section>' );
 
 			this.$el.prepend( this.$containerEl );
 
@@ -198,8 +198,8 @@
 			
 			var template 		= '\
 			<div id="' + moduleId + '" class="noise-module ' + nodeType + '">\
-				<div class="noise-module-content">\
-					<h6 class="noise-module-content-title">' + name + '</h6>\
+				<div class="nm-content">\
+					<h6 class="nm-content-title">' + name + '</h6>\
 				</div>\
 			</div>';
 
@@ -534,6 +534,34 @@
 		},
 
 		_createGainDiv				: function ( $moduleEl, audioNode ) {
+
+			var template 	= '\
+			<div>\
+				<div class="nm-slider-info" min="0" max="1">\
+					<span class="nm-label">gain</span>\
+					<span class="nm-value" units="1">1</span>\
+				</div>\
+				<input min="0" max="1" step="0.01" type="range"></input>\
+			</div>';
+
+			var $divEl		= $( template );
+
+			var $valueSpan	= $( $divEl ).find( '.nm-value' );
+			var $input 		= $( $divEl ).find( 'input' );
+
+			$input[0].value = audioNode.gain.value;
+			$valueSpan.text( audioNode.gain.value );
+
+			$input[0].addEventListener( 'change', function() {
+
+				audioNode.gain.value = this.value;
+				$valueSpan.text( this.value );
+
+			} );
+
+			console.log( $valueSpan );
+
+			$divEl.appendTo( $moduleEl );
 
 		},
 
