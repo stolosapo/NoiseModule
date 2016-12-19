@@ -26,15 +26,18 @@
 					modules 				: [
 
 						{ name: "WhiteNoise", nodeType: "noise", type: "white" },
+						{ name: "Gain", nodeType: "gain", type: "" },
 						{ name: "SineWave", nodeType: "oscillator", type: "sine" },
-						{ name: "Gain", nodeType: "gain", type: "" }
+						{ name: "Master", nodeType: "gain", type: "" }
 
 					],
 
 					connections				: [
 
+						{ srcNode: "SineWave", destNode: "Master" },
 						{ srcNode: "WhiteNoise", destNode: "Gain" },
-						{ srcNode: "Gain", destNode: "output" }
+						{ srcNode: "Gain", destNode: "Master" },
+						{ srcNode: "Master", destNode: "output" }
 
 					],
 

@@ -40,8 +40,8 @@
 
 		],
 
-		oscillatorFrequency		: 900,
-		oscillatorDetune		: 100,
+		oscillatorFrequency		: 440,
+		oscillatorDetune		: 0,
 
 		biquadFilterFrequency	: 900,
 		biquadFilterDetune		: 400,
@@ -366,10 +366,12 @@
 
 		_createNoiseDiv 			: function ( $moduleEl, audioNode ) {
 
-			var template 	= '<img src=""></img>';
+			// var template 	= '<img src="img/play_24.png" alt="play"></img>';
 
-			var $divEl		= $( template );
-			$divEl.appendTo( $moduleEl );
+			// var $divEl		= $( template );
+			// $divEl.appendTo( $moduleEl );
+
+			this._createPlayStopButton( $moduleEl, audioNode );
 
 		},
 
@@ -465,8 +467,6 @@
 			wave.frequency.value = this.options.oscillatorFrequency;
 			wave.detune.value = this.options.oscillatorDetune;
 
-			wave.start ( 0 );
-
 			return wave;
 
 		},
@@ -486,28 +486,76 @@
 
 		},
 
+		_createPlayStopButton		: function ( $moduleEl, audioNode ) {
+
+			var template	= '<img src="img/play_24.png" alt="play"></img>';
+			var $img 		= $( template );
+
+			$img[0].addEventListener( 'click', function( ) {
+
+				var alt 	= $(this).attr( 'alt' );
+
+				if (alt === 'play') {
+					
+					audioNode.start();
+
+					$(this).attr( 'alt', 'stop' );
+					$(this).attr( 'src', 'img/stop_24.png' );
+
+				}
+				else {
+
+					audioNode.stop();
+
+					$(this).attr( 'alt', 'play' );
+					$(this).attr( 'src', 'img/play_24.png' );
+
+				}
+
+			} );
+
+			$img.appendTo( $moduleEl );
+		},
+
 		_createOscillatorDiv		: function ( $moduleEl, audioNode ) {
 
 			var $freqDiv		= this._createSliderDiv( 'frequency', 0, 8000, 1, "Hz" );
 			var $detuDiv		= this._createSliderDiv( 'detune', -1200, 1200, 1, "cents" );
 
-			// var $valueSpan	= $( $divEl ).find( '.nm-value' );
-			// var $input 		= $( $divEl ).find( 'input' );
+			var $freqSpan		= $( $freqDiv ).find( '.nm-value' );
+			var $detuSpan		= $( $detuDiv ).find( '.nm-value' );
 
-			// $input[0].value = audioNode.gain.value;
-			// $valueSpan.text( audioNode.gain.value );
+			var $inputFreq 		= $( $freqDiv ).find( 'input' );
+			var $inputDetu 		= $( $detuDiv ).find( 'input' );
 
-			// $input[0].addEventListener( 'change', function() {
 
-			// 	audioNode.gain.value = this.value;
-			// 	$valueSpan.text( this.value );
+			$inputFreq[0].value = audioNode.frequency.value;
+			$inputDetu[0].value = audioNode.detune.value;
 
-			// } );
+			$freqSpan.text( audioNode.frequency.value );
+			$detuSpan.text( audioNode.detune.value );
 
-			// console.log( $valueSpan );
+
+			$inputFreq[0].addEventListener( 'change', function() {
+
+				audioNode.frequency.value = this.value;
+				$freqSpan.text( this.value );
+
+			} );
+
+			$inputDetu[0].addEventListener( 'change', function() {
+
+				audioNode.detune.value = this.value;
+				$detuSpan.text( this.value );
+
+			} );
+
 
 			$freqDiv.appendTo( $moduleEl );
 			$detuDiv.appendTo( $moduleEl );
+
+			// Create Play / Stop button
+			this._createPlayStopButton( $moduleEl, audioNode );
 
 		},
 
@@ -586,8 +634,6 @@
 				$valueSpan.text( this.value );
 
 			} );
-
-			console.log( $valueSpan );
 
 			$divEl.appendTo( $moduleEl );
 
