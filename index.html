@@ -29,10 +29,7 @@
 						{ name: "Gain", nodeType: "gain", type: "" },
 
 						{ name: "SineWave", nodeType: "oscillator", type: "sine" },
-						{ name: "LowpassFilter", nodeType: "biquadfilter", type: "lowpass" },
-						{ name: "Delay", nodeType: "delay", type: "" },
 						{ name: "Compressor", nodeType: "dynamicscompressor", type: "" },
-						{ name: "StereoPanner", nodeType: "stereopannernode", type: "" },
 
 						{ name: "Master", nodeType: "gain", type: "" }
 
@@ -40,11 +37,8 @@
 
 					connections				: [
 
-						{ srcNode: "SineWave", destNode: "LowpassFilter" },
-						{ srcNode: "LowpassFilter", destNode: "Delay" },
-						{ srcNode: "Delay", destNode: "Compressor" },
-						{ srcNode: "Compressor", destNode: "StereoPanner" },
-						{ srcNode: "StereoPanner", destNode: "Master" },
+						{ srcNode: "SineWave", destNode: "Compressor" },
+						{ srcNode: "Compressor", destNode: "Master" },
 
 						{ srcNode: "WhiteNoise", destNode: "Gain" },
 						// { srcNode: "Gain", destNode: "Master" },

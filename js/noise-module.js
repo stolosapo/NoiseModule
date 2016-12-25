@@ -486,7 +486,7 @@
 
 		},
 
-		_createSliderControl		: function ( audioNode, property, min, max, step, units ) {
+		_createSliderControl		: function ( audioNode, property, min, max, step, units, changeEvent ) {
 
 			var $div		= this._createSliderDiv( property, min, max, step, units );
 
@@ -496,6 +496,13 @@
 			$input[0].value = audioNode[ property ].value;
 
 			$span.text( audioNode[ property ].value );
+
+			if (changeEvent != null && changeEvent != undefined) {
+
+				$input[0].addEventListener( 'change', changeEvent );
+
+				return $div;
+			}
 
 			$input[0].addEventListener( 'change', function() {
 
@@ -695,6 +702,7 @@
 			$reductionDiv.appendTo( $moduleEl );
 			$attackDiv.appendTo( $moduleEl );
 			$releaseDiv.appendTo( $moduleEl );
+			
 		},
 
 		_createStreoPanner			: function ( ) {
@@ -748,6 +756,25 @@
 		},
 
 		_createWaveShaperDiv		: function ( $moduleEl, audioNode ) {
+
+			var _self = this;
+
+			var $curveDiv		= this._createSliderControl( audioNode, 'curve', 0, 1000, 1, "", function() {
+
+				audioNode.curve = _self._createDistortionCurve ( this.value );
+
+			} );
+
+			var $oversampleDiv		= this._createSliderControl( audioNode, 'oversample', 0, 4, 2, "", function() {
+
+				var value = this.value == 0 ? 'none' : this.value + 'x';
+
+				audioNode.oversample = value;
+
+			} );
+
+			$curveDiv.appendTo( $moduleEl );
+			$oversampleDiv.appendTo( $moduleEl );
 
 		},
 
