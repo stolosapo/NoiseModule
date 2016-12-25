@@ -27,9 +27,12 @@
 
 						{ name: "WhiteNoise", nodeType: "noise", type: "white" },
 						{ name: "Gain", nodeType: "gain", type: "" },
+
 						{ name: "SineWave", nodeType: "oscillator", type: "sine" },
 						{ name: "LowpassFilter", nodeType: "biquadfilter", type: "lowpass" },
 						{ name: "Delay", nodeType: "delay", type: "" },
+						{ name: "Compressor", nodeType: "dynamicscompressor", type: "" },
+
 						{ name: "Master", nodeType: "gain", type: "" }
 
 					],
@@ -38,7 +41,8 @@
 
 						{ srcNode: "SineWave", destNode: "LowpassFilter" },
 						{ srcNode: "LowpassFilter", destNode: "Delay" },
-						{ srcNode: "Delay", destNode: "Master" },
+						{ srcNode: "Delay", destNode: "Compressor" },
+						{ srcNode: "Compressor", destNode: "Master" },
 
 						{ srcNode: "WhiteNoise", destNode: "Gain" },
 						// { srcNode: "Gain", destNode: "Master" },

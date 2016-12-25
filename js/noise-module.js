@@ -50,11 +50,11 @@
 
 		delayTime				: 0.2,
 
-		compressorThreshold 	: -50,
-		compressorKnee			: 40,
+		compressorThreshold 	: -25,
+		compressorKnee			: 30,
 		compressorRatio 		: 12,
 		compressorReduction		: -20,
-		compressorAttack		: 0,
+		compressorAttack		: 0.003,
 		compressorRelease		: 0.25,
 
 		gainGain				: 0.7,
@@ -662,7 +662,7 @@
 			var $timeDiv	= this._createSliderControl( audioNode, 'delayTime', 0, 10, 0.01, "Sec" );
 
 			$timeDiv.appendTo( $moduleEl );
-			
+
 		},
 
 		_createDynamicsCompressor	: function ( ) {
@@ -682,6 +682,19 @@
 
 		_createDynamicsCompressorDiv: function ( $moduleEl, audioNode ) {
 
+			var $thresholdDiv	= this._createSliderControl( audioNode, 'threshold', -36, 0, 0.01, "DB" );
+			var $kneeDiv		= this._createSliderControl( audioNode, 'knee', 0, 40, 0.01, "DB" );
+			var $ratioDiv		= this._createSliderControl( audioNode, 'ratio', 1, 50, 0.1, "Sec" );
+			var $reductionDiv	= this._createSliderControl( audioNode, 'reduction', -20, 0, 0.01, "DB" );
+			var $attackDiv		= this._createSliderControl( audioNode, 'attack', 0, 1, 0.001, "Sec" );
+			var $releaseDiv		= this._createSliderControl( audioNode, 'release', 0, 2, 0.01, "Sec" );
+
+			$thresholdDiv.appendTo( $moduleEl );
+			$kneeDiv.appendTo( $moduleEl );
+			$ratioDiv.appendTo( $moduleEl );
+			$reductionDiv.appendTo( $moduleEl );
+			$attackDiv.appendTo( $moduleEl );
+			$releaseDiv.appendTo( $moduleEl );
 		},
 
 		_createStreoPanner			: function ( ) {
