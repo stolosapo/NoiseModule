@@ -43,10 +43,10 @@
 		oscillatorFrequency		: 440,
 		oscillatorDetune		: 0,
 
-		biquadFilterFrequency	: 900,
-		biquadFilterDetune		: 400,
-		biquadFilterQ 			: 100,
-		biquadFilterGain		: 25,
+		biquadFilterFrequency	: 440,
+		biquadFilterDetune		: 0,
+		biquadFilterQ 			: 1,
+		biquadFilterGain		: 0.7,
 
 		delayTime				: 5.0,
 
@@ -486,6 +486,28 @@
 
 		},
 
+		_createSliderControl		: function ( audioNode, property, min, max, step, units ) {
+
+			var $div		= this._createSliderDiv( property, min, max, step, units );
+
+			var $span		= $( $div ).find( '.nm-value' );
+			var $input 		= $( $div ).find( 'input' );
+
+			$input[0].value = audioNode[ property ].value;
+
+			$span.text( audioNode[ property ].value );
+
+			$input[0].addEventListener( 'change', function() {
+
+				audioNode[ property ].value = this.value;
+				$span.text( this.value );
+
+			} );
+
+			return $div;
+
+		},
+
 		_createPlayStopButton		: function ( $moduleEl, audioNode ) {
 
 			var template	= '<img src="img/play_24.png" alt="play"></img>';
@@ -519,37 +541,8 @@
 
 		_createOscillatorDiv		: function ( $moduleEl, audioNode ) {
 
-			var $freqDiv		= this._createSliderDiv( 'frequency', 0, 8000, 1, "Hz" );
-			var $detuDiv		= this._createSliderDiv( 'detune', -1200, 1200, 1, "cents" );
-
-			var $freqSpan		= $( $freqDiv ).find( '.nm-value' );
-			var $detuSpan		= $( $detuDiv ).find( '.nm-value' );
-
-			var $inputFreq 		= $( $freqDiv ).find( 'input' );
-			var $inputDetu 		= $( $detuDiv ).find( 'input' );
-
-
-			$inputFreq[0].value = audioNode.frequency.value;
-			$inputDetu[0].value = audioNode.detune.value;
-
-			$freqSpan.text( audioNode.frequency.value );
-			$detuSpan.text( audioNode.detune.value );
-
-
-			$inputFreq[0].addEventListener( 'change', function() {
-
-				audioNode.frequency.value = this.value;
-				$freqSpan.text( this.value );
-
-			} );
-
-			$inputDetu[0].addEventListener( 'change', function() {
-
-				audioNode.detune.value = this.value;
-				$detuSpan.text( this.value );
-
-			} );
-
+			var $freqDiv	= this._createSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
+			var $detuDiv	= this._createSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
 
 			$freqDiv.appendTo( $moduleEl );
 			$detuDiv.appendTo( $moduleEl );
@@ -620,22 +613,9 @@
 
 		_createGainDiv				: function ( $moduleEl, audioNode ) {
 
-			var $divEl		= this._createSliderDiv( 'gain', 0, 1, 0.01, '' );
+			var $gainDiv	= this._createSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
 
-			var $valueSpan	= $( $divEl ).find( '.nm-value' );
-			var $input 		= $( $divEl ).find( 'input' );
-
-			$input[0].value = audioNode.gain.value;
-			$valueSpan.text( audioNode.gain.value );
-
-			$input[0].addEventListener( 'change', function() {
-
-				audioNode.gain.value = this.value;
-				$valueSpan.text( this.value );
-
-			} );
-
-			$divEl.appendTo( $moduleEl );
+			$gainDiv.appendTo( $moduleEl );
 
 		},
 
@@ -654,6 +634,16 @@
 		},
 
 		_createBiquadFilterDiv		: function ( $moduleEl, audioNode ) {
+
+			var $freqDiv	= this._createSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
+			var $detuDiv	= this._createSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
+			var $qDiv		= this._createSliderControl( audioNode, 'Q', 1, 100, 0.1, "" );
+			var $gainDiv	= this._createSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
+
+			$freqDiv.appendTo( $moduleEl );
+			$detuDiv.appendTo( $moduleEl );
+			$qDiv.appendTo( $moduleEl );
+			$gainDiv.appendTo( $moduleEl );
 
 		},
 
