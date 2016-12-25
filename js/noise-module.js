@@ -709,6 +709,10 @@
 
 		_createStreoPannerDiv		: function ( $moduleEl, audioNode ) {
 
+			var $panDiv		= this._createSliderControl( audioNode, 'pan', -1, 1, 0.01, "" );
+
+			$panDiv.appendTo( $moduleEl );
+
 		},
 
 		_createDistortionCurve		: function ( amount ) {
