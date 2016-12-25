@@ -28,7 +28,6 @@
 		modules 				: [
 
 			{ name: "WhiteNoise", nodeType: "noise", type: "white", options: { started: false } },
-			{ name: "SineWave", nodeType: "oscillator", type: "sine", options: { started: false } },
 			{ name: "Gain", nodeType: "gain", type: "", options: { gainGain: 0.65 } }
 
 		],

@@ -29,7 +29,6 @@
 						{ name: "Gain", nodeType: "gain", type: "", options: { gainGain: 0.5 } },
 
 						{ name: "SineWave", nodeType: "oscillator", type: "sine", options: { started: false } },
-						{ name: "Compressor", nodeType: "dynamicscompressor", type: "" },
 
 						{ name: "Master", nodeType: "gain", type: "" },
 
@@ -39,8 +38,7 @@
 
 					connections				: [
 
-						{ srcNode: "SineWave", destNode: "Compressor", connected: false },
-						{ srcNode: "Compressor", destNode: "Master" },
+						{ srcNode: "SineWave", destNode: "Master", connected: false },
 
 						{ srcNode: "WhiteNoise", destNode: "Gain", connected: false },
 						{ srcNode: "Gain", destNode: "Master" },
