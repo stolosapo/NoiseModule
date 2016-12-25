@@ -48,7 +48,7 @@
 		biquadFilterQ 			: 1,
 		biquadFilterGain		: 0.7,
 
-		delayTime				: 5.0,
+		delayTime				: 0.2,
 
 		compressorThreshold 	: -50,
 		compressorKnee			: 40,
@@ -659,6 +659,10 @@
 
 		_createDelayDiv				: function ( $moduleEl, audioNode ) {
 
+			var $timeDiv	= this._createSliderControl( audioNode, 'delayTime', 0, 10, 0.01, "Sec" );
+
+			$timeDiv.appendTo( $moduleEl );
+			
 		},
 
 		_createDynamicsCompressor	: function ( ) {
