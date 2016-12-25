@@ -702,7 +702,7 @@
 			$reductionDiv.appendTo( $moduleEl );
 			$attackDiv.appendTo( $moduleEl );
 			$releaseDiv.appendTo( $moduleEl );
-			
+
 		},
 
 		_createStreoPanner			: function ( ) {
@@ -780,12 +780,12 @@
 
 		_createAnalyser				: function ( ) {
 
-			var analyser = this.audioContext.createAnalyser ( );
+			var analyser 		= this.audioContext.createAnalyser ( );
 
-			analyser.fftSize = this.options.analyserFftSize;
+			analyser.fftSize 	= this.options.analyserFftSize;
 
-			var bufferLength = analyser.frequencyBinCount;
-			var dataArray = new Uint8Array ( bufferLength );
+			var bufferLength 	= analyser.frequencyBinCount;
+			var dataArray		= new Uint8Array ( bufferLength );
 			
 			analyser.getByteTimeDomainData ( dataArray );
 
@@ -794,6 +794,53 @@
 		},
 
 		_createAnalyserDiv			: function ( $moduleEl, audioNode ) {
+
+			var $canvas 	= $( '<canvas class="nm-analyser-canvas"></canvas>' );
+
+			var canvasCtx 	= $canvas[0].getContext("2d");
+
+			$canvas.appendTo( $moduleEl );
+
+			function draw() {
+
+				var bufferLength 		= audioNode.frequencyBinCount;
+				var dataArray 			= new Uint8Array( bufferLength );
+
+				drawVisual 				= requestAnimationFrame( draw );
+
+				audioNode.getByteTimeDomainData( dataArray );
+
+				canvasCtx.fillStyle 	= 'rgb(200, 200, 200)';
+				canvasCtx.fillRect( 0, 0, $canvas[0].width, $canvas[0].height );
+
+				canvasCtx.lineWidth 	= 2;
+				canvasCtx.strokeStyle 	= 'rgb(0, 0, 0)';
+
+				canvasCtx.beginPath();
+
+				var sliceWidth = $canvas[0].width * 1.0 / bufferLength;
+				var x = 0;
+
+				for (var i = 0; i < bufferLength; i++) {
+
+					var v = dataArray[i] / 128.0;
+					var y = v * $canvas[0].height / 2;
+
+					if (i === 0) {
+					  canvasCtx.moveTo(x, y);
+					} else {
+					  canvasCtx.lineTo(x, y);
+					}
+
+					x += sliceWidth;
+
+				}
+
+				canvasCtx.lineTo($canvas[0].width, $canvas[0].height / 2);
+				canvasCtx.stroke();
+			};
+
+			draw();
 
 		},
 
