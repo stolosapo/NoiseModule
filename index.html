@@ -27,8 +27,7 @@
 						{ name: "LiveInput", nodeType: "liveinput", type: "", options: { started: false } },
 
 						{ name: "Master", nodeType: "gain", type: "" },
-
-						{ name: "Analyser", nodeType: "analyser", type: "" }
+						{ name: "MasterAnalyser", nodeType: "analyser", type: "frequencybars" }
 
 					],
 
@@ -41,9 +40,9 @@
 
 						{ srcNode: "LiveInput", destNode: "Master" },
 
-						{ srcNode: "Master", destNode: "Analyser" },
+						{ srcNode: "Master", destNode: "MasterAnalyser" },
 
-						{ srcNode: "Analyser", destNode: "output" }
+						{ srcNode: "MasterAnalyser", destNode: "output" }
 
 					],
 

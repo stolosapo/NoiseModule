@@ -35,7 +35,7 @@
 			stereopannernode
 			waveshapernode
 			periodicwave
-			analyser
+			analyser 			{ sinewave, frequencybars }
 		*/
 		modules 				: [
 
@@ -281,7 +281,7 @@
 			// };
 
 			if ( nodeType === "analyser" ) {
-				return this._createAnalyserDiv( $moduleEl, audioNode );
+				return this._createAnalyserDiv( $moduleEl, module, audioNode );
 			};
 
 		},
@@ -885,54 +885,120 @@
 
 		},
 
-		_createAnalyserDiv			: function ( $moduleEl, audioNode ) {
+		_createAnalyserDiv			: function ( $moduleEl, module, audioNode ) {
 
-			var $canvas 	= $( '<canvas class="nm-analyser-canvas"></canvas>' );
+			var template 	= '<canvas class="nm-analyser-canvas"></canvas>';
+			var $canvas 	= $( template );
 
 			var canvasCtx 	= $canvas[0].getContext("2d");
 
 			$canvas.appendTo( $moduleEl );
 
-			function draw() {
+			if (module.type === 'sinewave') {
 
-				var bufferLength 		= audioNode.frequencyBinCount;
-				var dataArray 			= new Uint8Array( bufferLength );
+				this._createSinewaveAnalyser( $moduleEl, $canvas, canvasCtx, audioNode );
+			}
+			else if (module.type === 'frequencybars') {
 
-				drawVisual 				= requestAnimationFrame( draw );
+				this._createFequencyBarsAnalyser( $moduleEl, $canvas, canvasCtx, audioNode );
+			}
+			else {
+
+				this._createSinewaveAnalyser( $moduleEl, $canvas, canvasCtx, audioNode );
+			}
+
+		},
+
+		_createSinewaveAnalyser 	: function ( $moduleEl, $canvas, canvasCtx, audioNode ) {
+
+			var WIDTH 			= $canvas[ 0 ].width;
+			var HEIGHT 			= $canvas[ 0 ].height;
+
+			audioNode.fftSize 	= 2048;
+			var bufferLength 	= audioNode.fftSize;
+
+			var dataArray 		= new Uint8Array( bufferLength );
+
+			canvasCtx.clearRect( 0, 0, WIDTH, HEIGHT );
+
+			function draw( ) {
+
+				drawVisual 		= requestAnimationFrame( draw );
 
 				audioNode.getByteTimeDomainData( dataArray );
 
 				canvasCtx.fillStyle 	= 'rgb(200, 200, 200)';
-				canvasCtx.fillRect( 0, 0, $canvas[0].width, $canvas[0].height );
+				canvasCtx.fillRect( 0, 0, WIDTH, HEIGHT );
 
 				canvasCtx.lineWidth 	= 2;
 				canvasCtx.strokeStyle 	= 'rgb(0, 0, 0)';
 
 				canvasCtx.beginPath();
 
-				var sliceWidth = $canvas[0].width * 1.0 / bufferLength;
+				var sliceWidth = WIDTH * 1.0 / bufferLength;
 				var x = 0;
 
-				for (var i = 0; i < bufferLength; i++) {
+				for ( var i = 0; i < bufferLength; i++ ) {
 
-					var v = dataArray[i] / 128.0;
-					var y = v * $canvas[0].height / 2;
+					var v = dataArray[ i ] / 128.0;
+					var y = v * HEIGHT / 2;
 
-					if (i === 0) {
-					  canvasCtx.moveTo(x, y);
+					if ( i === 0 ) {
+						canvasCtx.moveTo( x, y );
 					} else {
-					  canvasCtx.lineTo(x, y);
+						canvasCtx.lineTo( x, y );
 					}
 
 					x += sliceWidth;
 
 				}
 
-				canvasCtx.lineTo($canvas[0].width, $canvas[0].height / 2);
-				canvasCtx.stroke();
+				canvasCtx.lineTo( WIDTH, HEIGHT / 2);
+				canvasCtx.stroke( );
 			};
 
-			draw();
+			draw( );
+
+		},
+
+		_createFequencyBarsAnalyser : function ( $moduleEl, $canvas, canvasCtx, audioNode ) {
+
+			var WIDTH 			= $canvas[ 0 ].width;
+			var HEIGHT 			= $canvas[ 0 ].height;
+
+			audioNode.fftSize 	= 256;
+
+			var bufferLength 	= audioNode.frequencyBinCount;
+			var dataArray 		= new Uint8Array( bufferLength );
+
+			canvasCtx.clearRect( 0, 0, WIDTH, HEIGHT );
+
+			function draw( ) {
+
+				drawVisual 		= requestAnimationFrame( draw );
+
+				audioNode.getByteFrequencyData( dataArray );
+
+				canvasCtx.fillStyle = 'rgb(0, 0, 0)';
+				canvasCtx.fillRect( 0, 0, WIDTH, HEIGHT );
+
+				var barWidth = ( WIDTH / bufferLength ) * 2.5;
+				var barHeight;
+				var x = 0;
+
+				for(var i = 0; i < bufferLength; i++) {
+
+					barHeight = dataArray[ i ];
+
+					canvasCtx.fillStyle = 'rgb(' + ( barHeight + 100 ) + ',50,50)';
+					canvasCtx.fillRect( x, HEIGHT - barHeight / 2, barWidth, barHeight / 2 );
+
+					x += barWidth + 1;
+				}
+
+			}
+
+			draw( );
 
 		},
 
