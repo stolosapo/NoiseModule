@@ -85,6 +85,9 @@
 		periodicWaveDisableNorm	: false,
 
 		analyserFftSize			: 2048,
+		analyserMainBgColor		: 200,
+		analyserBarBgColor 		: 50,
+		analyserSineBgColor		: 0
 
 	};
 
@@ -528,7 +531,6 @@
 				<div class="nm-slider-info" min="' + min + '" max="' + max + '">\
 					<span class="nm-label">' + label + '</span>\
 					<span class="nm-value" units="' + units + '"></span>\
-					<span class="nm-value-unit" units="' + units + '">' + units + '</span>\
 				</div>\
 				<input min="' + min + '" max="' + max + '" step="' + step + '" type="range"></input>\
 			</div>';
@@ -544,9 +546,11 @@
 			var $span		= $( $div ).find( '.nm-value' );
 			var $input 		= $( $div ).find( 'input' );
 
-			$input[0].value = audioNode[ property ].value;
+			var value 		= audioNode[ property ].value;
 
-			$span.text( audioNode[ property ].value );
+			$input[0].value = value;
+
+			$span.text( value + ' ' + units );
 
 			if (changeEvent != null && changeEvent != undefined) {
 
@@ -558,7 +562,7 @@
 			$input[0].addEventListener( 'change', function() {
 
 				audioNode[ property ].value = this.value;
-				$span.text( this.value );
+				$span.text( this.value + ' ' + units );
 
 			} );
 
@@ -573,10 +577,10 @@
 			var template;
 
 			if (module.options.started) {
-				template	= '<img src="img/stop_24.png" alt="stop"></img>';
+				template	= '<img src="img/stop_48.png" alt="stop"></img>';
 			}
 			else {
-				template	= '<img src="img/play_24.png" alt="play"></img>';
+				template	= '<img src="img/play_48.png" alt="play"></img>';
 			}
 
 			var $img 		= $( template );
@@ -590,7 +594,7 @@
 					_self._connectAllDestinations( module );
 
 					$(this).attr( 'alt', 'stop' );
-					$(this).attr( 'src', 'img/stop_24.png' );
+					$(this).attr( 'src', 'img/stop_48.png' );
 
 				}
 				else {
@@ -598,7 +602,7 @@
 					_self._disconnectAllDestinations( module );
 
 					$(this).attr( 'alt', 'play' );
-					$(this).attr( 'src', 'img/play_24.png' );
+					$(this).attr( 'src', 'img/play_48.png' );
 
 				}
 
@@ -896,23 +900,26 @@
 
 			if (module.type === 'sinewave') {
 
-				this._createSinewaveAnalyser( $moduleEl, $canvas, canvasCtx, audioNode );
+				this._createSinewaveAnalyser( $moduleEl, module, $canvas, canvasCtx, audioNode );
 			}
 			else if (module.type === 'frequencybars') {
 
-				this._createFequencyBarsAnalyser( $moduleEl, $canvas, canvasCtx, audioNode );
+				this._createFequencyBarsAnalyser( $moduleEl, module, $canvas, canvasCtx, audioNode );
 			}
 			else {
 
-				this._createSinewaveAnalyser( $moduleEl, $canvas, canvasCtx, audioNode );
+				this._createSinewaveAnalyser( $moduleEl, module, $canvas, canvasCtx, audioNode );
 			}
 
 		},
 
-		_createSinewaveAnalyser 	: function ( $moduleEl, $canvas, canvasCtx, audioNode ) {
+		_createSinewaveAnalyser 	: function ( $moduleEl, module, $canvas, canvasCtx, audioNode ) {
 
 			var WIDTH 			= $canvas[ 0 ].width;
 			var HEIGHT 			= $canvas[ 0 ].height;
+
+			var mainBg 			= module.options.analyserMainBgColor;
+			var sineBg 			= module.options.analyserSineBgColor;
 
 			audioNode.fftSize 	= 2048;
 			var bufferLength 	= audioNode.fftSize;
@@ -927,11 +934,11 @@
 
 				audioNode.getByteTimeDomainData( dataArray );
 
-				canvasCtx.fillStyle 	= 'rgb(200, 200, 200)';
+				canvasCtx.fillStyle 	= 'rgb(' + mainBg + ', ' + mainBg + ', ' + mainBg + ')';
 				canvasCtx.fillRect( 0, 0, WIDTH, HEIGHT );
 
 				canvasCtx.lineWidth 	= 2;
-				canvasCtx.strokeStyle 	= 'rgb(0, 0, 0)';
+				canvasCtx.strokeStyle 	= 'rgb(' + sineBg + ', ' + sineBg + ', ' + sineBg + ')';
 
 				canvasCtx.beginPath();
 
@@ -961,10 +968,13 @@
 
 		},
 
-		_createFequencyBarsAnalyser : function ( $moduleEl, $canvas, canvasCtx, audioNode ) {
+		_createFequencyBarsAnalyser : function ( $moduleEl, module, $canvas, canvasCtx, audioNode ) {
 
 			var WIDTH 			= $canvas[ 0 ].width;
 			var HEIGHT 			= $canvas[ 0 ].height;
+
+			var mainBg 			= module.options.analyserMainBgColor;
+			var barBg 			= module.options.analyserBarBgColor;
 
 			audioNode.fftSize 	= 256;
 
@@ -979,7 +989,7 @@
 
 				audioNode.getByteFrequencyData( dataArray );
 
-				canvasCtx.fillStyle = 'rgb(0, 0, 0)';
+				canvasCtx.fillStyle = 'rgb(' + mainBg + ', ' + mainBg + ', ' + mainBg + ')';
 				canvasCtx.fillRect( 0, 0, WIDTH, HEIGHT );
 
 				var barWidth = ( WIDTH / bufferLength ) * 2.5;
@@ -990,7 +1000,7 @@
 
 					barHeight = dataArray[ i ];
 
-					canvasCtx.fillStyle = 'rgb(' + ( barHeight + 100 ) + ',50,50)';
+					canvasCtx.fillStyle = 'rgb(' + ( barHeight + 100 ) + ', ' + barBg + ', ' + barBg + ')';
 					canvasCtx.fillRect( x, HEIGHT - barHeight / 2, barWidth, barHeight / 2 );
 
 					x += barWidth + 1;
