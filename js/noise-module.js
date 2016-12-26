@@ -1,4 +1,4 @@
-( function( window, $, undefined ) {
+( function( window, navigator, $, undefined ) {
 
 	/* Noise Module Object */
 
@@ -16,6 +16,7 @@
 		/* Node Type :
 			noise 				{ white, pink, brown }
 			oscillator 			{ sine, square, sawtooth, triangle }
+			liveinput
 			biquadfilter 		{ lowpass, highpass, bandpass, lowshelf, highshelf, peaking, notch, allpass }
 			delay
 			dynamicscompressor
@@ -193,6 +194,10 @@
 				return this._createOscillatorDiv( $moduleEl, module, audioNode );
 			};
 
+			if ( nodeType === "liveinput" ) {
+				return this._createLiveInputDiv( $moduleEl, module, audioNode );
+			};
+
 			if ( nodeType === "biquadfilter" ) {
 				return this._createBiquadFilterDiv( $moduleEl, audioNode );
 			};
@@ -237,6 +242,10 @@
 
 			if ( nodeType === "oscillator" ) {
 				return this._createOscillator( module );
+			};
+
+			if ( nodeType === "liveinput" ) {
+				return this._createLiveInput( module );
 			};
 
 			if ( nodeType === "biquadfilter" ) {
@@ -312,6 +321,21 @@
 			} );
 
 			return node;
+
+		},
+
+		_updateAudioNode			: function ( moduleName, audioNode ) {
+
+			$.each( this.moduleMap, function( index, map ) {
+
+				if ( map.name === moduleName ) {
+					
+					map.node = audioNode;
+					return;
+
+				};
+
+			} );
 
 		},
 
@@ -450,6 +474,7 @@
 				<div class="nm-slider-info" min="' + min + '" max="' + max + '">\
 					<span class="nm-label">' + label + '</span>\
 					<span class="nm-value" units="' + units + '"></span>\
+					<span class="nm-value-unit" units="' + units + '">' + units + '</span>\
 				</div>\
 				<input min="' + min + '" max="' + max + '" step="' + step + '" type="range"></input>\
 			</div>';
@@ -564,6 +589,60 @@
 		
 
 			return source;
+
+		},
+
+		_createMediaStreamSource 	: function ( stream ) {
+
+			var source 	= this.audioContext.createMediaStreamSource( stream );
+
+			return source;
+
+		},
+
+		_createLiveInput 			: function ( module ) {
+
+			navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+			if (navigator.mediaDevices) {
+
+				var _self 	= this;
+				var source;
+
+				navigator.mediaDevices.getUserMedia(
+				{
+					"audio": {
+						"mandatory": {
+							"googEchoCancellation": "false",
+							"googAutoGainControl": "false",
+							"googNoiseSuppression": "false",
+							"googHighpassFilter": "false"
+						},
+						"optional": [ ]
+					},
+				}).then( function( stream ) {
+
+					source = _self._createMediaStreamSource( stream );
+
+					/* Update source node map with this new instance */
+					_self._updateAudioNode( module.name, source );
+
+
+					console.log("twra to source einai:" , source);
+
+				} );
+
+				console.log("akoma to source einai:" , source);
+
+				return source;
+
+			}
+
+		},
+
+		_createLiveInputDiv 		: function ( $moduleEl, module, audioNode ) {
+
+			this._createPlayStopButton( $moduleEl, module, audioNode );
 
 		},
 
@@ -826,11 +905,21 @@
 
 		_connectNodes				: function ( srcNode, destNode ) {
 
+			if (srcNode === null || srcNode === undefined || 
+				destNode === null || destNode === undefined) {
+				return;
+			}
+
 			srcNode.connect ( destNode );
 
 		},
 
 		_disconnectNodes			: function ( srcNode, destNode ) {
+
+			if (srcNode === null || srcNode === undefined || 
+				destNode === null || destNode === undefined) {
+				return;
+			}
 
 			srcNode.disconnect ( destNode );
 
@@ -935,4 +1024,4 @@
 	};
 
 
-} )( window, jQuery );
+} )( window, navigator, jQuery );
