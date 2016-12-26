@@ -4,10 +4,21 @@
 
 	$.NoiseModule				= function ( options, element, radio ) {
 
-		this.$el = $( element );
-		this.$radio = $( radio );
+		this.$el 		= $( element );
+		this.$radio 	= $( radio );
 
-		this._init ( options );
+		var fileMode 	= options.fileMode;
+
+		if (fileMode === null || fileMode === undefined || fileMode === false) {
+
+			this._init ( options );	
+		
+		}
+		else {
+
+			this._initFromFile( );
+
+		}
 
 	};
 
@@ -41,6 +52,7 @@
 		],
 
 		started					: true,
+		fileMode				: false,
 
 		oscillatorFrequency		: 440,
 		oscillatorDetune		: 0,
@@ -87,11 +99,49 @@
 			this.moduleCounter	= 0;
 			this.moduleMap		= [];
 
+			// remove all containers
+			if ( this.$containerEl ) {
+				this.$containerEl.remove( );
+			}
+
 			// create audio context
 			this._createAudioContext();
 
 			// create modules
 			this._createModules();
+
+		},
+
+		_initFromFile				: function ( ) {
+
+			var _self 			= this;
+			var template 		= '<input type="file" id="nm-file-input" />';
+			var $fileInput 		= $( template );
+
+			$fileInput[0].addEventListener( 'change', function ( e ) {
+
+				var file 	= e.target.files[0];
+				
+				if (!file) {
+					return;
+				}
+				
+				var reader 	= new FileReader();
+				
+				reader.onload = function( e ) {
+
+					var content 		= e.target.result;
+					var moduleOptions 	= JSON.parse( content );
+
+					_self._init( moduleOptions );
+
+				};
+
+				reader.readAsText( file );
+
+			}, false );
+
+			$fileInput.appendTo( this.$el );
 
 		},
 
@@ -116,7 +166,11 @@
 		_createModules				: function ( ) {
 
 			// create container for all modules
-			this.$containerEl = $( '<section id="noise-module-container" class="noise-module-container"></section>' );
+			var template 		= '\
+				<section id="noise-module-container" class="noise-module-container">\
+				</section>';
+
+			this.$containerEl 	= $( template );
 
 			this.$el.prepend( this.$containerEl );
 
@@ -627,12 +681,12 @@
 					/* Update source node map with this new instance */
 					_self._updateAudioNode( module.name, source );
 
-
-					console.log("twra to source einai:" , source);
+					/* If module option is started then do the connection */
+					if (module.options.started) {
+						_self._connectAllDestinations( module );
+					}
 
 				} );
-
-				console.log("akoma to source einai:" , source);
 
 				return source;
 
