@@ -9,6 +9,7 @@
 	margin: 10px;
 	display: inline-block;
 	/*position: absolute;*/
+	position: relative;
 }
 
 .noise-module .nm-content {
@@ -19,7 +20,10 @@
 	position: relative;
 }
 
-.noise-module h6 {
+.noise-module .nm-content-title {
+	border-bottom: 1px solid #dbdbdb;
+	border-radius: 5px 5px 0 0;
+	padding-bottom: 5px;
 	font-size: 11px;
 	margin: 0 0 11px;
 	text-align: center;
@@ -67,8 +71,36 @@
     width: 100%;
 }
 
+.noise-module .nm-content .nm-play-button.play {
+    background-image: url("../img/play_48.png");
+}
+
+.noise-module .nm-content .nm-play-button.stop {
+    background-image: url("../img/stop_48.png");
+}
+
 .noise-module .nm-content canvas {
-	background-image: url("img/blueprint-dark.png");
+	background-image: url("../img/blueprint-dark.png");
 	display: inline-block;
 	width: 100%;
+}
+
+.noise-module .nm-bypass {
+	background: url("../img/bypass_16.png") 0 0 no-repeat;
+	height: 16px;
+	width: 16px;
+	text-indent: -999em;
+	position: absolute;
+	left: 8px;
+	top: 8px;
+}
+
+.noise-module .nm-reset {
+	background: url("../img/reset_16.png") 0 0 no-repeat;
+	height: 16px;
+	width: 16px;
+	text-indent: -999em;
+	position: absolute;
+	right: 8px;
+	top: 8px;
 }

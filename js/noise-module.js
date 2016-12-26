@@ -226,6 +226,8 @@
 				<div class="nm-content">\
 					<h6 class="nm-content-title">' + name + '</h6>\
 				</div>\
+				<a class="nm-bypass" href="#"></a>\
+				<a class="nm-reset" href="#"></a>\
 			</div>';
 
 			var $divEl 			= $( template );
@@ -341,7 +343,9 @@
 
 		_createConnection			: function ( connection ) {
 
-			if (connection.connected === false) {
+			var srcModule = this._findModule( connection.srcNode );
+
+			if (connection.connected === false || srcModule.options.started === false) {
 				return;
 			}
 
@@ -359,6 +363,25 @@
 				this._connectNodes( srcNode, destNode );
 
 			};
+
+		},
+
+		_findModule					: function ( moduleName ) {
+
+			var module;
+
+			$.each( this.options.modules, function( index, mod ) {
+
+				if ( mod.name === moduleName ) {
+					
+					module = mod;
+					return;
+
+				};
+
+			} );
+
+			return module;
 
 		},
 
@@ -574,7 +597,20 @@
 
 			var _self 		= this;
 
-			var template;
+			var playClass 	= 'play';
+			var stopClass 	= 'stop';
+
+			var template 	= '<img class="nm-play-button"></img>';
+			// var $img 		= $( template );
+
+			// if ( module.options.started ) {
+
+			// 	$img.addClass( stopClass );
+			// }
+			// else {
+				
+			// 	$img.addClass( playClass );
+			// }
 
 			if (module.options.started) {
 				template	= '<img src="img/stop_48.png" alt="stop"></img>';
@@ -590,8 +626,12 @@
 				var alt 	= $(this).attr( 'alt' );
 
 				if (alt === 'play') {
+				// if ( $(this).hasClass( playClass ) ) {
 
 					_self._connectAllDestinations( module );
+
+					// $(this).removeClass( playClass );
+					// $(this).addClass( stopClass );
 
 					$(this).attr( 'alt', 'stop' );
 					$(this).attr( 'src', 'img/stop_48.png' );
@@ -600,6 +640,9 @@
 				else {
 
 					_self._disconnectAllDestinations( module );
+
+					// $(this).removeClass( stopClass );
+					// $(this).addClass( playClass );
 
 					$(this).attr( 'alt', 'play' );
 					$(this).attr( 'src', 'img/play_48.png' );
