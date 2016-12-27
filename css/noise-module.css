@@ -43,6 +43,7 @@
 }
 
 .noise-module .nm-content-title {
+	text-decoration: none;
 	border-bottom: 1px solid #dbdbdb;
 	border-radius: 5px 5px 0 0;
 	padding-bottom: 5px;
@@ -50,6 +51,10 @@
 	margin: 0 0 11px;
 	text-align: center;
 	text-transform: uppercase;
+}
+
+.noise-module .nm-content.bypassed .nm-content-title {
+	text-decoration: line-through;
 }
 
 .nm-slider-info {

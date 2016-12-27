@@ -226,8 +226,6 @@
 				<div class="nm-content">\
 					<h6 class="nm-content-title">' + name + '</h6>\
 				</div>\
-				<img class="nm-bypass" />\
-				<img class="nm-reset" />\
 			</div>';
 
 			var $divEl 			= $( template );
@@ -236,12 +234,51 @@
 			var $content 		= $( $divEl ).find( '.nm-content' );
 			this._appendContentToModule( $content, module, audioNode );
 
-			// add events for bypass and reset modes
-			this._createBypassEvent( $divEl, $content, module, audioNode );
-			this._createResetEvent( $divEl, $content, module, audioNode );
+			// add bypass and reset modes
+			this._appendBypassButton( $divEl, $content, module, audioNode );
+			this._appendResetButton( $divEl, $content, module, audioNode );
+
+			// add footer
+			this._appendModuleFooter( $divEl, $content, module, audioNode );
 
 			$divEl.appendTo( this.$containerEl );
 			$divEl.show();
+
+		},
+
+		_appendBypassButton 		: function ( $divEl, $content, module, audioNode ) {
+
+			if (audioNode === null || audioNode === undefined) {
+				return;
+			}
+
+			if (audioNode.numberOfInputs > 0) {
+
+				var template 	= '<img class="nm-bypass" />';
+				var $img 		= $( template );
+
+				$img.appendTo( $divEl );
+
+				this._createBypassEvent( $divEl, $content, module, audioNode );
+
+			}
+
+		},
+
+		_appendResetButton 		: function ( $divEl, $content, module, audioNode ) {
+
+			if (module.nodeType != 'noise' && 
+				module.nodeType != 'liveinput' &&
+				module.nodeType != 'analyser') {
+
+				var template 	= '<img class="nm-reset" />';
+				var $img 		= $( template );
+
+				$img.appendTo( $divEl );
+
+				this._createResetEvent( $divEl, $content, module, audioNode );
+
+			}
 
 		},
 
@@ -259,6 +296,15 @@
 		},
 
 		_createBypassEvent			: function ( $divEl, $content, module, audioNode ) {
+
+			var _self 		= this;
+			var $bypass		= $( $divEl ).find( '.nm-bypass' );
+
+			$bypass[0].addEventListener( 'click', function( ) {
+
+				_self._bypassModule( $content, module, audioNode );
+
+			} );
 
 		},
 
@@ -309,6 +355,35 @@
 			if ( nodeType === "analyser" ) {
 				return this._createAnalyserDiv( $moduleEl, module, audioNode );
 			};
+
+		},
+
+		_appendModuleFooter 		: function ( $divEl, $content, module, audioNode ) {
+
+			if (audioNode === null || audioNode === undefined) {
+				return;
+			}
+
+			var template 	= '<footer class="nm-footer"></footer>';
+			var $footer		= $( template );
+
+			if (audioNode.numberOfInputs > 0) {
+
+				var fromTem	= '<span class="nm-from"></span>';
+				var $from 	= $( fromTem );
+
+				$from.appendTo( $footer );
+			}
+
+			if (audioNode.numberOfOutputs > 0) {
+
+				var toTem	= '<span class="nm-to"></span>';
+				var $to 	= $( toTem );
+
+				$to.appendTo( $footer );
+			}
+
+			$footer.appendTo( $divEl );
 
 		},
 
@@ -393,6 +468,22 @@
 			if ( nodeType === "waveshapernode" ) {
 				return this._resetWaveShaperModule( $content, module, audioNode );
 			};
+
+		},
+
+		_bypassModule 				: function ( $content, module, audioNode ) {
+
+			var bypassedClass 	= 'bypassed';
+			var bypassed 		= $content.hasClass( bypassedClass );
+
+			if (bypassed) {
+
+				$content.removeClass( bypassedClass );
+			}
+			else {
+
+				$content.addClass( bypassedClass );	
+			}
 
 		},
 
