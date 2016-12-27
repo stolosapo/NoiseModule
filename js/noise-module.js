@@ -40,7 +40,7 @@
 		modules 				: [
 
 			{ name: "WhiteNoise", nodeType: "noise", type: "white", options: { started: false } },
-			{ name: "Gain", nodeType: "gain", type: "", options: { gainGain: 0.65 } }
+			{ name: "Gain", nodeType: "gain", type: "", options: { gainGain: 0.7 } }
 
 		],
 
@@ -265,7 +265,7 @@
 
 		},
 
-		_appendResetButton 		: function ( $divEl, $content, module, audioNode ) {
+		_appendResetButton 			: function ( $divEl, $content, module, audioNode ) {
 
 			if (module.nodeType != 'noise' && 
 				module.nodeType != 'liveinput' &&
@@ -1103,7 +1103,7 @@
 
 		},
 
-		_resetWaveShaperModule 	: function ( $moduleEl, module, audioNode ) {
+		_resetWaveShaperModule 		: function ( $moduleEl, module, audioNode ) {
 
 			this._resetSliderSetting( $moduleEl, audioNode, 'curve', module.options.waveShapperCurveAmount );
 			this._resetSliderSetting( $moduleEl, audioNode, 'oversample', module.options.waveShapperOversample );
