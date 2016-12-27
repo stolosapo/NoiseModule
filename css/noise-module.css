@@ -12,6 +12,28 @@
 	position: relative;
 }
 
+.noise-module img.nm-bypass {
+	background: url("../img/bypass_16.png") 0 0 no-repeat;
+	height: 16px;
+	width: 16px;
+	text-indent: -999em;
+	position: absolute;
+	left: 8px;
+	top: 8px;
+	cursor: pointer;
+}
+
+.noise-module img.nm-reset {
+	background: url("../img/reset_16.png") 0 0 no-repeat;
+	height: 16px;
+	width: 16px;
+	text-indent: -999em;
+	position: absolute;
+	right: 8px;
+	top: 8px;
+	cursor: pointer;
+}
+
 .noise-module .nm-content {
 	background: #fff;
 	width: 162px;
@@ -28,11 +50,6 @@
 	margin: 0 0 11px;
 	text-align: center;
 	text-transform: uppercase;
-}
-
-.noise-module .nm-content img {
-	display: block;
-	margin: 0 auto;
 }
 
 .nm-slider-info {
@@ -71,11 +88,19 @@
     width: 100%;
 }
 
-.noise-module .nm-content .nm-play-button.play {
+.noise-module .nm-content img.nm-play-button {
+	display: block;
+	margin: 0 auto;
+	height: 48px;
+	width: 48px;
+	cursor: pointer;
+}
+
+.noise-module .nm-content img.nm-play-button.play {
     background-image: url("../img/play_48.png");
 }
 
-.noise-module .nm-content .nm-play-button.stop {
+.noise-module .nm-content img.nm-play-button.stop {
     background-image: url("../img/stop_48.png");
 }
 
@@ -83,24 +108,4 @@
 	background-image: url("../img/blueprint-dark.png");
 	display: inline-block;
 	width: 100%;
-}
-
-.noise-module .nm-bypass {
-	background: url("../img/bypass_16.png") 0 0 no-repeat;
-	height: 16px;
-	width: 16px;
-	text-indent: -999em;
-	position: absolute;
-	left: 8px;
-	top: 8px;
-}
-
-.noise-module .nm-reset {
-	background: url("../img/reset_16.png") 0 0 no-repeat;
-	height: 16px;
-	width: 16px;
-	text-indent: -999em;
-	position: absolute;
-	right: 8px;
-	top: 8px;
 }

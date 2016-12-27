@@ -226,8 +226,8 @@
 				<div class="nm-content">\
 					<h6 class="nm-content-title">' + name + '</h6>\
 				</div>\
-				<a class="nm-bypass" href="#"></a>\
-				<a class="nm-reset" href="#"></a>\
+				<img class="nm-bypass" />\
+				<img class="nm-reset" />\
 			</div>';
 
 			var $divEl 			= $( template );
@@ -236,8 +236,29 @@
 			var $content 		= $( $divEl ).find( '.nm-content' );
 			this._appendContentToModule( $content, module, audioNode );
 
+			// add events for bypass and reset modes
+			this._createBypassEvent( $divEl, $content, module, audioNode );
+			this._createResetEvent( $divEl, $content, module, audioNode );
+
 			$divEl.appendTo( this.$containerEl );
 			$divEl.show();
+
+		},
+
+		_createResetEvent			: function ( $divEl, $content, module, audioNode ) {
+
+			var _self 		= this;
+			var $reset 		= $( $divEl ).find( '.nm-reset' );
+
+			$reset[0].addEventListener( 'click', function( ) {
+
+				_self._resetModuleSettings( $content, module, audioNode );
+
+			} );
+
+		},
+
+		_createBypassEvent			: function ( $divEl, $content, module, audioNode ) {
 
 		},
 
@@ -337,6 +358,40 @@
 
 			if ( nodeType === "analyser" ) {
 				return this._createAnalyser( module );
+			};
+
+		},
+
+		_resetModuleSettings 		: function ( $content, module, audioNode ) {
+
+			var nodeType = module.nodeType;
+
+			if ( nodeType === "oscillator" ) {
+				return this._resetOscillatorModule( $content, module, audioNode );
+			};
+
+			if ( nodeType === "biquadfilter" ) {
+				return this._resetBiquadFilterModule( $content, module, audioNode );
+			};
+
+			if ( nodeType === "delay" ) {
+				return this._resetDelayModule( $content, module, audioNode );
+			};
+
+			if ( nodeType === "dynamicscompressor" ) {
+				return this._resetDynamicsCompressor( $content, module, audioNode );
+			};
+
+			if ( nodeType === "gain" ) {
+				return this._resetGainModule( $content, module, audioNode );
+			};
+
+			if ( nodeType === "stereopannernode" ) {
+				return this._resetStreoPannerModule( $content, module, audioNode );
+			};
+
+			if ( nodeType === "waveshapernode" ) {
+				return this._resetWaveShaperModule( $content, module, audioNode );
 			};
 
 		},
@@ -550,7 +605,7 @@
 		_createSliderDiv			: function ( label, min, max, step, units ) {
 
 			var template 	= '\
-			<div>\
+			<div class="' + label + '">\
 				<div class="nm-slider-info" min="' + min + '" max="' + max + '">\
 					<span class="nm-label">' + label + '</span>\
 					<span class="nm-value" units="' + units + '"></span>\
@@ -582,7 +637,7 @@
 				return $div;
 			}
 
-			$input[0].addEventListener( 'change', function() {
+			$input[0].addEventListener( 'change', function( ) {
 
 				audioNode[ property ].value = this.value;
 				$span.text( this.value + ' ' + units );
@@ -590,6 +645,19 @@
 			} );
 
 			return $div;
+
+		},
+
+		_resetSliderSetting 		: function ( $moduleEl, audioNode, property, value ) {
+
+			var $div  		= $( $moduleEl ).find( '.' + property );
+			var $span		= $( $div ).find( '.nm-value' );
+			var $input 		= $( $div ).find( 'input' );
+			var units 		= $span.attr( 'units' );
+
+			$input[0].value	= value;
+			$span.text( value + ' ' + units );
+			audioNode[ property ].value = value;
 
 		},
 
@@ -601,51 +669,33 @@
 			var stopClass 	= 'stop';
 
 			var template 	= '<img class="nm-play-button"></img>';
-			// var $img 		= $( template );
+			var $img 		= $( template );
 
-			// if ( module.options.started ) {
+			if ( module.options.started ) {
 
-			// 	$img.addClass( stopClass );
-			// }
-			// else {
-				
-			// 	$img.addClass( playClass );
-			// }
-
-			if (module.options.started) {
-				template	= '<img src="img/stop_48.png" alt="stop"></img>';
+				$img.addClass( stopClass );
 			}
 			else {
-				template	= '<img src="img/play_48.png" alt="play"></img>';
+				
+				$img.addClass( playClass );
 			}
-
-			var $img 		= $( template );
 
 			$img[0].addEventListener( 'click', function( ) {
 
-				var alt 	= $(this).attr( 'alt' );
-
-				if (alt === 'play') {
-				// if ( $(this).hasClass( playClass ) ) {
+				if ( $(this).hasClass( playClass ) ) {
 
 					_self._connectAllDestinations( module );
 
-					// $(this).removeClass( playClass );
-					// $(this).addClass( stopClass );
-
-					$(this).attr( 'alt', 'stop' );
-					$(this).attr( 'src', 'img/stop_48.png' );
+					$(this).removeClass( playClass );
+					$(this).addClass( stopClass );
 
 				}
 				else {
 
 					_self._disconnectAllDestinations( module );
 
-					// $(this).removeClass( stopClass );
-					// $(this).addClass( playClass );
-
-					$(this).attr( 'alt', 'play' );
-					$(this).attr( 'src', 'img/play_48.png' );
+					$(this).removeClass( stopClass );
+					$(this).addClass( playClass );
 
 				}
 
@@ -665,6 +715,13 @@
 
 			// Create Play / Stop button
 			this._createPlayStopButton( $moduleEl, module, audioNode );
+
+		},
+
+		_resetOscillatorModule 		: function ( $moduleEl, module, audioNode ) {
+
+			this._resetSliderSetting( $moduleEl, audioNode, 'frequency', module.options.oscillatorFrequency );
+			this._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.oscillatorDetune );
 
 		},
 
@@ -765,6 +822,12 @@
 
 		},
 
+		_resetGainModule 			: function ( $moduleEl, module, audioNode ) {
+
+			this._resetSliderSetting( $moduleEl, audioNode, 'gain', module.options.gainGain );
+
+		},
+
 		_createBiquadFilter			: function ( module ) {
 
 			var node = this.audioContext.createBiquadFilter();
@@ -793,6 +856,15 @@
 
 		},
 
+		_resetBiquadFilterModule 	: function ( $moduleEl, module, audioNode ) {
+
+			this._resetSliderSetting( $moduleEl, audioNode, 'frequency', module.options.biquadFilterFrequency );
+			this._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.biquadFilterDetune );
+			this._resetSliderSetting( $moduleEl, audioNode, 'Q', module.options.biquadFilterQ );
+			this._resetSliderSetting( $moduleEl, audioNode, 'gain', module.options.biquadFilterGain );
+
+		},
+
 		_createDelay				: function ( module ) {
 
 			var node = this.audioContext.createDelay ();
@@ -808,6 +880,12 @@
 			var $timeDiv	= this._createSliderControl( audioNode, 'delayTime', 0, 10, 0.01, "Sec" );
 
 			$timeDiv.appendTo( $moduleEl );
+
+		},
+
+		_resetDelayModule 			: function ( $moduleEl, module, audioNode ) {
+
+			this._resetSliderSetting( $moduleEl, audioNode, 'delayTime', module.options.delayTime );
 
 		},
 
@@ -844,6 +922,17 @@
 
 		},
 
+		_resetDynamicsCompressor 	: function ( $moduleEl, module, audioNode ) {
+
+			this._resetSliderSetting( $moduleEl, audioNode, 'threshold', module.options.compressorThreshold );
+			this._resetSliderSetting( $moduleEl, audioNode, 'knee', module.options.compressorKnee );
+			this._resetSliderSetting( $moduleEl, audioNode, 'ratio', module.options.compressorRatio );
+			this._resetSliderSetting( $moduleEl, audioNode, 'reduction', module.options.compressorReduction );
+			this._resetSliderSetting( $moduleEl, audioNode, 'attack', module.options.compressorAttack );
+			this._resetSliderSetting( $moduleEl, audioNode, 'release', module.options.compressorRelease );
+
+		},
+
 		_createStreoPanner			: function ( module ) {
 
 			var node = this.audioContext.createStereoPanner ( );
@@ -859,6 +948,12 @@
 			var $panDiv		= this._createSliderControl( audioNode, 'pan', -1, 1, 0.01, "" );
 
 			$panDiv.appendTo( $moduleEl );
+
+		},
+
+		_resetStreoPannerModule 	: function ( $moduleEl, module, audioNode ) {
+
+			this._resetSliderSetting( $moduleEl, audioNode, 'pan', module.options.stereoPannerPan );
 
 		},
 
@@ -914,6 +1009,13 @@
 
 			$curveDiv.appendTo( $moduleEl );
 			$oversampleDiv.appendTo( $moduleEl );
+
+		},
+
+		_resetWaveShaperModule 	: function ( $moduleEl, module, audioNode ) {
+
+			this._resetSliderSetting( $moduleEl, audioNode, 'curve', module.options.waveShapperCurveAmount );
+			this._resetSliderSetting( $moduleEl, audioNode, 'oversample', module.options.waveShapperOversample );
 
 		},
 
