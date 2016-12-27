@@ -1,3 +1,6 @@
+# NoiseModule
+A JQuery library for playing with Web Audio API
+
 ## Welcome to GitHub Pages
 
 You can use the [editor on GitHub](https://github.com/stolosapo/NoiseModule/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
