@@ -1015,21 +1015,37 @@
 			var preAmp 		= _self._createGain( module, module.options.eqPreAmpGain );
 			var outputGain	= _self._createGain( module );
 
+			var nodes 		= [];
 			var prevNode 	= preAmp;
+
+			nodes.push( preAmp );
 
 			// Create all bands
 			$.each( module.options.eqBands, function( index, band ) {
 
+				// console.log(prevNode);
+
 				var bandNode 	= _self._createBiquadFilter( 
-					module, 
-					module.options.eqBandType, 
-					band.frequency, 
-					band.detune, 
-					band.Q );
+					module); 
+					// module.options.eqBandType, 
+					// band.frequency, 
+					// band.detune, 
+					// band.Q );
 
 				_self._connectNodes( prevNode, bandNode );
 
 				prevNode 		= bandNode;
+
+				nodes.push( prevNode );
+
+			} );
+
+			// console.log(outputGain);
+			nodes.push( outputGain );
+
+			$.each( nodes, function( index, node ) {
+
+				console.log(node);
 
 			} );
 

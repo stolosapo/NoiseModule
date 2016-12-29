@@ -26,6 +26,8 @@
 
 						{ name: "LiveInput", nodeType: "liveinput", type: "", options: { started: false } },
 						{ name: "Filter", nodeType: "biquadfilter", type: "highpass" },
+						// { name: "Eq", nodeType: "equalizer" },
+
 
 						{ name: "Master", nodeType: "gain", type: "" },
 						{ name: "MasterAnalyser", nodeType: "analyser", type: "frequencybars" }
@@ -41,6 +43,7 @@
 
 						{ srcNode: "LiveInput", destNode: "Filter" },
 						{ srcNode: "Filter", destNode: "Master" },
+						// { srcNode: "Eq", destNode: "Master" },
 
 						{ srcNode: "Master", destNode: "MasterAnalyser" },
 
