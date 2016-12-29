@@ -29,6 +29,7 @@
 			oscillator 			{ sine, square, sawtooth, triangle }
 			liveinput
 			biquadfilter 		{ lowpass, highpass, bandpass, lowshelf, highshelf, peaking, notch, allpass }
+			equalizer
 			delay
 			dynamicscompressor
 			gain
@@ -61,6 +62,23 @@
 		biquadFilterDetune		: 0,
 		biquadFilterQ 			: 1,
 		biquadFilterGain		: 0.7,
+
+		eqBandType				: 'bandpass',
+		eqPreAmpGain			: 0.7,
+		eqBands					: [
+
+			{ frequency: 60, detune: 0, Q: 1 },
+			{ frequency: 170, detune: 0, Q: 1 },
+			{ frequency: 310, detune: 0, Q: 1 },
+			{ frequency: 600, detune: 0, Q: 1 },
+			{ frequency: 1000, detune: 0, Q: 1 },
+			{ frequency: 3000, detune: 0, Q: 1 },
+			{ frequency: 6000, detune: 0, Q: 1 },
+			{ frequency: 12000, detune: 0, Q: 1 },
+			{ frequency: 14000, detune: 0, Q: 1 },
+			{ frequency: 16000, detune: 0, Q: 1 }
+
+		],
 
 		delayTime				: 0.2,
 
@@ -203,11 +221,30 @@
 
 			var audioNode 		= this._createAudioNode( module );
 
+			var inNode;
+			var outNode;
+
+			if (audioNode === null || audioNode === undefined) {
+
+				inNode 	= undefined;
+				outNode = undefined;
+			}
+			else {
+
+				inNode	= audioNode.inNode || audioNode;
+				outNode = audioNode.outNode || audioNode;
+			}
+
 			// create div for module
 			this._createModuleDiv( module, audioNode );
 
 			// register audio node
-			var moduleItem = { name: module.name, node: audioNode };
+			var moduleItem = { 
+				name: module.name, 
+				inNode: inNode, 
+				outNode: outNode
+			};
+
 			this.moduleMap.push( moduleItem );
 
 			// increase module counter
@@ -328,6 +365,10 @@
 				return this._createBiquadFilterDiv( $moduleEl, audioNode );
 			};
 
+			if ( nodeType === "equalizer" ) {
+				// return this._createEqualizerDiv( $moduleEl, audioNode );
+			};
+
 			if ( nodeType === "delay" ) {
 				return this._createDelayDiv( $moduleEl, audioNode );
 			};
@@ -407,6 +448,10 @@
 				return this._createBiquadFilter( module );
 			};
 
+			if ( nodeType === "equalizer" ) {
+				return this._createEqualizer( module );
+			};
+
 			if ( nodeType === "delay" ) {
 				return this._createDelay( module );
 			};
@@ -447,6 +492,10 @@
 
 			if ( nodeType === "biquadfilter" ) {
 				return this._resetBiquadFilterModule( $content, module, audioNode );
+			};
+
+			if ( nodeType === "equalizer" ) {
+				// return this._resetEqualizerModule( $content, module, audioNode );
 			};
 
 			if ( nodeType === "delay" ) {
@@ -495,7 +544,7 @@
 				return;
 			}
 
-			var srcNode = this._findAudioNode( connection.srcNode );
+			var srcNode = this._findAudioNode( connection.srcNode ).outNode;
 			var destNode;
 
 			if ( connection.destNode === "output" ) {
@@ -505,7 +554,7 @@
 			}
 			else {
 				
-				destNode = this._findAudioNode( connection.destNode );
+				destNode = this._findAudioNode( connection.destNode ).inNode;
 				this._connectNodes( srcNode, destNode );
 
 			};
@@ -539,7 +588,8 @@
 
 				if ( map.name === moduleName ) {
 					
-					node = map.node;
+					node = { inNode: map.inNode, outNode: map.outNode };
+
 					return;
 
 				};
@@ -550,13 +600,15 @@
 
 		},
 
-		_updateAudioNode			: function ( moduleName, audioNode ) {
+		_updateAudioNode			: function ( moduleName, audioInNode, audioOutNode ) {
 
 			$.each( this.moduleMap, function( index, map ) {
 
 				if ( map.name === moduleName ) {
 					
-					map.node = audioNode;
+					map.inNode 	= audioInNode;
+					map.outNode = audioOutNode || audioInNode;
+
 					return;
 
 				};
@@ -895,11 +947,11 @@
 
 		},
 
-		_createGain					: function ( module ) {
+		_createGain					: function ( module, value ) {
 
 			var gain = this.audioContext.createGain ();
 
-			gain.gain.value = module.options.gainGain;
+			gain.gain.value = value || module.options.gainGain;
 
 			return gain;
 
@@ -919,15 +971,15 @@
 
 		},
 
-		_createBiquadFilter			: function ( module ) {
+		_createBiquadFilter			: function ( module, type, frequency, detune, Q, gain ) {
 
 			var node = this.audioContext.createBiquadFilter();
 
-			node.type = module.type;
-			node.frequency.value = module.options.biquadFilterFrequency;
-			node.detune.value = module.options.biquadFilterDetune;
-			node.Q.value = module.options.biquadFilterQ;
-			node.gain.value = module.options.biquadFilterGain;
+			node.type = type || module.type;
+			node.frequency.value = frequency || module.options.biquadFilterFrequency;
+			node.detune.value = detune || module.options.biquadFilterDetune;
+			node.Q.value = Q || module.options.biquadFilterQ;
+			node.gain.value = gain || module.options.biquadFilterGain;
 
 			return node;
 
@@ -953,6 +1005,37 @@
 			this._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.biquadFilterDetune );
 			this._resetSliderSetting( $moduleEl, audioNode, 'Q', module.options.biquadFilterQ );
 			this._resetSliderSetting( $moduleEl, audioNode, 'gain', module.options.biquadFilterGain );
+
+		},
+
+		_createEqualizer 			: function ( module ) {
+
+			var _self 		= this;
+
+			var preAmp 		= _self._createGain( module, module.options.eqPreAmpGain );
+			var outputGain	= _self._createGain( module );
+
+			var prevNode 	= preAmp;
+
+			// Create all bands
+			$.each( module.options.eqBands, function( index, band ) {
+
+				var bandNode 	= _self._createBiquadFilter( 
+					module, 
+					module.options.eqBandType, 
+					band.frequency, 
+					band.detune, 
+					band.Q );
+
+				_self._connectNodes( prevNode, bandNode );
+
+				prevNode 		= bandNode;
+
+			} );
+
+			_self._connectNodes( prevNode, outputGain );
+
+			return { inNode: preAmp, outNode: outputGain };
 
 		},
 
@@ -1299,8 +1382,8 @@
 
 				if ( conn.srcNode === module.name ) {
 					
-					var srcNode 	= _self._findAudioNode( conn.srcNode );
-					var destNode 	= _self._findAudioNode( conn.destNode );
+					var srcNode 	= _self._findAudioNode( conn.srcNode ).outNode;
+					var destNode 	= _self._findAudioNode( conn.destNode ).inNode;
 
 					_self._connectNodes( srcNode, destNode );
 
@@ -1318,8 +1401,8 @@
 
 				if ( conn.srcNode === module.name ) {
 					
-					var srcNode 	= _self._findAudioNode( conn.srcNode );
-					var destNode 	= _self._findAudioNode( conn.destNode );
+					var srcNode 	= _self._findAudioNode( conn.srcNode ).outNode;
+					var destNode 	= _self._findAudioNode( conn.destNode ).inNode;
 
 					_self._disconnectNodes( srcNode, destNode );
 
