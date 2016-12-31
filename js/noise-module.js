@@ -63,20 +63,20 @@
 		biquadFilterQ 			: 1,
 		biquadFilterGain		: 0.7,
 
-		eqBandType				: 'bandpass',
 		eqPreAmpGain			: 0.7,
+		eqControl				: 'gain',
 		eqBands					: [
 
-			{ frequency: 60, detune: 0, Q: 1 },
-			{ frequency: 170, detune: 0, Q: 1 },
-			{ frequency: 310, detune: 0, Q: 1 },
-			{ frequency: 600, detune: 0, Q: 1 },
-			{ frequency: 1000, detune: 0, Q: 1 },
-			{ frequency: 3000, detune: 0, Q: 1 },
-			{ frequency: 6000, detune: 0, Q: 1 },
-			{ frequency: 12000, detune: 0, Q: 1 },
-			{ frequency: 14000, detune: 0, Q: 1 },
-			{ frequency: 16000, detune: 0, Q: 1 }
+			{ type: 'lowshelf', frequency: 60, detune: 0, Q: 1, gain: 0 },
+			{ type: 'peaking', frequency: 170, detune: 0, Q: 1, gain: 0 },
+			{ type: 'peaking', frequency: 310, detune: 0, Q: 1, gain: 0 },
+			{ type: 'peaking', frequency: 600, detune: 0, Q: 1, gain: 0 },
+			{ type: 'peaking', frequency: 1000, detune: 0, Q: 1, gain: 0 },
+			{ type: 'peaking', frequency: 3000, detune: 0, Q: 1, gain: 0 },
+			{ type: 'peaking', frequency: 6000, detune: 0, Q: 1, gain: 0 },
+			{ type: 'peaking', frequency: 12000, detune: 0, Q: 1, gain: 0 },
+			{ type: 'peaking', frequency: 14000, detune: 0, Q: 1, gain: 0 },
+			{ type: 'highshelf', frequency: 16000, detune: 0, Q: 1, gain: 0 }
 
 		],
 
@@ -289,7 +289,10 @@
 				return;
 			}
 
-			if (audioNode.numberOfInputs > 0) {
+
+
+			if ( audioNode.numberOfInputs > 0 || 
+				( audioNode.inNode && audioNode.inNode.numberOfInputs > 0 ) ) {
 
 				var template 	= '<img class="nm-bypass" />';
 				var $img 		= $( template );
@@ -366,7 +369,7 @@
 			};
 
 			if ( nodeType === "equalizer" ) {
-				// return this._createEqualizerDiv( $moduleEl, audioNode );
+				return this._createEqualizerDiv( $moduleEl, module, audioNode );
 			};
 
 			if ( nodeType === "delay" ) {
@@ -495,7 +498,7 @@
 			};
 
 			if ( nodeType === "equalizer" ) {
-				// return this._resetEqualizerModule( $content, module, audioNode );
+				return this._resetEqualizerModule( $content, module, audioNode );
 			};
 
 			if ( nodeType === "delay" ) {
@@ -745,24 +748,32 @@
 
 		},
 
-		_createSliderDiv			: function ( label, min, max, step, units ) {
+		_createSimpleSliderControl		: function ( audioNode, property, min, max, step, units, changeEvent ) {
+
+			return this._createSliderControl( 
+				audioNode, 
+				property, 
+				property,
+				min,
+				max,
+				step,
+				units,
+				changeEvent );
+
+		},
+
+		_createSliderControl		: function ( audioNode, property, description, min, max, step, units, changeEvent ) {
 
 			var template 	= '\
-			<div class="' + label + '">\
+			<div class="' + property + '" name="' + description + '">\
 				<div class="nm-slider-info" min="' + min + '" max="' + max + '">\
-					<span class="nm-label">' + label + '</span>\
+					<span class="nm-label">' + description + '</span>\
 					<span class="nm-value" units="' + units + '"></span>\
 				</div>\
 				<input min="' + min + '" max="' + max + '" step="' + step + '" type="range"></input>\
 			</div>';
 
-			return $( template );
-
-		},
-
-		_createSliderControl		: function ( audioNode, property, min, max, step, units, changeEvent ) {
-
-			var $div		= this._createSliderDiv( property, min, max, step, units );
+			var $div		= $( template );
 
 			var $span		= $( $div ).find( '.nm-value' );
 			var $input 		= $( $div ).find( 'input' );
@@ -850,8 +861,8 @@
 
 		_createOscillatorDiv		: function ( $moduleEl, module, audioNode ) {
 
-			var $freqDiv	= this._createSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
-			var $detuDiv	= this._createSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
+			var $freqDiv	= this._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
+			var $detuDiv	= this._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
 
 			$freqDiv.appendTo( $moduleEl );
 			$detuDiv.appendTo( $moduleEl );
@@ -959,7 +970,7 @@
 
 		_createGainDiv				: function ( $moduleEl, audioNode ) {
 
-			var $gainDiv	= this._createSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
+			var $gainDiv	= this._createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
 
 			$gainDiv.appendTo( $moduleEl );
 
@@ -987,10 +998,10 @@
 
 		_createBiquadFilterDiv		: function ( $moduleEl, audioNode ) {
 
-			var $freqDiv	= this._createSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
-			var $detuDiv	= this._createSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
-			var $qDiv		= this._createSliderControl( audioNode, 'Q', 1, 100, 0.1, "" );
-			var $gainDiv	= this._createSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
+			var $freqDiv	= this._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
+			var $detuDiv	= this._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
+			var $qDiv		= this._createSimpleSliderControl( audioNode, 'Q', 1, 100, 0.1, "" );
+			var $gainDiv	= this._createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
 
 			$freqDiv.appendTo( $moduleEl );
 			$detuDiv.appendTo( $moduleEl );
@@ -1015,7 +1026,7 @@
 			var preAmp 		= _self._createGain( module, module.options.eqPreAmpGain );
 			var outputGain	= _self._createGain( module );
 
-			var nodes 		= [];
+			var nodes 		= [ ];
 			var prevNode 	= preAmp;
 
 			nodes.push( preAmp );
@@ -1023,14 +1034,12 @@
 			// Create all bands
 			$.each( module.options.eqBands, function( index, band ) {
 
-				// console.log(prevNode);
-
 				var bandNode 	= _self._createBiquadFilter( 
-					module); 
-					// module.options.eqBandType, 
-					// band.frequency, 
-					// band.detune, 
-					// band.Q );
+					module,
+					band.type,
+					band.frequency,
+					band.detune, 
+					band.Q );
 
 				_self._connectNodes( prevNode, bandNode );
 
@@ -1040,18 +1049,58 @@
 
 			} );
 
-			// console.log(outputGain);
+			_self._connectNodes( prevNode, outputGain );
+
 			nodes.push( outputGain );
 
-			$.each( nodes, function( index, node ) {
+			return { inNode: preAmp, outNode: outputGain, allNodes: nodes };
 
-				console.log(node);
+		},
+
+		_createEqualizerDiv 		: function ( $moduleEl, module,  audioNode ) {
+
+			var _self 		= this;
+			var inGain 		= audioNode.inNode;
+			var outGain 	= audioNode.outNode;
+
+			var $inGainDiv	= this._createSliderControl( inGain, 'gain', 'preAmp In', 0, 1, 0.01, "" );
+			var $outGainDiv	= this._createSliderControl( outGain, 'gain', 'preAmp Out', 0, 1, 0.01, "" );
+
+			var lastIndex 	= audioNode.allNodes.length - 1;
+
+			$inGainDiv.appendTo( $moduleEl );
+
+			$.each( audioNode.allNodes, function( index, node ) {
+
+				if ( index == 0 || index == lastIndex ) {
+					return;
+				}
+
+				var description	= node.frequency.value + ' Hz';
+
+				var $filterDiv	= _self._createSliderControl( 
+					node, 
+					module.options.eqControl, 
+					description, 
+					1, 
+					100, 
+					0.1, 
+					'' );
+
+				$filterDiv.appendTo( $moduleEl );
 
 			} );
 
-			_self._connectNodes( prevNode, outputGain );
+			
+			$outGainDiv.appendTo( $moduleEl );
 
-			return { inNode: preAmp, outNode: outputGain };
+		},
+
+		_resetEqualizerModule		: function ( $moduleEl, module, audioNode ) {
+
+			this._resetSliderSetting( $moduleEl, audioNode.inNode, 'gain', module.options.eqPreAmpGain );
+			this._resetSliderSetting( $moduleEl, audioNode.outNode, 'gain', module.options.eqPreAmpGain );
+			
 
 		},
 
@@ -1067,7 +1116,7 @@
 
 		_createDelayDiv				: function ( $moduleEl, audioNode ) {
 
-			var $timeDiv	= this._createSliderControl( audioNode, 'delayTime', 0, 10, 0.01, "Sec" );
+			var $timeDiv	= this._createSimpleSliderControl( audioNode, 'delayTime', 0, 10, 0.01, "Sec" );
 
 			$timeDiv.appendTo( $moduleEl );
 
@@ -1096,12 +1145,12 @@
 
 		_createDynamicsCompressorDiv: function ( $moduleEl, audioNode ) {
 
-			var $thresholdDiv	= this._createSliderControl( audioNode, 'threshold', -36, 0, 0.01, "DB" );
-			var $kneeDiv		= this._createSliderControl( audioNode, 'knee', 0, 40, 0.01, "DB" );
-			var $ratioDiv		= this._createSliderControl( audioNode, 'ratio', 1, 50, 0.1, "Sec" );
-			var $reductionDiv	= this._createSliderControl( audioNode, 'reduction', -20, 0, 0.01, "DB" );
-			var $attackDiv		= this._createSliderControl( audioNode, 'attack', 0, 1, 0.001, "Sec" );
-			var $releaseDiv		= this._createSliderControl( audioNode, 'release', 0, 2, 0.01, "Sec" );
+			var $thresholdDiv	= this._createSimpleSliderControl( audioNode, 'threshold', -36, 0, 0.01, "DB" );
+			var $kneeDiv		= this._createSimpleSliderControl( audioNode, 'knee', 0, 40, 0.01, "DB" );
+			var $ratioDiv		= this._createSimpleSliderControl( audioNode, 'ratio', 1, 50, 0.1, "Sec" );
+			var $reductionDiv	= this._createSimpleSliderControl( audioNode, 'reduction', -20, 0, 0.01, "DB" );
+			var $attackDiv		= this._createSimpleSliderControl( audioNode, 'attack', 0, 1, 0.001, "Sec" );
+			var $releaseDiv		= this._createSimpleSliderControl( audioNode, 'release', 0, 2, 0.01, "Sec" );
 
 			$thresholdDiv.appendTo( $moduleEl );
 			$kneeDiv.appendTo( $moduleEl );
@@ -1135,7 +1184,7 @@
 
 		_createStreoPannerDiv		: function ( $moduleEl, audioNode ) {
 
-			var $panDiv		= this._createSliderControl( audioNode, 'pan', -1, 1, 0.01, "" );
+			var $panDiv		= this._createSimpleSliderControl( audioNode, 'pan', -1, 1, 0.01, "" );
 
 			$panDiv.appendTo( $moduleEl );
 
@@ -1183,13 +1232,13 @@
 
 			var _self = this;
 
-			var $curveDiv		= this._createSliderControl( audioNode, 'curve', 0, 1000, 1, "", function() {
+			var $curveDiv		= this._createSimpleSliderControl( audioNode, 'curve', 0, 1000, 1, "", function() {
 
 				audioNode.curve = _self._createDistortionCurve ( this.value );
 
 			} );
 
-			var $oversampleDiv		= this._createSliderControl( audioNode, 'oversample', 0, 4, 2, "", function() {
+			var $oversampleDiv		= this._createSimpleSliderControl( audioNode, 'oversample', 0, 4, 2, "", function() {
 
 				var value = this.value == 0 ? 'none' : this.value + 'x';
 
