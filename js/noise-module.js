@@ -47,7 +47,7 @@
 
 		connections				: [
 
-			{ srcNode: "WhiteNoise", destNode: "Gain", connected: false },
+			{ srcNode: "WhiteNoise", destNode: "Gain", connected: true },
 			{ srcNode: "Gain", destNode: "output", connected: true }
 
 		],
@@ -226,16 +226,19 @@
 
 			var inNode;
 			var outNode;
+			var allNodes;
 
 			if (audioNode === null || audioNode === undefined) {
 
-				inNode 	= undefined;
-				outNode = undefined;
+				inNode 		= undefined;
+				outNode 	= undefined;
+				allNodes	= undefined;
 			}
 			else {
 
-				inNode	= audioNode.inNode || audioNode;
-				outNode = audioNode.outNode || audioNode;
+				inNode		= audioNode.inNode || audioNode;
+				outNode 	= audioNode.outNode || audioNode;
+				allNodes	= audioNode.allNodes;
 			}
 
 			// create div for module
@@ -243,9 +246,10 @@
 
 			// register audio node
 			var moduleItem = { 
-				name: module.name, 
-				inNode: inNode, 
-				outNode: outNode
+				name 		: module.name, 
+				inNode 		: inNode, 
+				outNode 	: outNode,
+				allNodes 	: allNodes
 			};
 
 			this.moduleMap.push( moduleItem );
@@ -546,7 +550,7 @@
 
 			var srcModule = this._findModule( connection.srcNode );
 
-			if (connection.connected === false || srcModule.options.started === false) {
+			if ( connection.connected === false || srcModule.options.started === false ) {
 				return;
 			}
 
@@ -751,7 +755,7 @@
 
 		},
 
-		_createSimpleSliderControl		: function ( audioNode, property, min, max, step, units, changeEvent ) {
+		_createSimpleSliderControl	: function ( audioNode, property, min, max, step, units, changeEvent ) {
 
 			return this._createSliderControl( 
 				audioNode, 

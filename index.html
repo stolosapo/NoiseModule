@@ -25,7 +25,6 @@
 						{ name: "SineWave", nodeType: "oscillator", type: "sine", options: { started: false } },
 
 						{ name: "LiveInput", nodeType: "liveinput", type: "", options: { started: false } },
-						{ name: "Filter", nodeType: "biquadfilter", type: "highpass" },
 						{ name: "Eq", nodeType: "equalizer" },
 
 
@@ -36,13 +35,12 @@
 
 					connections				: [
 
-						{ srcNode: "SineWave", destNode: "Eq" },
-
 						{ srcNode: "WhiteNoise", destNode: "Gain" },
 						{ srcNode: "Gain", destNode: "Master" },
 
-						{ srcNode: "LiveInput", destNode: "Filter" },
-						{ srcNode: "Filter", destNode: "Eq" },
+						{ srcNode: "SineWave", destNode: "Eq" },
+
+						{ srcNode: "LiveInput", destNode: "Eq" },
 						{ srcNode: "Eq", destNode: "Master" },
 
 						{ srcNode: "Master", destNode: "MasterAnalyser" },
