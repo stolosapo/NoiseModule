@@ -70,16 +70,16 @@
 		eqBandStep 				: 1,
 		eqBands					: [
 
-			{ description: '60', type: 'lowshelf', frequency: 60, detune: 0, Q: 1, gain: 0 },
-			{ description: '170', type: 'peaking', frequency: 170, detune: 0, Q: 1, gain: 0 },
-			{ description: '310', type: 'peaking', frequency: 310, detune: 0, Q: 1, gain: 0 },
-			{ description: '600', type: 'peaking', frequency: 600, detune: 0, Q: 1, gain: 0 },
-			{ description: '1K', type: 'peaking', frequency: 1000, detune: 0, Q: 1, gain: 0 },
-			{ description: '3K', type: 'peaking', frequency: 3000, detune: 0, Q: 1, gain: 0 },
-			{ description: '6K', type: 'peaking', frequency: 6000, detune: 0, Q: 1, gain: 0 },
-			{ description: '12K', type: 'peaking', frequency: 12000, detune: 0, Q: 1, gain: 0 },
-			{ description: '14K', type: 'peaking', frequency: 14000, detune: 0, Q: 1, gain: 0 },
-			{ description: '16K', type: 'highshelf', frequency: 16000, detune: 0, Q: 1, gain: 0 }
+			{ description: '60 Hz', type: 'lowshelf', frequency: 60, detune: 0, Q: 1, gain: 0 },
+			{ description: '170 Hz', type: 'lowshelf', frequency: 170, detune: 0, Q: 1, gain: 0 },
+			{ description: '310 Hz', type: 'lowshelf', frequency: 310, detune: 0, Q: 1, gain: 0 },
+			{ description: '600 Hz', type: 'peaking', frequency: 600, detune: 0, Q: 1, gain: 0 },
+			{ description: '1 KHz', type: 'peaking', frequency: 1000, detune: 0, Q: 1, gain: 0 },
+			{ description: '3 KHz', type: 'peaking', frequency: 3000, detune: 0, Q: 1, gain: 0 },
+			{ description: '6 KHz', type: 'peaking', frequency: 6000, detune: 0, Q: 1, gain: 0 },
+			{ description: '12 KHz', type: 'highshelf', frequency: 12000, detune: 0, Q: 1, gain: 0 },
+			{ description: '14 KHz', type: 'highshelf', frequency: 14000, detune: 0, Q: 1, gain: 0 },
+			{ description: '16 KHz', type: 'highshelf', frequency: 16000, detune: 0, Q: 1, gain: 0 }
 
 		],
 
@@ -1087,10 +1087,12 @@
 			var step 		= module.options.eqBandStep;
 
 			var $inGainDiv	= this._createSliderControl( inGain, 'gain', 'preAmp In', 0, 1, 0.1, '' );
-			var $outGainDiv	= this._createSliderControl( outGain, 'gain', 'preAmp Out', 0, 1, 0.1, '' );
+			$inGainDiv.addClass( 'pre-amp' );
+			$inGainDiv.addClass( 'in' );
 
-			$inGainDiv.addClass( 'pre-amp-in' );
-			$outGainDiv.addClass( 'pre-amp-out' );
+			var $outGainDiv	= this._createSliderControl( outGain, 'gain', 'preAmp Out', 0, 1, 0.1, '' );
+			$outGainDiv.addClass( 'pre-amp' );
+			$outGainDiv.addClass( 'out' );
 
 			var lastIndex 	= audioNode.allNodes.length - 1;
 
@@ -1130,8 +1132,8 @@
 
 			var _self 		= this;
 
-			var inClasses 	= [ 'gain', 'pre-amp-in' ];
-			var outClasses 	= [ 'gain', 'pre-amp-out' ];
+			var inClasses 	= [ 'gain', 'pre-amp', 'in' ];
+			var outClasses 	= [ 'gain', 'pre-amp', 'out' ];
 
 			this._resetSliderSettingByClasses( $moduleEl, audioNode.inNode, 'gain', inClasses, module.options.eqPreAmpGain );
 			this._resetSliderSettingByClasses( $moduleEl, audioNode.outNode, 'gain', outClasses, module.options.eqPreAmpGain );

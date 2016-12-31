@@ -114,3 +114,9 @@
 	display: inline-block;
 	width: 100%;
 }
+
+
+.noise-module .nm-content .pre-amp input[type="range"],
+.noise-module .nm-content .eq-band input[type="range"] {
+	/*transform: rotate(90deg);*/
+}
