@@ -61,22 +61,25 @@
 		biquadFilterFrequency	: 440,
 		biquadFilterDetune		: 0,
 		biquadFilterQ 			: 1,
-		biquadFilterGain		: 0.7,
+		biquadFilterGain		: 0,
 
 		eqPreAmpGain			: 0.7,
-		eqControl				: 'gain',
+		eqBandControl			: 'gain',
+		eqBandMin				: -12,
+		eqBandMax				: 12,
+		eqBandStep 				: 1,
 		eqBands					: [
 
-			{ type: 'lowshelf', frequency: 60, detune: 0, Q: 1, gain: 0 },
-			{ type: 'peaking', frequency: 170, detune: 0, Q: 1, gain: 0 },
-			{ type: 'peaking', frequency: 310, detune: 0, Q: 1, gain: 0 },
-			{ type: 'peaking', frequency: 600, detune: 0, Q: 1, gain: 0 },
-			{ type: 'peaking', frequency: 1000, detune: 0, Q: 1, gain: 0 },
-			{ type: 'peaking', frequency: 3000, detune: 0, Q: 1, gain: 0 },
-			{ type: 'peaking', frequency: 6000, detune: 0, Q: 1, gain: 0 },
-			{ type: 'peaking', frequency: 12000, detune: 0, Q: 1, gain: 0 },
-			{ type: 'peaking', frequency: 14000, detune: 0, Q: 1, gain: 0 },
-			{ type: 'highshelf', frequency: 16000, detune: 0, Q: 1, gain: 0 }
+			{ description: '60', type: 'lowshelf', frequency: 60, detune: 0, Q: 1, gain: 0 },
+			{ description: '170', type: 'peaking', frequency: 170, detune: 0, Q: 1, gain: 0 },
+			{ description: '310', type: 'peaking', frequency: 310, detune: 0, Q: 1, gain: 0 },
+			{ description: '600', type: 'peaking', frequency: 600, detune: 0, Q: 1, gain: 0 },
+			{ description: '1K', type: 'peaking', frequency: 1000, detune: 0, Q: 1, gain: 0 },
+			{ description: '3K', type: 'peaking', frequency: 3000, detune: 0, Q: 1, gain: 0 },
+			{ description: '6K', type: 'peaking', frequency: 6000, detune: 0, Q: 1, gain: 0 },
+			{ description: '12K', type: 'peaking', frequency: 12000, detune: 0, Q: 1, gain: 0 },
+			{ description: '14K', type: 'peaking', frequency: 14000, detune: 0, Q: 1, gain: 0 },
+			{ description: '16K', type: 'highshelf', frequency: 16000, detune: 0, Q: 1, gain: 0 }
 
 		],
 
@@ -815,6 +818,21 @@
 
 		},
 
+		_resetSliderSettingByClasses: function ( $moduleEl, audioNode, property, classes, value ) {
+
+			var propertyClass	= classes.join( '.' );
+
+			var $div  			= $( $moduleEl ).find( '.' + propertyClass );
+			var $span			= $( $div ).find( '.nm-value' );
+			var $input 			= $( $div ).find( 'input' );
+			var units 			= $span.attr( 'units' );
+
+			$input[0].value	= value;
+			$span.text( value + ' ' + units );
+			audioNode[ property ].value = value;
+
+		},
+
 		_createPlayStopButton		: function ( $moduleEl, module, audioNode ) {
 
 			var _self 		= this;
@@ -990,7 +1008,7 @@
 			node.frequency.value = frequency || module.options.biquadFilterFrequency;
 			node.detune.value = detune || module.options.biquadFilterDetune;
 			node.Q.value = Q || module.options.biquadFilterQ;
-			node.gain.value = gain || module.options.biquadFilterGain;
+			node.gain.value = gain === undefined ? module.options.biquadFilterGain : gain;
 
 			return node;
 
@@ -1039,7 +1057,8 @@
 					band.type,
 					band.frequency,
 					band.detune, 
-					band.Q );
+					band.Q,
+					band.gain );
 
 				_self._connectNodes( prevNode, bandNode );
 
@@ -1063,8 +1082,15 @@
 			var inGain 		= audioNode.inNode;
 			var outGain 	= audioNode.outNode;
 
-			var $inGainDiv	= this._createSliderControl( inGain, 'gain', 'preAmp In', 0, 1, 0.01, "" );
-			var $outGainDiv	= this._createSliderControl( outGain, 'gain', 'preAmp Out', 0, 1, 0.01, "" );
+			var min 		= module.options.eqBandMin;
+			var max 		= module.options.eqBandMax;
+			var step 		= module.options.eqBandStep;
+
+			var $inGainDiv	= this._createSliderControl( inGain, 'gain', 'preAmp In', 0, 1, 0.1, '' );
+			var $outGainDiv	= this._createSliderControl( outGain, 'gain', 'preAmp Out', 0, 1, 0.1, '' );
+
+			$inGainDiv.addClass( 'pre-amp-in' );
+			$outGainDiv.addClass( 'pre-amp-out' );
 
 			var lastIndex 	= audioNode.allNodes.length - 1;
 
@@ -1076,16 +1102,20 @@
 					return;
 				}
 
-				var description	= node.frequency.value + ' Hz';
+				var bandIndex 	= index - 1;
+				var description	= module.options.eqBands[ bandIndex ].description;
 
 				var $filterDiv	= _self._createSliderControl( 
 					node, 
-					module.options.eqControl, 
+					module.options.eqBandControl, 
 					description, 
-					1, 
-					100, 
-					0.1, 
+					min, 
+					max, 
+					step, 
 					'' );
+
+				$filterDiv.addClass( 'eq-band' );
+				$filterDiv.addClass( 'band' + bandIndex );
 
 				$filterDiv.appendTo( $moduleEl );
 
@@ -1098,9 +1128,36 @@
 
 		_resetEqualizerModule		: function ( $moduleEl, module, audioNode ) {
 
-			this._resetSliderSetting( $moduleEl, audioNode.inNode, 'gain', module.options.eqPreAmpGain );
-			this._resetSliderSetting( $moduleEl, audioNode.outNode, 'gain', module.options.eqPreAmpGain );
+			var _self 		= this;
+
+			var inClasses 	= [ 'gain', 'pre-amp-in' ];
+			var outClasses 	= [ 'gain', 'pre-amp-out' ];
+
+			this._resetSliderSettingByClasses( $moduleEl, audioNode.inNode, 'gain', inClasses, module.options.eqPreAmpGain );
+			this._resetSliderSettingByClasses( $moduleEl, audioNode.outNode, 'gain', outClasses, module.options.eqPreAmpGain );
 			
+			var lastIndex 	= audioNode.allNodes.length - 1;
+
+			$.each( audioNode.allNodes, function( index, node ) {
+
+				if ( index == 0 || index == lastIndex ) {
+					return;
+				}
+
+				var bandControlType	= module.options.eqBandControl;
+				var bandIndex 		= index - 1;
+
+				var classes 	= [ bandControlType, 'eq-band', 'band' + bandIndex ];
+				var value 		= module.options.eqBands[ bandIndex ][ bandControlType ];
+
+				_self._resetSliderSettingByClasses( 
+					$moduleEl, 
+					node, 
+					bandControlType, 
+					classes, 
+					value );
+
+			} );
 
 		},
 
