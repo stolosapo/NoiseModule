@@ -65,6 +65,14 @@
 	position: relative;
 }
 
+.nm-label {
+	font-size: 10px;
+	display: inline;
+	float: left;
+	text-transform: uppercase;
+	width: 49%;
+}
+
 .nm-slider-info .nm-label {
 	display: inline;
 	float: left;

@@ -28,6 +28,7 @@
 			noise 				{ white, pink, brown }
 			oscillator 			{ sine, square, sawtooth, triangle }
 			liveinput
+			radionode
 			biquadfilter 		{ lowpass, highpass, bandpass, lowshelf, highshelf, peaking, notch, allpass }
 			equalizer
 			delay
@@ -296,8 +297,6 @@
 				return;
 			}
 
-
-
 			if ( audioNode.numberOfInputs > 0 || 
 				( audioNode.inNode && audioNode.inNode.numberOfInputs > 0 ) ) {
 
@@ -369,6 +368,10 @@
 
 			if ( nodeType === "liveinput" ) {
 				return this._createLiveInputDiv( $moduleEl, module, audioNode );
+			};
+
+			if ( nodeType === "radionode" ) {
+				return this._createRadioNodeDiv( $moduleEl, module, audioNode );
 			};
 
 			if ( nodeType === "biquadfilter" ) {
@@ -452,6 +455,10 @@
 
 			if ( nodeType === "liveinput" ) {
 				return this._createLiveInput( module );
+			};
+
+			if ( nodeType === "radionode" ) {
+				return this._createRadioNode( module );
 			};
 
 			if ( nodeType === "biquadfilter" ) {
@@ -901,7 +908,7 @@
 
 		},
 
-		_createRadioNode			: function ( ) {
+		_createRadioNode			: function ( module ) {
 
 			var _self = this;
 
@@ -911,18 +918,39 @@
 				return;
 			};
 
-			var source;
-
-			audio.onplay = function () {
-
-				var stream = audio.captureStream ();
-
-				source = _self.audioContext.createMediaStreamSource ( stream );
-
-			};
+			var source = this.audioContext.createMediaElementSource( audio );
 		
-
 			return source;
+
+		},
+
+		_createRadioNodeDiv			: function ( $moduleEl, module, audioNode ) {
+
+			var _self 		= this;
+
+			var audio = _self.$radio.get( 0 );
+
+			if (!audio) {
+				return;
+			};
+
+			var template 	= '<span class="nm-label"></span>';
+
+			var $span 		= $( template );
+
+
+			this.$radio.on( 'playing', function( e ) { $span.text( 'Playing' ); } );
+			this.$radio.on( 'pause', function( e ) { $span.text( 'Paused' ); } );
+			this.$radio.on( 'play', function( e ) { $span.text( 'Play' ); } );
+			this.$radio.on( 'seeked', function( e ) { $span.text( 'Seeked' ); } );
+			this.$radio.on( 'seeking', function( e ) { $span.text( 'Seeking' ); } );
+			this.$radio.on( 'waiting', function( e ) { $span.text( 'Waiting' ); } );
+			this.$radio.on( 'emptied', function( e ) { $span.text( 'Stopped' ); } );
+
+
+			$span.appendTo( $moduleEl );
+
+			return $span;
 
 		},
 
