@@ -12,10 +12,17 @@
 			
 			$(document).ready(function() {
 
+				var urlParams 	= new URLSearchParams( window.location.search );
+				var fileMode 	= false;
+
+				if (urlParams.has( 'fileMode' )) {
+					fileMode 	= urlParams.get( 'fileMode' );
+				}
+
 				/* Create a new Singleton Noise Module */
 				$( 'body' ).noiseModule( {
 
-					fileMode: false,
+					fileMode: fileMode,
 
 					modules 				: [
 
