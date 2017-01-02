@@ -19,8 +19,6 @@
 					fileMode 	= urlParams.get( 'fileMode' );
 				}
 
-				// var audio 		= $( '#radio' );
-
 				/* Create a new Singleton Noise Module */
 				$( 'body' ).noiseModule( {
 
@@ -33,6 +31,7 @@
 
 						{ name: "SineWave", nodeType: "oscillator", type: "sine", options: { started: false } },
 
+						{ name: "Radio", nodeType: "radionode", options: { radioAudioIdSelector: 'radio' } },
 						{ name: "LiveInput", nodeType: "liveinput", type: "", options: { started: false } },
 						{ name: "Eq", nodeType: "equalizer" },
 
@@ -48,6 +47,8 @@
 						{ srcNode: "Gain", destNode: "Master" },
 
 						{ srcNode: "SineWave", destNode: "Eq" },
+
+						{ srcNode: "Radio", destNode: "Eq" },
 
 						{ srcNode: "LiveInput", destNode: "Eq" },
 						{ srcNode: "Eq", destNode: "Master" },
@@ -68,10 +69,9 @@
 
 	<body>
 		
-<!-- 		
-		<audio id='radio' preload='none' loop='true' controls>
-			<source src='http://us1.internet-radio.com/proxy/dougwsjf?mp=/;'>
+		<audio id='radio' controls>
+			<!-- <source src='http://us1.internet-radio.com/proxy/dougwsjf?mp=/;'> -->
 		</audio>
- -->
+
 	</body>
 </html>

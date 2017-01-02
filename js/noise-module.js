@@ -2,10 +2,9 @@
 
 	/* Noise Module Object */
 
-	$.NoiseModule				= function ( options, element, radio ) {
+	$.NoiseModule				= function ( options, element ) {
 
 		this.$el 		= $( element );
-		this.$radio 	= $( radio );
 
 		var fileMode 	= options.fileMode;
 
@@ -58,6 +57,10 @@
 
 		oscillatorFrequency		: 440,
 		oscillatorDetune		: 0,
+
+		radioAudioElement	 	: undefined,
+		radioAudioIdSelector	: undefined,
+		radioAudioClassSelector	: undefined,
 
 		biquadFilterFrequency	: 440,
 		biquadFilterDetune		: 0,
@@ -507,6 +510,10 @@
 				return this._resetOscillatorModule( $content, module, audioNode );
 			};
 
+			if ( nodeType === "radionode" ) {
+				return this._resetRadioNodeModule( $content, module, audioNode );
+			};
+
 			if ( nodeType === "biquadfilter" ) {
 				return this._resetBiquadFilterModule( $content, module, audioNode );
 			};
@@ -908,11 +915,29 @@
 
 		},
 
+		_getRadioAudioElement 		: function ( module ) {
+
+			if ( module.options.radioAudioElement != undefined ) {
+				return module.options.radioAudioElement;
+			};
+
+			if ( module.options.radioAudioIdSelector != undefined ) {
+
+				module.options.radioAudioElement = $( '#' + module.options.radioAudioIdSelector );
+				return module.options.radioAudioElement;
+			};
+
+			if ( module.options.radioAudioClassSelector != undefined ) {
+
+				module.options.radioAudioElement = $( '.' + module.options.radioAudioClassSelector );
+				return module.options.radioAudioElement;
+			};
+
+		},
+
 		_createRadioNode			: function ( module ) {
 
-			var _self = this;
-
-			var audio = _self.$radio.get( 0 );
+			var audio = this._getRadioAudioElement( module ).get( 0 );
 
 			if (!audio) {
 				return;
@@ -926,31 +951,47 @@
 
 		_createRadioNodeDiv			: function ( $moduleEl, module, audioNode ) {
 
-			var _self 		= this;
-
-			var audio = _self.$radio.get( 0 );
-
-			if (!audio) {
-				return;
-			};
-
 			var template 	= '<span class="nm-label"></span>';
-
 			var $span 		= $( template );
 
+			var audio = module.options.radioAudioElement;
 
-			this.$radio.on( 'playing', function( e ) { $span.text( 'Playing' ); } );
-			this.$radio.on( 'pause', function( e ) { $span.text( 'Paused' ); } );
-			this.$radio.on( 'play', function( e ) { $span.text( 'Play' ); } );
-			this.$radio.on( 'seeked', function( e ) { $span.text( 'Seeked' ); } );
-			this.$radio.on( 'seeking', function( e ) { $span.text( 'Seeking' ); } );
-			this.$radio.on( 'waiting', function( e ) { $span.text( 'Waiting' ); } );
-			this.$radio.on( 'emptied', function( e ) { $span.text( 'Stopped' ); } );
+			if (!audio) {
+
+				$span.text( 'Could not connect...' );
+				$span.appendTo( $moduleEl );
+
+				return $span;
+			};	
+
+
+			audio.on( 'playing', function( e ) { $span.text( 'Playing' ); } );
+			audio.on( 'pause', function( e ) { $span.text( 'Paused' ); } );
+			audio.on( 'play', function( e ) { $span.text( 'Play' ); } );
+			audio.on( 'ended', function( e ) { $span.text( 'Ended' ); } );
+			audio.on( 'seeked', function( e ) { $span.text( 'Seeked' ); } );
+			audio.on( 'seeking', function( e ) { $span.text( 'Seeking' ); } );
+			audio.on( 'waiting', function( e ) { $span.text( 'Waiting' ); } );
+			audio.on( 'emptied', function( e ) { $span.text( 'Cleared' ); } );
 
 
 			$span.appendTo( $moduleEl );
 
 			return $span;
+
+		},
+
+		_resetRadioNodeModule 		: function ( $moduleEl, module, audioNode ) {
+
+			var audio = module.options.radioAudioElement.get( 0 );
+
+			if (!audio) {
+				return;
+			};
+
+			audio.pause( );
+			audio.removeAttribute( "src" );
+			audio.load( );
 
 		},
 
@@ -1573,7 +1614,7 @@
 
 	/* Noise Module Factory */
 
-	$.fn.noiseModule 			= function ( options, radio ) {
+	$.fn.noiseModule 			= function ( options ) {
 
 		if ( typeof options === 'string' ) {
 			
@@ -1615,7 +1656,7 @@
 				
 				if ( !instance ) {
 
-					instance = new $.NoiseModule( options, this, radio );
+					instance = new $.NoiseModule( options, this );
 
 					$.data( this, 'noiseModule', instance );
 				}
