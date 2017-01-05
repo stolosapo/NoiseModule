@@ -128,3 +128,47 @@
 .noise-module .nm-content .eq-band input[type="range"] {
 	/*transform: rotate(90deg);*/
 }
+
+.noise-module footer.nm-footer {
+    background-color: #F8F8F8;
+    border-top: 1px solid #DBDBDB;
+    font-size: 9px;
+    font-style: italic;
+    border-radius: 0px 0px 5px 5px;
+    overflow: hidden;
+    padding: 0em 0.4em 0.1em;
+}
+
+.noise-module .nm-footer .nm-direction {
+	display: inline;
+	text-transform: lowercase;
+	height: 100%
+}
+
+.noise-module .nm-footer .direction-from {
+	float: left;
+	width: 49%;
+}
+
+.noise-module .nm-footer .direction-to {
+	float: right;
+	text-align: right;
+	width: 49%;
+}
+
+.noise-module .nm-footer img {
+	background-image: url("../img/right_16.png");
+	height: 16px;
+	width: 16px;
+	text-indent: -999em;
+	position: relative;
+	display: inline-block;
+} 
+
+.noise-module .nm-footer .nm-direction .nm-list {
+	list-style-type: none;
+	padding: 0px;
+	margin-top: 0px; 
+	margin-bottom: 0px;
+	position: relative;
+}

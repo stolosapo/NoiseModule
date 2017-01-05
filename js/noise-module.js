@@ -422,21 +422,55 @@
 				return;
 			}
 
+			var inNode 		= audioNode.inNode || audioNode;
+			var outNode 	= audioNode.outNode || audioNode;
+
 			var template 	= '<footer class="nm-footer"></footer>';
 			var $footer		= $( template );
 
-			if (audioNode.numberOfInputs > 0) {
+			if (inNode.numberOfInputs > 0) {
 
-				var fromTem	= '<span class="nm-from"></span>';
+				var conns 	= this._findModuleConnections( module, 'in' );
+
+				var fromTem	= '\
+				<div class="nm-direction direction-from">\
+					<img class="nm-icon icon-from" />\
+					<ul class="nm-list list-from">\
+					</ul>\
+				</div>';
+
 				var $from 	= $( fromTem );
+				var $list 	= ( $from ).find( '.nm-list' );
+				
+				$.each( conns, function( index, conn ) {
+
+					$list.append( $('<li>').text( conn ) );
+
+				} );
+
 
 				$from.appendTo( $footer );
 			}
 
-			if (audioNode.numberOfOutputs > 0) {
+			if (outNode.numberOfOutputs > 0) {
 
-				var toTem	= '<span class="nm-to"></span>';
+				var conns 	= this._findModuleConnections( module, 'out' );
+
+				var toTem	= '\
+				<div class="nm-direction direction-to">\
+					<img class="nm-icon icon-to" />\
+					<ul class="nm-list list-to">\
+					</ul>\
+				</div>';
+
 				var $to 	= $( toTem );
+				var $list 	= ( $to ).find( '.nm-list' );
+
+				$.each( conns, function( index, conn ) {
+
+					$list.append( $('<li>').text( conn ) );
+
+				} );
 
 				$to.appendTo( $footer );
 			}
@@ -603,6 +637,29 @@
 
 			return module;
 
+		},
+
+		_findModuleConnections 		: function ( module, direction ) {
+
+			var _self 	= this;
+
+			var name 			= module.name;
+
+			var askedNodeDir 	= direction == 'in' ? 'destNode' : 'srcNode';
+			var givenNodeDir 	= direction == 'in' ? 'srcNode' : 'destNode';
+
+			var conns 			= [];
+
+			$.each( this.options.connections, function( index, conn ) {
+
+				if ( name === conn[ askedNodeDir ] ) {
+					
+					conns.push( conn[ givenNodeDir ] );
+				};
+
+			} );
+
+			return conns;
 		},
 
 		_findAudioNode				: function ( moduleName ) {
