@@ -278,6 +278,7 @@
 			</div>';
 
 			var $divEl 			= $( template );
+			$divEl.attr( 'name', module.name );
 
 			// append content
 			var $content 		= $( $divEl ).find( '.nm-content' );
@@ -639,6 +640,27 @@
 
 		},
 
+		_findModuleDivByName		: function ( module ) {
+
+			var $allDivs 	= this.$containerEl.find( '.noise-module.' + module.nodeType );
+			var $divEl		= undefined;
+
+			$.each( $allDivs, function ( index, div ) {
+
+				var name = $( div ).attr( 'name' );
+
+				if ( name === module.name ) {
+					
+					$divEl = div;
+					return;
+				};
+
+			} );
+
+			return $divEl;
+
+		},
+
 		_findModuleConnections 		: function ( module, direction ) {
 
 			var _self 	= this;
@@ -660,7 +682,7 @@
 			} );
 
 			return conns;
-			
+
 		},
 
 		_findAudioNode				: function ( moduleName ) {
@@ -1076,10 +1098,15 @@
 					},
 				}).then( function( stream ) {
 
-					source = _self.audioContext.createMediaStreamSource( stream );
+					source 			= _self.audioContext.createMediaStreamSource( stream );
 
 					/* Update source node map with this new instance */
 					_self._updateAudioNode( module.name, source );
+
+					var $divEl 		= _self._findModuleDivByName( module );
+					var $content 	= $( $divEl ).find( '.nm-content' );
+
+					_self._appendModuleFooter( $( $divEl ), $content, module, source );
 
 					/* If module option is started then do the connection */
 					if (module.options.started) {
