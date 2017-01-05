@@ -67,7 +67,8 @@
 		biquadFilterQ 			: 1,
 		biquadFilterGain		: 0,
 
-		eqPreAmpGain			: 0.7,
+		eqPreAmpInGain			: 1,
+		eqPreAmpOutGain			: 1,
 		eqBandControl			: 'gain',
 		eqBandMin				: -12,
 		eqBandMax				: 12,
@@ -1114,8 +1115,8 @@
 
 			var _self 		= this;
 
-			var preAmp 		= _self._createGain( module, module.options.eqPreAmpGain );
-			var outputGain	= _self._createGain( module );
+			var preAmp 		= _self._createGain( module, module.options.eqPreAmpInGain );
+			var outputGain	= _self._createGain( module, module.options.eqPreAmpOutGain );
 
 			var nodes 		= [ ];
 			var prevNode 	= preAmp;
@@ -1159,11 +1160,11 @@
 			var max 		= module.options.eqBandMax;
 			var step 		= module.options.eqBandStep;
 
-			var $inGainDiv	= this._createSliderControl( inGain, 'gain', 'preAmp In', 0, 1, 0.1, '' );
+			var $inGainDiv	= this._createSliderControl( inGain, 'gain', 'preAmp In', 0, 2, 0.1, '' );
 			$inGainDiv.addClass( 'pre-amp' );
 			$inGainDiv.addClass( 'in' );
 
-			var $outGainDiv	= this._createSliderControl( outGain, 'gain', 'preAmp Out', 0, 1, 0.1, '' );
+			var $outGainDiv	= this._createSliderControl( outGain, 'gain', 'preAmp Out', 0, 2, 0.1, '' );
 			$outGainDiv.addClass( 'pre-amp' );
 			$outGainDiv.addClass( 'out' );
 
@@ -1208,8 +1209,8 @@
 			var inClasses 	= [ 'gain', 'pre-amp', 'in' ];
 			var outClasses 	= [ 'gain', 'pre-amp', 'out' ];
 
-			this._resetSliderSettingByClasses( $moduleEl, audioNode.inNode, 'gain', inClasses, module.options.eqPreAmpGain );
-			this._resetSliderSettingByClasses( $moduleEl, audioNode.outNode, 'gain', outClasses, module.options.eqPreAmpGain );
+			this._resetSliderSettingByClasses( $moduleEl, audioNode.inNode, 'gain', inClasses, module.options.eqPreAmpInGain );
+			this._resetSliderSettingByClasses( $moduleEl, audioNode.outNode, 'gain', outClasses, module.options.eqPreAmpOutGain );
 			
 			var lastIndex 	= audioNode.allNodes.length - 1;
 
