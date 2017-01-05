@@ -660,6 +660,7 @@
 			} );
 
 			return conns;
+			
 		},
 
 		_findAudioNode				: function ( moduleName ) {
@@ -1053,14 +1054,6 @@
 
 		},
 
-		_createMediaStreamSource 	: function ( stream ) {
-
-			var source 	= this.audioContext.createMediaStreamSource( stream );
-
-			return source;
-
-		},
-
 		_createLiveInput 			: function ( module ) {
 
 			navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
@@ -1083,7 +1076,7 @@
 					},
 				}).then( function( stream ) {
 
-					source = _self._createMediaStreamSource( stream );
+					source = _self.audioContext.createMediaStreamSource( stream );
 
 					/* Update source node map with this new instance */
 					_self._updateAudioNode( module.name, source );
