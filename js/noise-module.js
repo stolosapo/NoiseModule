@@ -28,6 +28,7 @@
 			oscillator 			{ sine, square, sawtooth, triangle }
 			liveinput
 			radionode
+			soundcloudnode
 			biquadfilter 		{ lowpass, highpass, bandpass, lowshelf, highshelf, peaking, notch, allpass }
 			equalizer
 			delay
@@ -61,6 +62,10 @@
 		radioAudioElement	 	: undefined,
 		radioAudioIdSelector	: undefined,
 		radioAudioClassSelector	: undefined,
+
+		soundCloudClientId		: '3b2585ef4a5eff04935abe84aad5f3f3',
+		soundCloudTrackUrl		: '',
+		soundCloudAudio			: undefined,
 
 		biquadFilterFrequency	: 440,
 		biquadFilterDetune		: 0,
@@ -379,6 +384,10 @@
 				return this._createRadioNodeDiv( $moduleEl, module, audioNode );
 			};
 
+			if ( nodeType === "soundcloudnode" ) {
+				return this._createSoundCloudNodeDiv( $moduleEl, module, audioNode );
+			};
+
 			if ( nodeType === "biquadfilter" ) {
 				return this._createBiquadFilterDiv( $moduleEl, audioNode );
 			};
@@ -498,6 +507,10 @@
 
 			if ( nodeType === "radionode" ) {
 				return this._createRadioNode( module );
+			};
+
+			if ( nodeType === "soundcloudnode" ) {
+				return this._createSoundCloudNode( module );
 			};
 
 			if ( nodeType === "biquadfilter" ) {
@@ -1074,6 +1087,81 @@
 			audio.removeAttribute( "src" );
 			audio.load( );
 
+		},
+
+		_createSoundCloudNode		: function ( module ) {
+
+			var _self 			= this;
+
+			var source;
+
+			var baseUrl			= 'https://api.soundcloud.com/resolve.json?url=';
+			var clientParameter = 'client_id=' + module.options.soundCloudClientId;
+			var url				= baseUrl + module.options.soundCloudTrackUrl + '&' + clientParameter;
+
+			var audio 			= new Audio( );
+			audio.crossOrigin	= "anonymous";
+
+			this._requestGET( url, function ( response ) {
+
+				var trackInfo 	= JSON.parse( response );
+				var streamUrl 	= trackInfo.stream_url + "?" + clientParameter;
+		
+				audio.src 		= streamUrl;
+				audio.play( );
+
+				source 			= _self.audioContext.createMediaElementSource( audio );
+
+				/* Update source node map with this new instance */
+				_self._updateAudioNode( module.name, source );
+
+				var $divEl 		= _self._findModuleDivByName( module );
+				var $content 	= $( $divEl ).find( '.nm-content' );
+
+				_self._appendModuleFooter( $( $divEl ), $content, module, source );
+
+				/* If module option is started then do the connection */
+				if (module.options.started) {
+					_self._connectAllDestinations( module );
+				}
+
+
+			} );
+
+		},
+
+		_appendSoundCloudDivContent	: function ( $moduleEl, module, audioNode ) {
+
+		},
+
+		_createSoundCloudNodeDiv	: function ( $moduleEl, module, audioNode ) {
+
+			var template 	= '<span class="nm-label"></span>';
+			var $span 		= $( template );
+
+			var audio 		= module.options.soundCloudAudio;
+
+			if (!audio) {
+
+				$span.text( 'Could not connect...' );
+				$span.appendTo( $moduleEl );
+
+				return $span;
+			};	
+
+
+			audio.on( 'playing', function( e ) { $span.text( 'Playing' ); } );
+			audio.on( 'pause', function( e ) { $span.text( 'Paused' ); } );
+			audio.on( 'play', function( e ) { $span.text( 'Play' ); } );
+			audio.on( 'ended', function( e ) { $span.text( 'Ended' ); } );
+			audio.on( 'seeking', function( e ) { $span.text( 'Seeking' ); } );
+			audio.on( 'waiting', function( e ) { $span.text( 'Waiting' ); } );
+
+
+			$span.appendTo( $moduleEl );
+
+			this._createPlayStopButton( $moduleEl, module, audioNode );
+			
 		},
 
 		_createLiveInput 			: function ( module ) {
@@ -1684,6 +1772,24 @@
 				};
 
 			} );
+
+		},
+
+		_requestGET					: function ( url, callback ) {
+
+			var request = new XMLHttpRequest( );
+
+			request.onreadystatechange = function( ) { 
+
+				if (request.readyState === 4 && 
+					request.status === 200) {
+					callback( request.responseText );
+				}
+
+			}
+
+			request.open( "GET", url, true );
+			request.send( null );
 
 		},
 
