@@ -563,6 +563,10 @@
 				return this._resetRadioNodeModule( $content, module, audioNode );
 			};
 
+			if ( nodeType === "soundcloudnode" ) {
+				return this._resetSoundCloudModule( $content, module, audioNode );
+			};
+
 			if ( nodeType === "biquadfilter" ) {
 				return this._resetBiquadFilterModule( $content, module, audioNode );
 			};
@@ -989,6 +993,50 @@
 
 		},
 
+		_createPlayPauseButton		: function ( $moduleEl, module, audioNode, playPauseClickEvent ) {
+
+			var _self 		= this;
+
+			var playClass 	= 'play';
+			var pauseClass 	= 'pause';
+
+			var template 	= '<img class="nm-play-button"></img>';
+			var $img 		= $( template );
+
+			if ( module.options.started ) {
+
+				$img.addClass( pauseClass );
+			}
+			else {
+				
+				$img.addClass( playClass );
+			}
+
+			$img[0].addEventListener( 'click', function( ) {
+
+				if ( $(this).hasClass( playClass ) ) {
+
+					playPauseClickEvent( _self, $moduleEl, module, audioNode, true );
+
+					$(this).removeClass( playClass );
+					$(this).addClass( pauseClass );
+
+				}
+				else {
+
+					playPauseClickEvent( _self, $moduleEl, module, audioNode, false );
+
+					$(this).removeClass( pauseClass );
+					$(this).addClass( playClass );
+
+				}
+
+			} );
+
+			$img.appendTo( $moduleEl );
+
+		},
+
 		_createOscillatorDiv		: function ( $moduleEl, module, audioNode ) {
 
 			var $freqDiv	= this._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
@@ -1102,13 +1150,14 @@
 			var audio 			= new Audio( );
 			audio.crossOrigin	= "anonymous";
 
+			module.options.soundCloudAudio = audio;
+
 			this._requestGET( url, function ( response ) {
 
 				var trackInfo 	= JSON.parse( response );
 				var streamUrl 	= trackInfo.stream_url + "?" + clientParameter;
 		
 				audio.src 		= streamUrl;
-				audio.play( );
 
 				source 			= _self.audioContext.createMediaElementSource( audio );
 
@@ -1119,10 +1168,11 @@
 				var $content 	= $( $divEl ).find( '.nm-content' );
 
 				_self._appendModuleFooter( $( $divEl ), $content, module, source );
+				_self._connectAllDestinations( module );
 
 				/* If module option is started then do the connection */
 				if (module.options.started) {
-					_self._connectAllDestinations( module );
+					audio.play( );
 				}
 
 
@@ -1130,7 +1180,18 @@
 
 		},
 
-		_appendSoundCloudDivContent	: function ( $moduleEl, module, audioNode ) {
+		_soundCloudPlayPauseEvent	: function ( self, $moduleEl, module, audioNode, playPause ) {
+
+			var audio 		= module.options.soundCloudAudio;
+
+			if (audio.paused) {
+				audio.play( );
+			}
+			else {
+				audio.pause( );
+			};
+
+			console.log(audio);
 
 		},
 
@@ -1149,19 +1210,34 @@
 				return $span;
 			};	
 
+			var $audioEl 	= $( audio );
 
-			audio.on( 'playing', function( e ) { $span.text( 'Playing' ); } );
-			audio.on( 'pause', function( e ) { $span.text( 'Paused' ); } );
-			audio.on( 'play', function( e ) { $span.text( 'Play' ); } );
-			audio.on( 'ended', function( e ) { $span.text( 'Ended' ); } );
-			audio.on( 'seeking', function( e ) { $span.text( 'Seeking' ); } );
-			audio.on( 'waiting', function( e ) { $span.text( 'Waiting' ); } );
+			$audioEl.on( 'playing', function( e ) { $span.text( 'Playing' ); } );
+			$audioEl.on( 'pause', function( e ) { $span.text( 'Paused' ); } );
+			$audioEl.on( 'play', function( e ) { $span.text( 'Play' ); } );
+			$audioEl.on( 'ended', function( e ) { $span.text( 'Ended' ); } );
+			$audioEl.on( 'seeking', function( e ) { $span.text( 'Seeking' ); } );
+			$audioEl.on( 'waiting', function( e ) { $span.text( 'Waiting' ); } );
 
 
 			$span.appendTo( $moduleEl );
 
-			this._createPlayStopButton( $moduleEl, module, audioNode );
+			this._createPlayPauseButton( $moduleEl, module, audioNode, this._soundCloudPlayPauseEvent );
 			
+		},
+
+		_resetSoundCloudModule 		: function ( $moduleEl, module, audioNode ) {
+
+			var audio	= module.options.soundCloudAudio;
+			var $img	= $moduleEl.find( '.nm-play-button' );
+
+			audio.pause( );
+
+			$img.removeClass( 'pause' );
+			$img.addClass( 'play' );
+
+			audio.load( );
+
 		},
 
 		_createLiveInput 			: function ( module ) {

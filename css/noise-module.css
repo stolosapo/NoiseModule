@@ -117,6 +117,10 @@
     background-image: url("../img/stop_48.png");
 }
 
+.noise-module .nm-content img.nm-play-button.pause {
+    background-image: url("../img/pause_48.png");
+}
+
 .noise-module .nm-content canvas {
 	background-image: url("../img/blueprint-dark.png");
 	display: inline-block;
