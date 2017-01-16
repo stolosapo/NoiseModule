@@ -32,6 +32,7 @@
 			biquadfilter 		{ lowpass, highpass, bandpass, lowshelf, highshelf, peaking, notch, allpass }
 			equalizer
 			delay
+			kingtubbynode
 			dynamicscompressor
 			gain
 			stereopannernode
@@ -94,6 +95,10 @@
 		],
 
 		delayTime				: 0.2,
+
+		kingTubbyDelayTime		: 0.5,
+		kingTubbyGain			: 0.8,
+		kingTubbyCutOffFreq		: 1000,
 
 		compressorThreshold 	: -25,
 		compressorKnee			: 30,
@@ -400,6 +405,10 @@
 				return this._createDelayDiv( $moduleEl, audioNode );
 			};
 
+			if ( nodeType === "kingtubbynode" ) {
+				return this._createKingTubbyDiv( $moduleEl, module, audioNode );
+			};
+
 			if ( nodeType === "dynamicscompressor" ) {
 				return this._createDynamicsCompressorDiv( $moduleEl, audioNode );
 			};
@@ -525,6 +534,10 @@
 				return this._createDelay( module );
 			};
 
+			if ( nodeType === "kingtubbynode" ) {
+				return this._createKingTubbyNode( module );
+			};
+
 			if ( nodeType === "dynamicscompressor" ) {
 				return this._createDynamicsCompressor( module );
 			};
@@ -579,6 +592,10 @@
 				return this._resetDelayModule( $content, module, audioNode );
 			};
 
+			if ( nodeType === "kingtubbynode" ) {
+				return this._resetKingTubbyModule( $content, module, audioNode );
+			};
+
 			if ( nodeType === "dynamicscompressor" ) {
 				return this._resetDynamicsCompressor( $content, module, audioNode );
 			};
@@ -621,7 +638,8 @@
 				return;
 			}
 
-			var srcNode = this._findAudioNode( connection.srcNode ).outNode;
+			var srcAudio	= this._findAudioNode( connection.srcNode );
+			var srcNode 	= srcAudio.outNode;
 			var destNode;
 
 			if ( connection.destNode === "output" ) {
@@ -631,7 +649,21 @@
 			}
 			else {
 				
-				destNode = this._findAudioNode( connection.destNode ).inNode;
+				var destAudio	= this._findAudioNode( connection.destNode );
+				destNode = destAudio.inNode;
+
+				console.log(destAudio.outNode, srcNode);
+
+				// If scr node is BYPASS, means no input exists
+				if (srcNode === "BYPASS") {
+					return;
+				};
+
+				// Chech if must bypass the output of destination with the output of source node
+				if (destAudio.outNode === "BYPASS") {
+					destAudio.outNode = srcNode;
+				};
+
 				this._connectNodes( srcNode, destNode );
 
 			};
@@ -1499,6 +1531,59 @@
 		_resetDelayModule 			: function ( $moduleEl, module, audioNode ) {
 
 			this._resetSliderSetting( $moduleEl, audioNode, 'delayTime', module.options.delayTime );
+
+		},
+
+		_createKingTubbyNode		: function ( module ) {
+
+			var nodes				= [ ];
+
+			var delay				= this.audioContext.createDelay( );
+			delay.delayTime.value	= module.options.kingTubbyDelayTime;
+			nodes.push( delay );
+
+			var feedback			= this.audioContext.createGain( );
+			feedback.gain.value		= module.options.kingTubbyGain;
+			nodes.push( feedback );
+
+			var filter				= this.audioContext.createBiquadFilter( );
+			filter.frequency.value	= module.options.kingTubbyCutOffFreq;
+			nodes.push( filter );
+
+
+			this._connectNodes( delay, feedback );
+			this._connectNodes( feedback, filter );
+			this._connectNodes( filter, delay );
+
+			return { inNode: delay, outNode: "BYPASS", allNodes: nodes };
+
+		},
+
+		_createKingTubbyDiv			: function ( $moduleEl, module, audioNode ) {
+
+			var delay 		= audioNode.inNode;
+			var feedback 	= audioNode.allNodes[ 1 ];
+			var filter	 	= audioNode.allNodes[ 2 ];
+			
+			var $delayDiv		= this._createSliderControl( delay, 'delayTime', 'delay', 0, 10, 0.01, "Sec" );
+			var $feedbackDiv	= this._createSliderControl( feedback, 'gain', 'feedback', 0, 1, 0.01, "" );
+			var $freqDiv		= this._createSliderControl( filter, 'frequency', 'cutoff', 0, 8000, 1, "Hz" );
+
+			$delayDiv.appendTo( $moduleEl );
+			$feedbackDiv.appendTo( $moduleEl );
+			$freqDiv.appendTo( $moduleEl );
+
+		},
+
+		_resetKingTubbyModule		: function ( $moduleEl, module, audioNode ) {
+
+			var delay 		= audioNode.inNode;
+			var feedback 	= audioNode.allNodes[ 1 ];
+			var filter	 	= audioNode.allNodes[ 2 ];
+
+			this._resetSliderSettingByClasses( $moduleEl, delay, 'delayTime', [ 'delayTime' ], module.options.kingTubbyDelayTime );
+			this._resetSliderSettingByClasses( $moduleEl, feedback, 'gain', [ 'gain' ], module.options.kingTubbyGain );
+			this._resetSliderSettingByClasses( $moduleEl, filter, 'frequency', [ 'frequency' ], module.options.kingTubbyCutOffFreq );
 
 		},
 
