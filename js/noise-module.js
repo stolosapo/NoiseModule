@@ -927,12 +927,12 @@
 
 			if (changeEvent != null && changeEvent != undefined) {
 
-				$input[0].addEventListener( 'change', changeEvent );
+				$input[0].addEventListener( 'input', changeEvent );
 
 				return $div;
 			}
 
-			$input[0].addEventListener( 'change', function( ) {
+			$input[0].addEventListener( 'input', function( ) {
 
 				audioNode[ property ].value = this.value;
 				$span.text( this.value + ' ' + units );
@@ -1532,7 +1532,6 @@
 			var outputGain			= this._createGain( module, module.options.kingTubbyPreAmpOutGain );
 
 			nodes.push( preAmp );
-			nodes.push( outputGain );
 
 			var delay				= this.audioContext.createDelay( );
 			delay.delayTime.value	= module.options.kingTubbyDelayTime;
@@ -1546,6 +1545,8 @@
 			filter.frequency.value	= module.options.kingTubbyCutOffFreq;
 			nodes.push( filter );
 
+			nodes.push( outputGain );
+
 
 			this._connectNodes( delay, feedback );
 			this._connectNodes( feedback, filter );
@@ -1553,6 +1554,7 @@
 
 			this._connectNodes( preAmp, delay );
 			this._connectNodes( preAmp, outputGain );
+			this._connectNodes( delay, outputGain );
 
 			return { inNode: preAmp, outNode: outputGain, allNodes: nodes };
 
@@ -1560,21 +1562,26 @@
 
 		_createKingTubbyDiv			: function ( $moduleEl, module, audioNode ) {
 
-			var delay 		= audioNode.inNode;
-			var feedback 	= audioNode.allNodes[ 1 ];
-			var filter	 	= audioNode.allNodes[ 2 ];
+			var delay 		= audioNode.allNodes[ 1 ]
+			var feedback 	= audioNode.allNodes[ 2 ];
+			var filter	 	= audioNode.allNodes[ 3 ];
 
-			var $inGainDiv	= this._createSliderControl( inGain, 'gain', 'preAmp In', 0, 2, 0.1, '' );
+			var $inGainDiv	= this._createSliderControl( audioNode.inNode, 'gain', 'preAmp In', 0, 2, 0.1, '' );
 			$inGainDiv.addClass( 'pre-amp' );
 			$inGainDiv.addClass( 'in' );
 
-			var $outGainDiv	= this._createSliderControl( outGain, 'gain', 'preAmp Out', 0, 2, 0.1, '' );
+			var $outGainDiv	= this._createSliderControl( audioNode.outNode, 'gain', 'preAmp Out', 0, 2, 0.1, '' );
 			$outGainDiv.addClass( 'pre-amp' );
 			$outGainDiv.addClass( 'out' );
 			
 			var $delayDiv		= this._createSliderControl( delay, 'delayTime', 'delay', 0, 10, 0.01, "Sec" );
+			$delayDiv.addClass( 'delay' );
+
 			var $feedbackDiv	= this._createSliderControl( feedback, 'gain', 'feedback', 0, 1, 0.01, "" );
+			$feedbackDiv.addClass( 'feedback' );
+
 			var $freqDiv		= this._createSliderControl( filter, 'frequency', 'cutoff', 0, 8000, 1, "Hz" );
+			$freqDiv.addClass( 'biquadfilter' );
 
 			$inGainDiv.appendTo( $moduleEl );
 
@@ -1588,9 +1595,9 @@
 
 		_resetKingTubbyModule		: function ( $moduleEl, module, audioNode ) {
 
-			var delay 		= audioNode.inNode;
-			var feedback 	= audioNode.allNodes[ 1 ];
-			var filter	 	= audioNode.allNodes[ 2 ];
+			var delay 		= audioNode.allNodes[ 1 ]
+			var feedback 	= audioNode.allNodes[ 2 ];
+			var filter	 	= audioNode.allNodes[ 3 ];
 
 			var inClasses 	= [ 'gain', 'pre-amp', 'in' ];
 			var outClasses 	= [ 'gain', 'pre-amp', 'out' ];
@@ -1598,9 +1605,9 @@
 			this._resetSliderSettingByClasses( $moduleEl, audioNode.inNode, 'gain', inClasses, module.options.kingTubbyPreAmpInGain );
 			this._resetSliderSettingByClasses( $moduleEl, audioNode.outNode, 'gain', outClasses, module.options.kingTubbyPreAmpOutGain );
 
-			this._resetSliderSettingByClasses( $moduleEl, delay, 'delayTime', [ 'delayTime' ], module.options.kingTubbyDelayTime );
-			this._resetSliderSettingByClasses( $moduleEl, feedback, 'gain', [ 'gain' ], module.options.kingTubbyGain );
-			this._resetSliderSettingByClasses( $moduleEl, filter, 'frequency', [ 'frequency' ], module.options.kingTubbyCutOffFreq );
+			this._resetSliderSettingByClasses( $moduleEl, delay, 'delayTime', [ 'delayTime', 'delay' ], module.options.kingTubbyDelayTime );
+			this._resetSliderSettingByClasses( $moduleEl, feedback, 'gain', [ 'gain', 'feedback' ], module.options.kingTubbyGain );
+			this._resetSliderSettingByClasses( $moduleEl, filter, 'frequency', [ 'frequency', 'biquadfilter' ], module.options.kingTubbyCutOffFreq );
 
 		},
 
