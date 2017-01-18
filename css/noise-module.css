@@ -73,6 +73,17 @@
 	width: 49%;
 }
 
+.nm-label.info {
+	width: 98%;
+}
+
+.nm-label.nm-list {
+	list-style-type: none;
+	padding: 0px;
+	margin-top: 0px; 
+	margin-bottom: 0px;
+}
+
 .nm-slider-info .nm-label {
 	display: inline;
 	float: left;

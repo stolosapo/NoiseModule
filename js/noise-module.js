@@ -129,6 +129,7 @@
 		analyserSineBgColor		: 0,
 
 		recorderChunks			: [ ],
+		recorderStopCallback	: undefined,
 		recorderMediaRecorder	: undefined,
 		recorderMediaRecordings	: [ ]
 
@@ -1960,8 +1961,11 @@
 
 				module.options.recorderMediaRecordings.push( audioURL );
 
+				if (module.options.recorderStopCallback != undefined) {
 
-				console.log(module.options.recorderMediaRecordings);
+					module.options.recorderStopCallback( module );
+				};
+
 			};
 
 			return recorder;
@@ -1971,7 +1975,7 @@
 		_recorderPlayPauseClickEvent: function ( self, $moduleEl, module, audioNode, playPause ) {
 
 			var mediaRecorder	= module.options.recorderMediaRecorder;
-			var $span 			= $( $moduleEl ).find( '.nm-label' );
+			var $span 			= $( $moduleEl ).find( '.nm-label.info' );
 
 
 			if (mediaRecorder.state === 'inactive') {
@@ -1989,7 +1993,8 @@
 				mediaRecorder.pause( );
 			};
 
-			$span.text( "Record: " + mediaRecorder.state + "..." );
+			$span.text( "Status: " + mediaRecorder.state + "..." );
+
 		},
 
 		_recorderStopClickEvent		: function ( self, $moduleEl, module, audioNode ) {
@@ -1998,7 +2003,7 @@
 			var playClass		= 'play';
 
 			var mediaRecorder	= module.options.recorderMediaRecorder;
-			var $span 			= $moduleEl.find( '.nm-label' );
+			var $span 			= $moduleEl.find( '.nm-label.info' );
 			var $img			= $moduleEl.find( '.nm-play-button.pause' );
 
 			if (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused') {
@@ -2011,7 +2016,7 @@
 					$img.addClass( playClass );
 				}
 
-				$span.text( "Record: stopped" );
+				$span.text( "Status: stopped" );
 			};		
 
 		},
@@ -2020,13 +2025,36 @@
 
 			var stopImgClass	= [ 'stop' ];
 
-			var template 		= '<span class="nm-label"></span>';
-			var $span 			= $( template );
+			var spanTemp 		= '<span class="nm-label info"></span>';
+			var $span 			= $( spanTemp );
+
+			var listTemp		= '<ul class="nm-label nm-list"></ul>';
+			var $list			= $( listTemp );
+
+			$span.text( 'Status:' );
 
 			this._createPlayPauseButton( $moduleEl, module, audioNode, this._recorderPlayPauseClickEvent );
 			this._createCustomButton( $moduleEl, module, audioNode, stopImgClass, this._recorderStopClickEvent );
 
+			module.options.recorderStopCallback = function( module ) {
+
+				$list.empty( );
+
+				$.each( module.options.recorderMediaRecordings, function( index, rec ) {
+
+					var $a = $( '<a>' );
+					$a.attr( 'href', rec );
+					$a.attr( 'target', '_blank' );
+					$a.text( 'track ' + (index + 1) );
+
+					$list.append( $('<li>').append( $a ) );
+
+				} );
+
+			};
+
 			$span.appendTo( $moduleEl );
+			$list.appendTo( $moduleEl );
 
 		},
 
