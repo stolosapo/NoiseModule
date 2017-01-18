@@ -39,6 +39,7 @@
 			waveshapernode
 			periodicwave
 			analyser 			{ sinewave, frequencybars }
+			recorder
 		*/
 		modules 				: [
 
@@ -125,7 +126,11 @@
 		analyserFftSize			: 2048,
 		analyserMainBgColor		: 200,
 		analyserBarBgColor 		: 50,
-		analyserSineBgColor		: 0
+		analyserSineBgColor		: 0,
+
+		recorderChunks			: [ ],
+		recorderMediaRecorder	: undefined,
+		recorderMediaRecordings	: [ ]
 
 	};
 
@@ -435,6 +440,10 @@
 				return this._createAnalyserDiv( $moduleEl, module, audioNode );
 			};
 
+			if ( nodeType === "recorder" ) {
+				return this._createRecorderDiv( $moduleEl, module, audioNode );
+			};
+
 		},
 
 		_appendModuleFooter 		: function ( $divEl, $content, module, audioNode ) {
@@ -562,6 +571,10 @@
 
 			if ( nodeType === "analyser" ) {
 				return this._createAnalyser( module );
+			};
+
+			if ( nodeType === "recorder" ) {
+				return this._createRecorder( module );
 			};
 
 		},
@@ -1052,6 +1065,31 @@
 					$(this).addClass( playClass );
 
 				}
+
+			} );
+
+			$img.appendTo( $moduleEl );
+
+		},
+
+		_createCustomButton			: function ( $moduleEl, module, audioNode, cssClasses, clickEvent ) {
+
+			var _self 		= this;
+
+			var template 	= '<img class="nm-play-button"></img>';
+			var $img 		= $( template );
+
+			if (cssClasses != undefined) {
+				$.each( cssClasses, function( index, cssClass ) {
+
+					$img.addClass( cssClass );
+
+				} );
+			};
+
+			$img[0].addEventListener( 'click', function( ) {
+
+				clickEvent( _self, $moduleEl, module, audioNode );
 
 			} );
 
@@ -1894,6 +1932,104 @@
 
 		},
 
+		_createRecorder				: function ( module ) {
+
+			var recorder 		= this.audioContext.createMediaStreamDestination ( );
+
+			var mediaRecorder	= new MediaRecorder( recorder.stream );
+			mediaRecorder.ignoreMutedMedia = true;
+
+			module.options.recorderMediaRecorder = mediaRecorder;
+
+
+			// push each chunk (blobs) in an array
+			mediaRecorder.ondataavailable	= function( e ) {
+			
+				module.options.recorderChunks.push(e.data);
+			};
+
+
+			// Make blob out of our blobs, and open it.
+			mediaRecorder.onstop			= function( e ) {
+
+				console.log( 'Started Download' );
+
+				var blob = new Blob(module.options.recorderChunks, { 'type' : 'audio/ogg; codecs=opus' });
+
+				var audioURL = window.URL.createObjectURL(blob);
+
+				module.options.recorderMediaRecordings.push( audioURL );
+
+
+				console.log(module.options.recorderMediaRecordings);
+			};
+
+			return recorder;
+
+		},
+
+		_recorderPlayPauseClickEvent: function ( self, $moduleEl, module, audioNode, playPause ) {
+
+			var mediaRecorder	= module.options.recorderMediaRecorder;
+			var $span 			= $( $moduleEl ).find( '.nm-label' );
+
+
+			if (mediaRecorder.state === 'inactive') {
+
+				module.options.recorderChunks = [ ];
+
+				mediaRecorder.start( );
+			}
+			else if (mediaRecorder.state === 'paused') {
+
+				mediaRecorder.resume( );
+			}
+			else if (mediaRecorder.state === 'recording') {
+
+				mediaRecorder.pause( );
+			};
+
+			$span.text( "Record: " + mediaRecorder.state + "..." );
+		},
+
+		_recorderStopClickEvent		: function ( self, $moduleEl, module, audioNode ) {
+
+			var pauseClass		= 'pause';
+			var playClass		= 'play';
+
+			var mediaRecorder	= module.options.recorderMediaRecorder;
+			var $span 			= $moduleEl.find( '.nm-label' );
+			var $img			= $moduleEl.find( '.nm-play-button.pause' );
+
+			if (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused') {
+
+				mediaRecorder.stop( );
+
+				if ( $img.length > 0 ) {
+
+					$img.removeClass( pauseClass );
+					$img.addClass( playClass );
+				}
+
+				$span.text( "Record: stopped" );
+			};		
+
+		},
+
+		_createRecorderDiv			: function ( $moduleEl, module, audioNode ) {
+
+			var stopImgClass	= [ 'stop' ];
+
+			var template 		= '<span class="nm-label"></span>';
+			var $span 			= $( template );
+
+			this._createPlayPauseButton( $moduleEl, module, audioNode, this._recorderPlayPauseClickEvent );
+			this._createCustomButton( $moduleEl, module, audioNode, stopImgClass, this._recorderStopClickEvent );
+
+			$span.appendTo( $moduleEl );
+
+		},
+
 		_connectNodeToDestination	: function ( node ) {
 
 			this._connectNodes ( node, this.audioContext.destination );
@@ -1975,6 +2111,27 @@
 
 			request.open( "GET", url, true );
 			request.send( null );
+
+		},
+
+	};
+
+
+	$.ModuleNode				= function ( noiseModule, options, module ) {
+
+		this.noiseModule	= noiseModule;
+		this.options		= options;
+		this.module			= module;
+
+	};
+
+	$.ModuleNode.prototype		= {
+
+		createModuleNode	: function ( ) {
+
+		},
+
+		createModuleDiv		: function ( $moduleEl, audioNode ) {
 
 		},
 
