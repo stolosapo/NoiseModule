@@ -216,6 +216,10 @@
 
 			this._registerModuleNode( 'noise', new $.NoiseModuleNode( this ) );
 			this._registerModuleNode( 'oscillator', new $.OscilatorModuleNode( this ) );
+			this._registerModuleNode( 'liveinput', new $.LiveInputModuleNode( this ) );
+			this._registerModuleNode( 'radionode', new $.RadioModuleNode( this ) );
+			this._registerModuleNode( 'soundcloudnode', new $.SoundCloudModuleNode( this ) );
+			this._registerModuleNode( 'biquadfilter', new $.BiquadFilterModuleNode( this ) );
 
 		},
 
@@ -433,31 +437,6 @@
 				return item.createModuleDiv( $moduleEl, module, audioNode );
 			};
 
-			// if ( nodeType === "noise" ) {
-			// 	var item = this._findRegisteredModuleImpl( 'noise' );
-
-			// 	return item.createModuleDiv( $moduleEl, module, audioNode );
-			// };
-
-			// if ( nodeType === "oscillator" ) {
-			// 	return this._createOscillatorDiv( $moduleEl, module, audioNode );
-			// };
-
-			if ( nodeType === "liveinput" ) {
-				return this._createLiveInputDiv( $moduleEl, module, audioNode );
-			};
-
-			if ( nodeType === "radionode" ) {
-				return this._createRadioNodeDiv( $moduleEl, module, audioNode );
-			};
-
-			if ( nodeType === "soundcloudnode" ) {
-				return this._createSoundCloudNodeDiv( $moduleEl, module, audioNode );
-			};
-
-			if ( nodeType === "biquadfilter" ) {
-				return this._createBiquadFilterDiv( $moduleEl, audioNode );
-			};
 
 			if ( nodeType === "equalizer" ) {
 				return this._createEqualizerDiv( $moduleEl, module, audioNode );
@@ -575,35 +554,6 @@
 				return item.createModuleAudioNode( module );
 			};
 
-			// if ( nodeType === "noise" ) {
-			// 	// return this._createNoise( module );
-
-			// 	var noiseImpl = new $.NoiseModuleNode( this );
-			// 	var abstractModule = new $.ModuleNode( this, noiseImpl );
-
-			// 	return abstractModule.createModuleAudioNode( module );
-
-			// };
-
-			// if ( nodeType === "oscillator" ) {
-			// 	return this._createOscillator( module );
-			// };
-
-			if ( nodeType === "liveinput" ) {
-				return this._createLiveInput( module );
-			};
-
-			if ( nodeType === "radionode" ) {
-				return this._createRadioNode( module );
-			};
-
-			if ( nodeType === "soundcloudnode" ) {
-				return this._createSoundCloudNode( module );
-			};
-
-			if ( nodeType === "biquadfilter" ) {
-				return this._createBiquadFilter( module );
-			};
 
 			if ( nodeType === "equalizer" ) {
 				return this._createEqualizer( module );
@@ -651,21 +601,14 @@
 
 			var nodeType = module.nodeType;
 
-			if ( nodeType === "oscillator" ) {
-				return this._resetOscillatorModule( $content, module, audioNode );
+			var item = this._findRegisteredModuleImpl( nodeType );
+
+			if (item != undefined) {
+
+				return item.resetModuleSettings( $content, module, audioNode );
 			};
 
-			if ( nodeType === "radionode" ) {
-				return this._resetRadioNodeModule( $content, module, audioNode );
-			};
 
-			if ( nodeType === "soundcloudnode" ) {
-				return this._resetSoundCloudModule( $content, module, audioNode );
-			};
-
-			if ( nodeType === "biquadfilter" ) {
-				return this._resetBiquadFilterModule( $content, module, audioNode );
-			};
 
 			if ( nodeType === "equalizer" ) {
 				return this._resetEqualizerModule( $content, module, audioNode );
@@ -847,128 +790,6 @@
 			return this.moduleCounter + 1;
 
 		},
-
-		// _createNoise 				: function ( module ) {
-
-		// 	var type 	= module.type;
-
-		// 	if ( type === "white" ) {
-		// 		return this._createWhiteNoise();
-		// 	};
-
-		// 	if ( type === "pink" ) {
-		// 		return this._createPinkNoise();
-		// 	};
-
-		// 	if ( type === "brown" ) {
-		// 		return this._createBrownNoise();
-		// 	};
-
-		// },
-
-		// _createNoiseDiv 			: function ( $moduleEl, module, audioNode ) {
-
-		// 	this._createPlayStopButton( $moduleEl, module, audioNode );
-
-		// },
-
-		// _createWhiteNoise			: function ( bufferSize ) {
-
-		// 	bufferSize = bufferSize || 4096;
-
-		// 	var node = this.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
-
-		// 	node.onaudioprocess = function ( e ) {
-
-		// 		var output = e.outputBuffer.getChannelData(0);
-
-		// 		for (var i = 0; i < bufferSize; i++) { 				
-				
-		// 			output[i] = Math.random() * 2 - 1; 			
-		// 		};
-
-		// 	};
-
-		// 	return node;
-
-		// },
-
-		// _createPinkNoise			: function ( bufferSize ) {
-
-		// 	bufferSize = bufferSize || 4096;
-
-		// 	var b0, b1, b2, b3, b4, b5, b6;
-		// 	b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
-
-		// 	var node = this.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
-
-		// 	node.onaudioprocess = function( e ) {
-
-		// 		var output = e.outputBuffer.getChannelData ( 0 );
-
-		// 		for (var i = 0; i < bufferSize; i++) { 				
-
-		// 			var white = Math.random() * 2 - 1;			
-
-		// 			b0 = 0.99886 * b0 + white * 0.0555179;
-		// 			b1 = 0.99332 * b1 + white * 0.0750759;
-		// 			b2 = 0.96900 * b2 + white * 0.1538520;
-		// 			b3 = 0.86650 * b3 + white * 0.3104856;
-		// 			b4 = 0.55000 * b4 + white * 0.5329522;
-		// 			b5 = -0.7616 * b5 - white * 0.0168980;
-
-		// 			output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-		// 			output[i] *= 0.11; // (roughly) compensate for gain
-
-		// 			b6 = white * 0.115926;
-
-		// 		};
-		// 	};		
-
-		// 	return node;
-
-		// },
-
-		// _createBrownNoise			: function ( bufferSize ) {
-
-		// 	bufferSize = bufferSize || 4096;
-
-		// 	var lastOut = 0.0;
-		// 	var node = this.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
-
-		// 	node.onaudioprocess = function( e ) {
-
-		// 		var output = e.outputBuffer.getChannelData(0);
-
-		// 		for (var i = 0; i < bufferSize; i++) {
-
-		// 			var white = Math.random() * 2 - 1;
-
-		// 			output[i] = (lastOut + (0.02 * white)) / 1.02;
-		// 			lastOut = output[i];
-		// 			output[i] *= 3.5; // (roughly) compensate for gain
-
-		// 		};
-
-		// 	};
-
-		// 	return node;
-
-		// },
-
-		// _createOscillator			: function ( module ) {
-
-		// 	var wave = this.audioContext.createOscillator();
-
-		// 	wave.type = module.type;
-		// 	wave.frequency.value = module.options.oscillatorFrequency;
-		// 	wave.detune.value = module.options.oscillatorDetune;
-
-		// 	wave.start( 0 );
-
-		// 	return wave;
-
-		// },
 
 		_createSimpleSliderControl	: function ( audioNode, property, min, max, step, units, changeEvent ) {
 
@@ -1165,259 +986,7 @@
 
 		},
 
-		// _createOscillatorDiv		: function ( $moduleEl, module, audioNode ) {
 
-		// 	var $freqDiv	= this._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
-		// 	var $detuDiv	= this._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
-
-		// 	$freqDiv.appendTo( $moduleEl );
-		// 	$detuDiv.appendTo( $moduleEl );
-
-		// 	// Create Play / Stop button
-		// 	this._createPlayStopButton( $moduleEl, module, audioNode );
-
-		// },
-
-		// _resetOscillatorModule 		: function ( $moduleEl, module, audioNode ) {
-
-		// 	this._resetSliderSetting( $moduleEl, audioNode, 'frequency', module.options.oscillatorFrequency );
-		// 	this._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.oscillatorDetune );
-
-		// },
-
-		_getRadioAudioElement 		: function ( module ) {
-
-			if ( module.options.radioAudioElement != undefined ) {
-				return module.options.radioAudioElement;
-			};
-
-			if ( module.options.radioAudioIdSelector != undefined ) {
-
-				module.options.radioAudioElement = $( '#' + module.options.radioAudioIdSelector );
-				return module.options.radioAudioElement;
-			};
-
-			if ( module.options.radioAudioClassSelector != undefined ) {
-
-				module.options.radioAudioElement = $( '.' + module.options.radioAudioClassSelector );
-				return module.options.radioAudioElement;
-			};
-
-		},
-
-		_createRadioNode			: function ( module ) {
-
-			var audio = this._getRadioAudioElement( module ).get( 0 );
-
-			if (!audio) {
-				return;
-			};
-
-			var source = this.audioContext.createMediaElementSource( audio );
-		
-			return source;
-
-		},
-
-		_createRadioNodeDiv			: function ( $moduleEl, module, audioNode ) {
-
-			var template 	= '<span class="nm-label"></span>';
-			var $span 		= $( template );
-
-			var audio = module.options.radioAudioElement;
-
-			if (!audio) {
-
-				$span.text( 'Could not connect...' );
-				$span.appendTo( $moduleEl );
-
-				return $span;
-			};	
-
-
-			audio.on( 'playing', function( e ) { $span.text( 'Playing' ); } );
-			audio.on( 'pause', function( e ) { $span.text( 'Paused' ); } );
-			audio.on( 'play', function( e ) { $span.text( 'Play' ); } );
-			audio.on( 'ended', function( e ) { $span.text( 'Ended' ); } );
-			audio.on( 'seeked', function( e ) { $span.text( 'Seeked' ); } );
-			audio.on( 'seeking', function( e ) { $span.text( 'Seeking' ); } );
-			audio.on( 'waiting', function( e ) { $span.text( 'Waiting' ); } );
-			audio.on( 'emptied', function( e ) { $span.text( 'Cleared' ); } );
-
-
-			$span.appendTo( $moduleEl );
-
-			return $span;
-
-		},
-
-		_resetRadioNodeModule 		: function ( $moduleEl, module, audioNode ) {
-
-			var audio = module.options.radioAudioElement.get( 0 );
-
-			if (!audio) {
-				return;
-			};
-
-			audio.pause( );
-			audio.removeAttribute( "src" );
-			audio.load( );
-
-		},
-
-		_createSoundCloudNode		: function ( module ) {
-
-			var _self 			= this;
-
-			var source;
-
-			var baseUrl			= 'https://api.soundcloud.com/resolve.json?url=';
-			var clientParameter = 'client_id=' + module.options.soundCloudClientId;
-			var url				= baseUrl + module.options.soundCloudTrackUrl + '&' + clientParameter;
-
-			var audio 			= new Audio( );
-			audio.crossOrigin	= "anonymous";
-
-			module.options.soundCloudAudio = audio;
-
-			this._requestGET( url, function ( response ) {
-
-				var trackInfo 	= JSON.parse( response );
-				var streamUrl 	= trackInfo.stream_url + "?" + clientParameter;
-		
-				audio.src 		= streamUrl;
-
-				source 			= _self.audioContext.createMediaElementSource( audio );
-
-				/* Update source node map with this new instance */
-				_self._updateAudioNode( module.name, source );
-
-				var $divEl 		= _self._findModuleDivByName( module );
-				var $content 	= $( $divEl ).find( '.nm-content' );
-
-				_self._appendModuleFooter( $( $divEl ), $content, module, source );
-				_self._connectAllDestinations( module );
-
-				/* If module option is started then do the connection */
-				if (module.options.started) {
-					audio.play( );
-				}
-
-
-			} );
-
-		},
-
-		_soundCloudPlayPauseEvent	: function ( self, $moduleEl, module, audioNode, playPause ) {
-
-			var audio 		= module.options.soundCloudAudio;
-
-			if (audio.paused) {
-				audio.play( );
-			}
-			else {
-				audio.pause( );
-			};
-
-			console.log(audio);
-
-		},
-
-		_createSoundCloudNodeDiv	: function ( $moduleEl, module, audioNode ) {
-
-			var template 	= '<span class="nm-label"></span>';
-			var $span 		= $( template );
-
-			var audio 		= module.options.soundCloudAudio;
-
-			if (!audio) {
-
-				$span.text( 'Could not connect...' );
-				$span.appendTo( $moduleEl );
-
-				return $span;
-			};	
-
-			var $audioEl 	= $( audio );
-
-			$audioEl.on( 'playing', function( e ) { $span.text( 'Playing' ); } );
-			$audioEl.on( 'pause', function( e ) { $span.text( 'Paused' ); } );
-			$audioEl.on( 'play', function( e ) { $span.text( 'Play' ); } );
-			$audioEl.on( 'ended', function( e ) { $span.text( 'Ended' ); } );
-			$audioEl.on( 'seeking', function( e ) { $span.text( 'Seeking' ); } );
-			$audioEl.on( 'waiting', function( e ) { $span.text( 'Waiting' ); } );
-
-
-			$span.appendTo( $moduleEl );
-
-			this._createPlayPauseButton( $moduleEl, module, audioNode, this._soundCloudPlayPauseEvent );
-			
-		},
-
-		_resetSoundCloudModule 		: function ( $moduleEl, module, audioNode ) {
-
-			var audio	= module.options.soundCloudAudio;
-			var $img	= $moduleEl.find( '.nm-play-button' );
-
-			audio.pause( );
-
-			$img.removeClass( 'pause' );
-			$img.addClass( 'play' );
-
-			audio.load( );
-
-		},
-
-		_createLiveInput 			: function ( module ) {
-
-			navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-			if (navigator.mediaDevices) {
-
-				var _self 	= this;
-				var source;
-
-				navigator.mediaDevices.getUserMedia(
-				{
-					"audio": {
-						"mandatory": {
-							"googEchoCancellation": "false",
-							"googAutoGainControl": "false",
-							"googNoiseSuppression": "false",
-							"googHighpassFilter": "false"
-						},
-						"optional": [ ]
-					},
-				}).then( function( stream ) {
-
-					source 			= _self.audioContext.createMediaStreamSource( stream );
-
-					/* Update source node map with this new instance */
-					_self._updateAudioNode( module.name, source );
-
-					var $divEl 		= _self._findModuleDivByName( module );
-					var $content 	= $( $divEl ).find( '.nm-content' );
-
-					_self._appendModuleFooter( $( $divEl ), $content, module, source );
-
-					/* If module option is started then do the connection */
-					if (module.options.started) {
-						_self._connectAllDestinations( module );
-					}
-
-				} );
-
-				return source;
-
-			}
-
-		},
-
-		_createLiveInputDiv 		: function ( $moduleEl, module, audioNode ) {
-
-			this._createPlayStopButton( $moduleEl, module, audioNode );
-
-		},
 
 		_createGain					: function ( module, value ) {
 
@@ -1456,29 +1025,7 @@
 			return node;
 
 		},
-
-		_createBiquadFilterDiv		: function ( $moduleEl, audioNode ) {
-
-			var $freqDiv	= this._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
-			var $detuDiv	= this._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
-			var $qDiv		= this._createSimpleSliderControl( audioNode, 'Q', 1, 100, 0.1, "" );
-			var $gainDiv	= this._createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
-
-			$freqDiv.appendTo( $moduleEl );
-			$detuDiv.appendTo( $moduleEl );
-			$qDiv.appendTo( $moduleEl );
-			$gainDiv.appendTo( $moduleEl );
-
-		},
-
-		_resetBiquadFilterModule 	: function ( $moduleEl, module, audioNode ) {
-
-			this._resetSliderSetting( $moduleEl, audioNode, 'frequency', module.options.biquadFilterFrequency );
-			this._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.biquadFilterDetune );
-			this._resetSliderSetting( $moduleEl, audioNode, 'Q', module.options.biquadFilterQ );
-			this._resetSliderSetting( $moduleEl, audioNode, 'gain', module.options.biquadFilterGain );
-
-		},
+		
 
 		_createEqualizer 			: function ( module ) {
 
@@ -2421,6 +1968,344 @@
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.oscillatorDetune );
 
 	 	},
+
+	};
+
+
+
+	/**
+	 * LiveInputModuleNode: Class for 'liveinput' node
+	 */
+
+	$.LiveInputModuleNode			= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.LiveInputModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			navigator.getUserMedia = navigator.getUserMedia || 
+									navigator.webkitGetUserMedia || 
+									navigator.mozGetUserMedia;
+
+			if (navigator.mediaDevices) {
+
+				var _self = this;
+
+				var source;
+
+				navigator.mediaDevices.getUserMedia(
+				{
+					"audio": {
+						"mandatory": {
+							"googEchoCancellation": "false",
+							"googAutoGainControl": "false",
+							"googNoiseSuppression": "false",
+							"googHighpassFilter": "false"
+						},
+						"optional": [ ]
+					},
+				}).then( function( stream ) {
+
+					source 			= _self.nm.audioContext.createMediaStreamSource( stream );
+
+					/* Update source node map with this new instance */
+					_self.nm._updateAudioNode( module.name, source );
+
+					var $divEl 		= _self.nm._findModuleDivByName( module );
+					var $content 	= $( $divEl ).find( '.nm-content' );
+
+					_self.nm._appendModuleFooter( $( $divEl ), $content, module, source );
+
+					/* If module option is started then do the connection */
+					if (module.options.started) {
+						_self.nm._connectAllDestinations( module );
+					}
+
+				} );
+
+				return source;
+
+			}
+
+		},
+
+		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+
+			this.nm._createPlayStopButton( $moduleEl, module, audioNode );
+
+		},
+
+		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+
+		}
+
+	};
+
+
+
+	/**
+	 * RadioModuleNode: Class for 'radionode' node
+	 */
+
+	$.RadioModuleNode			= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.RadioModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			var audio = this._getRadioAudioElement( module ).get( 0 );
+
+			if (!audio) {
+				return;
+			};
+
+			var source = this.nm.audioContext.createMediaElementSource( audio );
+		
+			return source;
+
+		},
+
+		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+
+			var template 	= '<span class="nm-label"></span>';
+			var $span 		= $( template );
+
+			var audio = module.options.radioAudioElement;
+
+			if (!audio) {
+
+				$span.text( 'Could not connect...' );
+				$span.appendTo( $moduleEl );
+
+				return $span;
+			};	
+
+
+			audio.on( 'playing', function( e ) { $span.text( 'Playing' ); } );
+			audio.on( 'pause', function( e ) { $span.text( 'Paused' ); } );
+			audio.on( 'play', function( e ) { $span.text( 'Play' ); } );
+			audio.on( 'ended', function( e ) { $span.text( 'Ended' ); } );
+			audio.on( 'seeked', function( e ) { $span.text( 'Seeked' ); } );
+			audio.on( 'seeking', function( e ) { $span.text( 'Seeking' ); } );
+			audio.on( 'waiting', function( e ) { $span.text( 'Waiting' ); } );
+			audio.on( 'emptied', function( e ) { $span.text( 'Cleared' ); } );
+
+
+			$span.appendTo( $moduleEl );
+
+			return $span;
+
+		},
+
+		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+
+			var audio = module.options.radioAudioElement.get( 0 );
+
+			if (!audio) {
+				return;
+			};
+
+			audio.pause( );
+			audio.removeAttribute( "src" );
+			audio.load( );
+
+		},
+
+		
+		/* Private Methods */
+
+		_getRadioAudioElement 	: function ( module ) {
+
+			if ( module.options.radioAudioElement != undefined ) {
+				return module.options.radioAudioElement;
+			};
+
+			if ( module.options.radioAudioIdSelector != undefined ) {
+
+				module.options.radioAudioElement = $( '#' + module.options.radioAudioIdSelector );
+				return module.options.radioAudioElement;
+			};
+
+			if ( module.options.radioAudioClassSelector != undefined ) {
+
+				module.options.radioAudioElement = $( '.' + module.options.radioAudioClassSelector );
+				return module.options.radioAudioElement;
+			};
+
+		},
+
+	};
+
+
+
+	/**
+	 * SoundCloudModuleNode: Class for 'soundcloudnode' node
+	 */
+
+	$.SoundCloudModuleNode				= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.SoundCloudModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			var _self 			= this;
+
+			var source;
+
+			var baseUrl			= 'https://api.soundcloud.com/resolve.json?url=';
+			var clientParameter = 'client_id=' + module.options.soundCloudClientId;
+			var url				= baseUrl + module.options.soundCloudTrackUrl + '&' + clientParameter;
+
+			var audio 			= new Audio( );
+			audio.crossOrigin	= "anonymous";
+
+			module.options.soundCloudAudio = audio;
+
+			this.nm._requestGET( url, function ( response ) {
+
+				var trackInfo 	= JSON.parse( response );
+				var streamUrl 	= trackInfo.stream_url + "?" + clientParameter;
+		
+				audio.src 		= streamUrl;
+
+				source 			= _self.nm.audioContext.createMediaElementSource( audio );
+
+				/* Update source node map with this new instance */
+				_self.nm._updateAudioNode( module.name, source );
+
+				var $divEl 		= _self.nm._findModuleDivByName( module );
+				var $content 	= $( $divEl ).find( '.nm-content' );
+
+				_self.nm._appendModuleFooter( $( $divEl ), $content, module, source );
+				_self.nm._connectAllDestinations( module );
+
+				/* If module option is started then do the connection */
+				if (module.options.started) {
+					audio.play( );
+				}
+
+
+			} );
+
+		},
+
+		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+
+			var template 	= '<span class="nm-label"></span>';
+			var $span 		= $( template );
+
+			var audio 		= module.options.soundCloudAudio;
+
+			if (!audio) {
+
+				$span.text( 'Could not connect...' );
+				$span.appendTo( $moduleEl );
+
+				return $span;
+			};	
+
+			var $audioEl 	= $( audio );
+
+			$audioEl.on( 'playing', function( e ) { $span.text( 'Playing' ); } );
+			$audioEl.on( 'pause', function( e ) { $span.text( 'Paused' ); } );
+			$audioEl.on( 'play', function( e ) { $span.text( 'Play' ); } );
+			$audioEl.on( 'ended', function( e ) { $span.text( 'Ended' ); } );
+			$audioEl.on( 'seeking', function( e ) { $span.text( 'Seeking' ); } );
+			$audioEl.on( 'waiting', function( e ) { $span.text( 'Waiting' ); } );
+
+
+			$span.appendTo( $moduleEl );
+
+			this.nm._createPlayPauseButton( $moduleEl, module, audioNode, this._soundCloudPlayPauseEvent );
+
+		},
+
+		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+
+			var audio	= module.options.soundCloudAudio;
+			var $img	= $moduleEl.find( '.nm-play-button' );
+
+			audio.pause( );
+
+			$img.removeClass( 'pause' );
+			$img.addClass( 'play' );
+
+			audio.load( );
+
+		},
+
+
+		/* Private Methods */
+
+		_soundCloudPlayPauseEvent	: function ( self, $moduleEl, module, audioNode, playPause ) {
+
+			var audio 		= module.options.soundCloudAudio;
+
+			if (audio.paused) {
+				audio.play( );
+			}
+			else {
+				audio.pause( );
+			};
+
+		},
+
+	};
+
+
+
+	/**
+	 * BiquadFilterModuleNode: Class for 'biquadfilter' node
+	 */
+
+	$.BiquadFilterModuleNode			= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.BiquadFilterModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			return this.nm._createBiquadFilter( module );
+
+		},
+
+		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+
+			var $freqDiv	= this.nm._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
+			var $detuDiv	= this.nm._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
+			var $qDiv		= this.nm._createSimpleSliderControl( audioNode, 'Q', 1, 100, 0.1, "" );
+			var $gainDiv	= this.nm._createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
+
+			$freqDiv.appendTo( $moduleEl );
+			$detuDiv.appendTo( $moduleEl );
+			$qDiv.appendTo( $moduleEl );
+			$gainDiv.appendTo( $moduleEl );
+
+		},
+
+		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'frequency', module.options.biquadFilterFrequency );
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.biquadFilterDetune );
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'Q', module.options.biquadFilterQ );
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'gain', module.options.biquadFilterGain );
+
+		},
 
 	};
 
