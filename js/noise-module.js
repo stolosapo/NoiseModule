@@ -220,6 +220,8 @@
 			this._registerModuleNode( 'radionode', new $.RadioModuleNode( this ) );
 			this._registerModuleNode( 'soundcloudnode', new $.SoundCloudModuleNode( this ) );
 			this._registerModuleNode( 'biquadfilter', new $.BiquadFilterModuleNode( this ) );
+			this._registerModuleNode( 'equalizer', new $.EqualizerModuleMode( this ) );
+			this._registerModuleNode( 'delay', new $.DelayModuleNode( this ) );
 
 		},
 
@@ -438,13 +440,6 @@
 			};
 
 
-			if ( nodeType === "equalizer" ) {
-				return this._createEqualizerDiv( $moduleEl, module, audioNode );
-			};
-
-			if ( nodeType === "delay" ) {
-				return this._createDelayDiv( $moduleEl, audioNode );
-			};
 
 			if ( nodeType === "kingtubbynode" ) {
 				return this._createKingTubbyDiv( $moduleEl, module, audioNode );
@@ -555,13 +550,6 @@
 			};
 
 
-			if ( nodeType === "equalizer" ) {
-				return this._createEqualizer( module );
-			};
-
-			if ( nodeType === "delay" ) {
-				return this._createDelay( module );
-			};
 
 			if ( nodeType === "kingtubbynode" ) {
 				return this._createKingTubbyNode( module );
@@ -608,15 +596,6 @@
 				return item.resetModuleSettings( $content, module, audioNode );
 			};
 
-
-
-			if ( nodeType === "equalizer" ) {
-				return this._resetEqualizerModule( $content, module, audioNode );
-			};
-
-			if ( nodeType === "delay" ) {
-				return this._resetDelayModule( $content, module, audioNode );
-			};
 
 			if ( nodeType === "kingtubbynode" ) {
 				return this._resetKingTubbyModule( $content, module, audioNode );
@@ -1025,157 +1004,8 @@
 			return node;
 
 		},
-		
 
-		_createEqualizer 			: function ( module ) {
 
-			var _self 		= this;
-
-			var preAmp 		= _self._createGain( module, module.options.eqPreAmpInGain );
-			var outputGain	= _self._createGain( module, module.options.eqPreAmpOutGain );
-
-			var nodes 		= [ ];
-			var prevNode 	= preAmp;
-
-			nodes.push( preAmp );
-
-			// Create all bands
-			$.each( module.options.eqBands, function( index, band ) {
-
-				var bandNode 	= _self._createBiquadFilter( 
-					module,
-					band.type,
-					band.frequency,
-					band.detune, 
-					band.Q,
-					band.gain );
-
-				_self._connectNodes( prevNode, bandNode );
-
-				prevNode 		= bandNode;
-
-				nodes.push( prevNode );
-
-			} );
-
-			_self._connectNodes( prevNode, outputGain );
-
-			nodes.push( outputGain );
-
-			return { inNode: preAmp, outNode: outputGain, allNodes: nodes };
-
-		},
-
-		_createEqualizerDiv 		: function ( $moduleEl, module,  audioNode ) {
-
-			var _self 		= this;
-			var inGain 		= audioNode.inNode;
-			var outGain 	= audioNode.outNode;
-
-			var min 		= module.options.eqBandMin;
-			var max 		= module.options.eqBandMax;
-			var step 		= module.options.eqBandStep;
-
-			var $inGainDiv	= this._createSliderControl( inGain, 'gain', 'preAmp In', 0, 2, 0.1, '' );
-			$inGainDiv.addClass( 'pre-amp' );
-			$inGainDiv.addClass( 'in' );
-
-			var $outGainDiv	= this._createSliderControl( outGain, 'gain', 'preAmp Out', 0, 2, 0.1, '' );
-			$outGainDiv.addClass( 'pre-amp' );
-			$outGainDiv.addClass( 'out' );
-
-			var lastIndex 	= audioNode.allNodes.length - 1;
-
-			$inGainDiv.appendTo( $moduleEl );
-
-			$.each( audioNode.allNodes, function( index, node ) {
-
-				if ( index == 0 || index == lastIndex ) {
-					return;
-				}
-
-				var bandIndex 	= index - 1;
-				var description	= module.options.eqBands[ bandIndex ].description;
-
-				var $filterDiv	= _self._createSliderControl( 
-					node, 
-					module.options.eqBandControl, 
-					description, 
-					min, 
-					max, 
-					step, 
-					'' );
-
-				$filterDiv.addClass( 'eq-band' );
-				$filterDiv.addClass( 'band' + bandIndex );
-
-				$filterDiv.appendTo( $moduleEl );
-
-			} );
-
-			
-			$outGainDiv.appendTo( $moduleEl );
-
-		},
-
-		_resetEqualizerModule		: function ( $moduleEl, module, audioNode ) {
-
-			var _self 		= this;
-
-			var inClasses 	= [ 'gain', 'pre-amp', 'in' ];
-			var outClasses 	= [ 'gain', 'pre-amp', 'out' ];
-
-			this._resetSliderSettingByClasses( $moduleEl, audioNode.inNode, 'gain', inClasses, module.options.eqPreAmpInGain );
-			this._resetSliderSettingByClasses( $moduleEl, audioNode.outNode, 'gain', outClasses, module.options.eqPreAmpOutGain );
-			
-			var lastIndex 	= audioNode.allNodes.length - 1;
-
-			$.each( audioNode.allNodes, function( index, node ) {
-
-				if ( index == 0 || index == lastIndex ) {
-					return;
-				}
-
-				var bandControlType	= module.options.eqBandControl;
-				var bandIndex 		= index - 1;
-
-				var classes 	= [ bandControlType, 'eq-band', 'band' + bandIndex ];
-				var value 		= module.options.eqBands[ bandIndex ][ bandControlType ];
-
-				_self._resetSliderSettingByClasses( 
-					$moduleEl, 
-					node, 
-					bandControlType, 
-					classes, 
-					value );
-
-			} );
-
-		},
-
-		_createDelay				: function ( module ) {
-
-			var node = this.audioContext.createDelay ();
-
-			node.delayTime.value = module.options.delayTime;
-
-			return node;
-
-		},
-
-		_createDelayDiv				: function ( $moduleEl, audioNode ) {
-
-			var $timeDiv	= this._createSimpleSliderControl( audioNode, 'delayTime', 0, 10, 0.01, "Sec" );
-
-			$timeDiv.appendTo( $moduleEl );
-
-		},
-
-		_resetDelayModule 			: function ( $moduleEl, module, audioNode ) {
-
-			this._resetSliderSetting( $moduleEl, audioNode, 'delayTime', module.options.delayTime );
-
-		},
 
 		_createKingTubbyNode		: function ( module ) {
 
@@ -2304,6 +2134,188 @@
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.biquadFilterDetune );
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'Q', module.options.biquadFilterQ );
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'gain', module.options.biquadFilterGain );
+
+		},
+
+	};
+
+
+
+	/**
+	 * EqualizerModuleMode: Class for 'equalizer' node
+	 */
+
+	$.EqualizerModuleMode			= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.EqualizerModuleMode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			var _self 		= this;
+
+			var preAmp 		= _self.nm._createGain( module, module.options.eqPreAmpInGain );
+			var outputGain	= _self.nm._createGain( module, module.options.eqPreAmpOutGain );
+
+			var nodes 		= [ ];
+			var prevNode 	= preAmp;
+
+			nodes.push( preAmp );
+
+			// Create all bands
+			$.each( module.options.eqBands, function( index, band ) {
+
+				var bandNode 	= _self.nm._createBiquadFilter( 
+					module,
+					band.type,
+					band.frequency,
+					band.detune, 
+					band.Q,
+					band.gain );
+
+				_self.nm._connectNodes( prevNode, bandNode );
+
+				prevNode 		= bandNode;
+
+				nodes.push( prevNode );
+
+			} );
+
+			_self.nm._connectNodes( prevNode, outputGain );
+
+			nodes.push( outputGain );
+
+			return { inNode: preAmp, outNode: outputGain, allNodes: nodes };
+
+		},
+
+		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+
+			var _self 		= this;
+			var inGain 		= audioNode.inNode;
+			var outGain 	= audioNode.outNode;
+
+			var min 		= module.options.eqBandMin;
+			var max 		= module.options.eqBandMax;
+			var step 		= module.options.eqBandStep;
+
+			var $inGainDiv	= this.nm._createSliderControl( inGain, 'gain', 'preAmp In', 0, 2, 0.1, '' );
+			$inGainDiv.addClass( 'pre-amp' );
+			$inGainDiv.addClass( 'in' );
+
+			var $outGainDiv	= this.nm._createSliderControl( outGain, 'gain', 'preAmp Out', 0, 2, 0.1, '' );
+			$outGainDiv.addClass( 'pre-amp' );
+			$outGainDiv.addClass( 'out' );
+
+			var lastIndex 	= audioNode.allNodes.length - 1;
+
+			$inGainDiv.appendTo( $moduleEl );
+
+			$.each( audioNode.allNodes, function( index, node ) {
+
+				if ( index == 0 || index == lastIndex ) {
+					return;
+				}
+
+				var bandIndex 	= index - 1;
+				var description	= module.options.eqBands[ bandIndex ].description;
+
+				var $filterDiv	= _self.nm._createSliderControl( 
+					node, 
+					module.options.eqBandControl, 
+					description, 
+					min, 
+					max, 
+					step, 
+					'' );
+
+				$filterDiv.addClass( 'eq-band' );
+				$filterDiv.addClass( 'band' + bandIndex );
+
+				$filterDiv.appendTo( $moduleEl );
+
+			} );
+
+			
+			$outGainDiv.appendTo( $moduleEl );
+
+		},
+
+		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+
+			var _self 		= this;
+
+			var inClasses 	= [ 'gain', 'pre-amp', 'in' ];
+			var outClasses 	= [ 'gain', 'pre-amp', 'out' ];
+
+			this.nm._resetSliderSettingByClasses( $moduleEl, audioNode.inNode, 'gain', inClasses, module.options.eqPreAmpInGain );
+			this.nm._resetSliderSettingByClasses( $moduleEl, audioNode.outNode, 'gain', outClasses, module.options.eqPreAmpOutGain );
+			
+			var lastIndex 	= audioNode.allNodes.length - 1;
+
+			$.each( audioNode.allNodes, function( index, node ) {
+
+				if ( index == 0 || index == lastIndex ) {
+					return;
+				}
+
+				var bandControlType	= module.options.eqBandControl;
+				var bandIndex 		= index - 1;
+
+				var classes 	= [ bandControlType, 'eq-band', 'band' + bandIndex ];
+				var value 		= module.options.eqBands[ bandIndex ][ bandControlType ];
+
+				_self.nm._resetSliderSettingByClasses( 
+					$moduleEl, 
+					node, 
+					bandControlType, 
+					classes, 
+					value );
+
+			} );
+
+		},
+
+	};
+
+
+
+	/**
+	 * DelayModuleNode: Class for 'delay' node
+	 */
+
+	$.DelayModuleNode			= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.DelayModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			var node = this.nm.audioContext.createDelay ();
+
+			node.delayTime.value = module.options.delayTime;
+
+			return node;
+
+		},
+
+		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+
+			var $timeDiv	= this.nm._createSimpleSliderControl( audioNode, 'delayTime', 0, 10, 0.01, "Sec" );
+
+			$timeDiv.appendTo( $moduleEl );
+
+		},
+
+		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'delayTime', module.options.delayTime );
 
 		},
 
