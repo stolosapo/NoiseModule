@@ -222,6 +222,8 @@
 			this._registerModuleNode( 'biquadfilter', new $.BiquadFilterModuleNode( this ) );
 			this._registerModuleNode( 'equalizer', new $.EqualizerModuleMode( this ) );
 			this._registerModuleNode( 'delay', new $.DelayModuleNode( this ) );
+			this._registerModuleNode( 'kingtubbynode', new $.KingTubbyModuleNode( this ) );
+			this._registerModuleNode( 'dynamicscompressor', new $.DynamicsCompressorModuleNode( this ) );
 
 		},
 
@@ -441,14 +443,6 @@
 
 
 
-			if ( nodeType === "kingtubbynode" ) {
-				return this._createKingTubbyDiv( $moduleEl, module, audioNode );
-			};
-
-			if ( nodeType === "dynamicscompressor" ) {
-				return this._createDynamicsCompressorDiv( $moduleEl, audioNode );
-			};
-
 			if ( nodeType === "gain" ) {
 				return this._createGainDiv( $moduleEl, audioNode );
 			};
@@ -551,14 +545,6 @@
 
 
 
-			if ( nodeType === "kingtubbynode" ) {
-				return this._createKingTubbyNode( module );
-			};
-
-			if ( nodeType === "dynamicscompressor" ) {
-				return this._createDynamicsCompressor( module );
-			};
-
 			if ( nodeType === "gain" ) {
 				return this._createGain( module );
 			};
@@ -597,13 +583,6 @@
 			};
 
 
-			if ( nodeType === "kingtubbynode" ) {
-				return this._resetKingTubbyModule( $content, module, audioNode );
-			};
-
-			if ( nodeType === "dynamicscompressor" ) {
-				return this._resetDynamicsCompressor( $content, module, audioNode );
-			};
 
 			if ( nodeType === "gain" ) {
 				return this._resetGainModule( $content, module, audioNode );
@@ -1006,137 +985,6 @@
 		},
 
 
-
-		_createKingTubbyNode		: function ( module ) {
-
-			var nodes				= [ ];
-
-			var preAmp 				= this._createGain( module, module.options.kingTubbyPreAmpInGain );
-			var outputGain			= this._createGain( module, module.options.kingTubbyPreAmpOutGain );
-
-			nodes.push( preAmp );
-
-			var delay				= this.audioContext.createDelay( );
-			delay.delayTime.value	= module.options.kingTubbyDelayTime;
-			nodes.push( delay );
-
-			var feedback			= this.audioContext.createGain( );
-			feedback.gain.value		= module.options.kingTubbyGain;
-			nodes.push( feedback );
-
-			var filter				= this.audioContext.createBiquadFilter( );
-			filter.frequency.value	= module.options.kingTubbyCutOffFreq;
-			nodes.push( filter );
-
-			nodes.push( outputGain );
-
-
-			this._connectNodes( delay, feedback );
-			this._connectNodes( feedback, filter );
-			this._connectNodes( filter, delay );
-
-			this._connectNodes( preAmp, delay );
-			this._connectNodes( preAmp, outputGain );
-			this._connectNodes( delay, outputGain );
-
-			return { inNode: preAmp, outNode: outputGain, allNodes: nodes };
-
-		},
-
-		_createKingTubbyDiv			: function ( $moduleEl, module, audioNode ) {
-
-			var delay 		= audioNode.allNodes[ 1 ]
-			var feedback 	= audioNode.allNodes[ 2 ];
-			var filter	 	= audioNode.allNodes[ 3 ];
-
-			var $inGainDiv	= this._createSliderControl( audioNode.inNode, 'gain', 'preAmp In', 0, 2, 0.1, '' );
-			$inGainDiv.addClass( 'pre-amp' );
-			$inGainDiv.addClass( 'in' );
-
-			var $outGainDiv	= this._createSliderControl( audioNode.outNode, 'gain', 'preAmp Out', 0, 2, 0.1, '' );
-			$outGainDiv.addClass( 'pre-amp' );
-			$outGainDiv.addClass( 'out' );
-			
-			var $delayDiv		= this._createSliderControl( delay, 'delayTime', 'delay', 0, 10, 0.01, "Sec" );
-			$delayDiv.addClass( 'delay' );
-
-			var $feedbackDiv	= this._createSliderControl( feedback, 'gain', 'feedback', 0, 1, 0.01, "" );
-			$feedbackDiv.addClass( 'feedback' );
-
-			var $freqDiv		= this._createSliderControl( filter, 'frequency', 'cutoff', 0, 8000, 1, "Hz" );
-			$freqDiv.addClass( 'biquadfilter' );
-
-			$inGainDiv.appendTo( $moduleEl );
-
-			$delayDiv.appendTo( $moduleEl );
-			$feedbackDiv.appendTo( $moduleEl );
-			$freqDiv.appendTo( $moduleEl );
-
-			$outGainDiv.appendTo( $moduleEl );
-
-		},
-
-		_resetKingTubbyModule		: function ( $moduleEl, module, audioNode ) {
-
-			var delay 		= audioNode.allNodes[ 1 ]
-			var feedback 	= audioNode.allNodes[ 2 ];
-			var filter	 	= audioNode.allNodes[ 3 ];
-
-			var inClasses 	= [ 'gain', 'pre-amp', 'in' ];
-			var outClasses 	= [ 'gain', 'pre-amp', 'out' ];
-
-			this._resetSliderSettingByClasses( $moduleEl, audioNode.inNode, 'gain', inClasses, module.options.kingTubbyPreAmpInGain );
-			this._resetSliderSettingByClasses( $moduleEl, audioNode.outNode, 'gain', outClasses, module.options.kingTubbyPreAmpOutGain );
-
-			this._resetSliderSettingByClasses( $moduleEl, delay, 'delayTime', [ 'delayTime', 'delay' ], module.options.kingTubbyDelayTime );
-			this._resetSliderSettingByClasses( $moduleEl, feedback, 'gain', [ 'gain', 'feedback' ], module.options.kingTubbyGain );
-			this._resetSliderSettingByClasses( $moduleEl, filter, 'frequency', [ 'frequency', 'biquadfilter' ], module.options.kingTubbyCutOffFreq );
-
-		},
-
-		_createDynamicsCompressor	: function ( module ) {
-
-			var node = this.audioContext.createDynamicsCompressor ();
-
-			node.threshold.value = module.options.compressorThreshold;
-			node.knee.value = module.options.compressorKnee;
-			node.ratio.value = module.options.compressorRatio;
-			node.reduction.value = module.options.compressorReduction;
-			node.attack.value = module.options.compressorAttack;
-			node.release.value = module.options.compressorRelease;
-
-			return node;
-
-		},
-
-		_createDynamicsCompressorDiv: function ( $moduleEl, audioNode ) {
-
-			var $thresholdDiv	= this._createSimpleSliderControl( audioNode, 'threshold', -36, 0, 0.01, "DB" );
-			var $kneeDiv		= this._createSimpleSliderControl( audioNode, 'knee', 0, 40, 0.01, "DB" );
-			var $ratioDiv		= this._createSimpleSliderControl( audioNode, 'ratio', 1, 50, 0.1, "Sec" );
-			var $reductionDiv	= this._createSimpleSliderControl( audioNode, 'reduction', -20, 0, 0.01, "DB" );
-			var $attackDiv		= this._createSimpleSliderControl( audioNode, 'attack', 0, 1, 0.001, "Sec" );
-			var $releaseDiv		= this._createSimpleSliderControl( audioNode, 'release', 0, 2, 0.01, "Sec" );
-
-			$thresholdDiv.appendTo( $moduleEl );
-			$kneeDiv.appendTo( $moduleEl );
-			$ratioDiv.appendTo( $moduleEl );
-			$reductionDiv.appendTo( $moduleEl );
-			$attackDiv.appendTo( $moduleEl );
-			$releaseDiv.appendTo( $moduleEl );
-
-		},
-
-		_resetDynamicsCompressor 	: function ( $moduleEl, module, audioNode ) {
-
-			this._resetSliderSetting( $moduleEl, audioNode, 'threshold', module.options.compressorThreshold );
-			this._resetSliderSetting( $moduleEl, audioNode, 'knee', module.options.compressorKnee );
-			this._resetSliderSetting( $moduleEl, audioNode, 'ratio', module.options.compressorRatio );
-			this._resetSliderSetting( $moduleEl, audioNode, 'reduction', module.options.compressorReduction );
-			this._resetSliderSetting( $moduleEl, audioNode, 'attack', module.options.compressorAttack );
-			this._resetSliderSetting( $moduleEl, audioNode, 'release', module.options.compressorRelease );
-
-		},
 
 		_createStreoPanner			: function ( module ) {
 
@@ -2316,6 +2164,169 @@
 		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
 
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'delayTime', module.options.delayTime );
+
+		},
+
+	};
+
+
+
+	/**
+	 * KingTubbyModuleNode: Class for 'kingtubbynode' node
+	 */
+
+	$.KingTubbyModuleNode			= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.KingTubbyModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			var nodes				= [ ];
+
+			var preAmp 				= this.nm._createGain( module, module.options.kingTubbyPreAmpInGain );
+			var outputGain			= this.nm._createGain( module, module.options.kingTubbyPreAmpOutGain );
+
+			nodes.push( preAmp );
+
+			var delay				= this.nm.audioContext.createDelay( );
+			delay.delayTime.value	= module.options.kingTubbyDelayTime;
+			nodes.push( delay );
+
+			var feedback			= this.nm.audioContext.createGain( );
+			feedback.gain.value		= module.options.kingTubbyGain;
+			nodes.push( feedback );
+
+			var filter				= this.nm.audioContext.createBiquadFilter( );
+			filter.frequency.value	= module.options.kingTubbyCutOffFreq;
+			nodes.push( filter );
+
+			nodes.push( outputGain );
+
+
+			this.nm._connectNodes( delay, feedback );
+			this.nm._connectNodes( feedback, filter );
+			this.nm._connectNodes( filter, delay );
+
+			this.nm._connectNodes( preAmp, delay );
+			this.nm._connectNodes( preAmp, outputGain );
+			this.nm._connectNodes( delay, outputGain );
+
+			return { inNode: preAmp, outNode: outputGain, allNodes: nodes };
+
+		},
+
+		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+
+			var delay 		= audioNode.allNodes[ 1 ]
+			var feedback 	= audioNode.allNodes[ 2 ];
+			var filter	 	= audioNode.allNodes[ 3 ];
+
+			var $inGainDiv	= this.nm._createSliderControl( audioNode.inNode, 'gain', 'preAmp In', 0, 2, 0.1, '' );
+			$inGainDiv.addClass( 'pre-amp' );
+			$inGainDiv.addClass( 'in' );
+
+			var $outGainDiv	= this.nm._createSliderControl( audioNode.outNode, 'gain', 'preAmp Out', 0, 2, 0.1, '' );
+			$outGainDiv.addClass( 'pre-amp' );
+			$outGainDiv.addClass( 'out' );
+			
+			var $delayDiv		= this.nm._createSliderControl( delay, 'delayTime', 'delay', 0, 10, 0.01, "Sec" );
+			$delayDiv.addClass( 'delay' );
+
+			var $feedbackDiv	= this.nm._createSliderControl( feedback, 'gain', 'feedback', 0, 1, 0.01, "" );
+			$feedbackDiv.addClass( 'feedback' );
+
+			var $freqDiv		= this.nm._createSliderControl( filter, 'frequency', 'cutoff', 0, 8000, 1, "Hz" );
+			$freqDiv.addClass( 'biquadfilter' );
+
+			$inGainDiv.appendTo( $moduleEl );
+
+			$delayDiv.appendTo( $moduleEl );
+			$feedbackDiv.appendTo( $moduleEl );
+			$freqDiv.appendTo( $moduleEl );
+
+			$outGainDiv.appendTo( $moduleEl );
+
+		},
+
+		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+
+			var delay 		= audioNode.allNodes[ 1 ]
+			var feedback 	= audioNode.allNodes[ 2 ];
+			var filter	 	= audioNode.allNodes[ 3 ];
+
+			var inClasses 	= [ 'gain', 'pre-amp', 'in' ];
+			var outClasses 	= [ 'gain', 'pre-amp', 'out' ];
+
+			this.nm._resetSliderSettingByClasses( $moduleEl, audioNode.inNode, 'gain', inClasses, module.options.kingTubbyPreAmpInGain );
+			this.nm._resetSliderSettingByClasses( $moduleEl, audioNode.outNode, 'gain', outClasses, module.options.kingTubbyPreAmpOutGain );
+
+			this.nm._resetSliderSettingByClasses( $moduleEl, delay, 'delayTime', [ 'delayTime', 'delay' ], module.options.kingTubbyDelayTime );
+			this.nm._resetSliderSettingByClasses( $moduleEl, feedback, 'gain', [ 'gain', 'feedback' ], module.options.kingTubbyGain );
+			this.nm._resetSliderSettingByClasses( $moduleEl, filter, 'frequency', [ 'frequency', 'biquadfilter' ], module.options.kingTubbyCutOffFreq );
+
+		},
+
+	};
+
+
+
+	/**
+	 * DynamicsCompressorModuleNode: Class for 'dynamicscompressor' node
+	 */
+
+	$.DynamicsCompressorModuleNode				= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.DynamicsCompressorModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			var node = this.nm.audioContext.createDynamicsCompressor ();
+
+			node.threshold.value = module.options.compressorThreshold;
+			node.knee.value = module.options.compressorKnee;
+			node.ratio.value = module.options.compressorRatio;
+			node.reduction.value = module.options.compressorReduction;
+			node.attack.value = module.options.compressorAttack;
+			node.release.value = module.options.compressorRelease;
+
+			return node;
+
+		},
+
+		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+
+			var $thresholdDiv	= this.nm._createSimpleSliderControl( audioNode, 'threshold', -36, 0, 0.01, "DB" );
+			var $kneeDiv		= this.nm._createSimpleSliderControl( audioNode, 'knee', 0, 40, 0.01, "DB" );
+			var $ratioDiv		= this.nm._createSimpleSliderControl( audioNode, 'ratio', 1, 50, 0.1, "Sec" );
+			var $reductionDiv	= this.nm._createSimpleSliderControl( audioNode, 'reduction', -20, 0, 0.01, "DB" );
+			var $attackDiv		= this.nm._createSimpleSliderControl( audioNode, 'attack', 0, 1, 0.001, "Sec" );
+			var $releaseDiv		= this.nm._createSimpleSliderControl( audioNode, 'release', 0, 2, 0.01, "Sec" );
+
+			$thresholdDiv.appendTo( $moduleEl );
+			$kneeDiv.appendTo( $moduleEl );
+			$ratioDiv.appendTo( $moduleEl );
+			$reductionDiv.appendTo( $moduleEl );
+			$attackDiv.appendTo( $moduleEl );
+			$releaseDiv.appendTo( $moduleEl );
+
+		},
+
+		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'threshold', module.options.compressorThreshold );
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'knee', module.options.compressorKnee );
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'ratio', module.options.compressorRatio );
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'reduction', module.options.compressorReduction );
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'attack', module.options.compressorAttack );
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'release', module.options.compressorRelease );
 
 		},
 
