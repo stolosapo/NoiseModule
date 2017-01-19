@@ -224,6 +224,7 @@
 			this._registerModuleNode( 'delay', new $.DelayModuleNode( this ) );
 			this._registerModuleNode( 'kingtubbynode', new $.KingTubbyModuleNode( this ) );
 			this._registerModuleNode( 'dynamicscompressor', new $.DynamicsCompressorModuleNode( this ) );
+			this._registerModuleNode( 'gain', new $.GainModuleNode( this ) );
 
 		},
 
@@ -443,9 +444,6 @@
 
 
 
-			if ( nodeType === "gain" ) {
-				return this._createGainDiv( $moduleEl, audioNode );
-			};
 
 			if ( nodeType === "stereopannernode" ) {
 				return this._createStreoPannerDiv( $moduleEl, audioNode );
@@ -544,11 +542,6 @@
 			};
 
 
-
-			if ( nodeType === "gain" ) {
-				return this._createGain( module );
-			};
-
 			if ( nodeType === "stereopannernode" ) {
 				return this._createStreoPanner( module );
 			};
@@ -583,10 +576,6 @@
 			};
 
 
-
-			if ( nodeType === "gain" ) {
-				return this._resetGainModule( $content, module, audioNode );
-			};
 
 			if ( nodeType === "stereopannernode" ) {
 				return this._resetStreoPannerModule( $content, module, audioNode );
@@ -944,8 +933,6 @@
 
 		},
 
-
-
 		_createGain					: function ( module, value ) {
 
 			var gain = this.audioContext.createGain ();
@@ -953,20 +940,6 @@
 			gain.gain.value = value || module.options.gainGain;
 
 			return gain;
-
-		},
-
-		_createGainDiv				: function ( $moduleEl, audioNode ) {
-
-			var $gainDiv	= this._createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
-
-			$gainDiv.appendTo( $moduleEl );
-
-		},
-
-		_resetGainModule 			: function ( $moduleEl, module, audioNode ) {
-
-			this._resetSliderSetting( $moduleEl, audioNode, 'gain', module.options.gainGain );
 
 		},
 
@@ -2327,6 +2300,42 @@
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'reduction', module.options.compressorReduction );
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'attack', module.options.compressorAttack );
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'release', module.options.compressorRelease );
+
+		},
+
+	};
+
+
+
+	/**
+	 * GainModuleNode: Class for 'gain' node
+	 */
+
+	$.GainModuleNode			= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.GainModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			return this.nm._createGain( module );
+
+		},
+
+		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+
+			var $gainDiv	= this.nm._createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
+
+			$gainDiv.appendTo( $moduleEl );
+
+		},
+
+		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'gain', module.options.gainGain );
 
 		},
 
