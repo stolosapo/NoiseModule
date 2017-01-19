@@ -145,6 +145,10 @@
 			// initialize counters
 			this.moduleCounter	= 0;
 			this.moduleMap		= [];
+			this.registeredNode	= [];
+
+			// register all node implementations
+			this._registerModuleNodes( );
 
 			// remove all containers
 			if ( this.$containerEl ) {
@@ -189,6 +193,47 @@
 			}, false );
 
 			$fileInput.appendTo( this.$el );
+
+		},
+
+		_createModuleNodeItem		: function ( nodeType, moduleImpl ) {
+
+			var abstractModule	= new $.ModuleNode( this, moduleImpl );
+
+			return { nodeType: nodeType, moduleImpl: abstractModule };
+
+		},
+
+		_registerModuleNode			: function ( nodeType, moduleImpl ) {
+
+			var item	= this._createModuleNodeItem( nodeType, moduleImpl );
+
+			this.registeredNode.push( item );
+
+		},
+
+		_registerModuleNodes		: function ( ) {
+
+			this._registerModuleNode( 'noise', new $.NoiseModuleNode( this ) );
+			this._registerModuleNode( 'oscillator', new $.OscilatorModuleNode( this ) );
+
+		},
+
+		_findRegisteredModuleImpl	: function ( nodeType ) {
+
+			var itemImp;
+
+			$.each( this.registeredNode, function( index, item ) {
+
+				if (item.nodeType === nodeType) {
+					
+					itemImp = item.moduleImpl;
+
+				};
+
+			} );
+
+			return itemImp;
 
 		},
 
@@ -381,13 +426,22 @@
 
 			var nodeType 	= module.nodeType;
 
-			if ( nodeType === "noise" ) {
-				return this._createNoiseDiv( $moduleEl, module, audioNode );
+			var item = this._findRegisteredModuleImpl( nodeType );
+
+			if (item != undefined) {
+
+				return item.createModuleDiv( $moduleEl, module, audioNode );
 			};
 
-			if ( nodeType === "oscillator" ) {
-				return this._createOscillatorDiv( $moduleEl, module, audioNode );
-			};
+			// if ( nodeType === "noise" ) {
+			// 	var item = this._findRegisteredModuleImpl( 'noise' );
+
+			// 	return item.createModuleDiv( $moduleEl, module, audioNode );
+			// };
+
+			// if ( nodeType === "oscillator" ) {
+			// 	return this._createOscillatorDiv( $moduleEl, module, audioNode );
+			// };
 
 			if ( nodeType === "liveinput" ) {
 				return this._createLiveInputDiv( $moduleEl, module, audioNode );
@@ -514,13 +568,26 @@
 
 			var nodeType = module.nodeType;
 
-			if ( nodeType === "noise" ) {
-				return this._createNoise( module );
+			var item = this._findRegisteredModuleImpl( nodeType );
+
+			if (item != undefined) {
+
+				return item.createModuleAudioNode( module );
 			};
 
-			if ( nodeType === "oscillator" ) {
-				return this._createOscillator( module );
-			};
+			// if ( nodeType === "noise" ) {
+			// 	// return this._createNoise( module );
+
+			// 	var noiseImpl = new $.NoiseModuleNode( this );
+			// 	var abstractModule = new $.ModuleNode( this, noiseImpl );
+
+			// 	return abstractModule.createModuleAudioNode( module );
+
+			// };
+
+			// if ( nodeType === "oscillator" ) {
+			// 	return this._createOscillator( module );
+			// };
 
 			if ( nodeType === "liveinput" ) {
 				return this._createLiveInput( module );
@@ -781,127 +848,127 @@
 
 		},
 
-		_createNoise 				: function ( module ) {
+		// _createNoise 				: function ( module ) {
 
-			var type 	= module.type;
+		// 	var type 	= module.type;
 
-			if ( type === "white" ) {
-				return this._createWhiteNoise();
-			};
+		// 	if ( type === "white" ) {
+		// 		return this._createWhiteNoise();
+		// 	};
 
-			if ( type === "pink" ) {
-				return this._createPinkNoise();
-			};
+		// 	if ( type === "pink" ) {
+		// 		return this._createPinkNoise();
+		// 	};
 
-			if ( type === "brown" ) {
-				return this._createBrownNoise();
-			};
+		// 	if ( type === "brown" ) {
+		// 		return this._createBrownNoise();
+		// 	};
 
-		},
+		// },
 
-		_createNoiseDiv 			: function ( $moduleEl, module, audioNode ) {
+		// _createNoiseDiv 			: function ( $moduleEl, module, audioNode ) {
 
-			this._createPlayStopButton( $moduleEl, module, audioNode );
+		// 	this._createPlayStopButton( $moduleEl, module, audioNode );
 
-		},
+		// },
 
-		_createWhiteNoise			: function ( bufferSize ) {
+		// _createWhiteNoise			: function ( bufferSize ) {
 
-			bufferSize = bufferSize || 4096;
+		// 	bufferSize = bufferSize || 4096;
 
-			var node = this.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
+		// 	var node = this.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
 
-			node.onaudioprocess = function ( e ) {
+		// 	node.onaudioprocess = function ( e ) {
 
-				var output = e.outputBuffer.getChannelData(0);
+		// 		var output = e.outputBuffer.getChannelData(0);
 
-				for (var i = 0; i < bufferSize; i++) { 				
+		// 		for (var i = 0; i < bufferSize; i++) { 				
 				
-					output[i] = Math.random() * 2 - 1; 			
-				};
+		// 			output[i] = Math.random() * 2 - 1; 			
+		// 		};
 
-			};
+		// 	};
 
-			return node;
+		// 	return node;
 
-		},
+		// },
 
-		_createPinkNoise			: function ( bufferSize ) {
+		// _createPinkNoise			: function ( bufferSize ) {
 
-			bufferSize = bufferSize || 4096;
+		// 	bufferSize = bufferSize || 4096;
 
-			var b0, b1, b2, b3, b4, b5, b6;
-			b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
+		// 	var b0, b1, b2, b3, b4, b5, b6;
+		// 	b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
 
-			var node = this.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
+		// 	var node = this.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
 
-			node.onaudioprocess = function( e ) {
+		// 	node.onaudioprocess = function( e ) {
 
-				var output = e.outputBuffer.getChannelData ( 0 );
+		// 		var output = e.outputBuffer.getChannelData ( 0 );
 
-				for (var i = 0; i < bufferSize; i++) { 				
+		// 		for (var i = 0; i < bufferSize; i++) { 				
 
-					var white = Math.random() * 2 - 1;			
+		// 			var white = Math.random() * 2 - 1;			
 
-					b0 = 0.99886 * b0 + white * 0.0555179;
-					b1 = 0.99332 * b1 + white * 0.0750759;
-					b2 = 0.96900 * b2 + white * 0.1538520;
-					b3 = 0.86650 * b3 + white * 0.3104856;
-					b4 = 0.55000 * b4 + white * 0.5329522;
-					b5 = -0.7616 * b5 - white * 0.0168980;
+		// 			b0 = 0.99886 * b0 + white * 0.0555179;
+		// 			b1 = 0.99332 * b1 + white * 0.0750759;
+		// 			b2 = 0.96900 * b2 + white * 0.1538520;
+		// 			b3 = 0.86650 * b3 + white * 0.3104856;
+		// 			b4 = 0.55000 * b4 + white * 0.5329522;
+		// 			b5 = -0.7616 * b5 - white * 0.0168980;
 
-					output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-					output[i] *= 0.11; // (roughly) compensate for gain
+		// 			output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+		// 			output[i] *= 0.11; // (roughly) compensate for gain
 
-					b6 = white * 0.115926;
+		// 			b6 = white * 0.115926;
 
-				};
-			};		
+		// 		};
+		// 	};		
 
-			return node;
+		// 	return node;
 
-		},
+		// },
 
-		_createBrownNoise			: function ( bufferSize ) {
+		// _createBrownNoise			: function ( bufferSize ) {
 
-			bufferSize = bufferSize || 4096;
+		// 	bufferSize = bufferSize || 4096;
 
-			var lastOut = 0.0;
-			var node = this.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
+		// 	var lastOut = 0.0;
+		// 	var node = this.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
 
-			node.onaudioprocess = function( e ) {
+		// 	node.onaudioprocess = function( e ) {
 
-				var output = e.outputBuffer.getChannelData(0);
+		// 		var output = e.outputBuffer.getChannelData(0);
 
-				for (var i = 0; i < bufferSize; i++) {
+		// 		for (var i = 0; i < bufferSize; i++) {
 
-					var white = Math.random() * 2 - 1;
+		// 			var white = Math.random() * 2 - 1;
 
-					output[i] = (lastOut + (0.02 * white)) / 1.02;
-					lastOut = output[i];
-					output[i] *= 3.5; // (roughly) compensate for gain
+		// 			output[i] = (lastOut + (0.02 * white)) / 1.02;
+		// 			lastOut = output[i];
+		// 			output[i] *= 3.5; // (roughly) compensate for gain
 
-				};
+		// 		};
 
-			};
+		// 	};
 
-			return node;
+		// 	return node;
 
-		},
+		// },
 
-		_createOscillator			: function ( module ) {
+		// _createOscillator			: function ( module ) {
 
-			var wave = this.audioContext.createOscillator();
+		// 	var wave = this.audioContext.createOscillator();
 
-			wave.type = module.type;
-			wave.frequency.value = module.options.oscillatorFrequency;
-			wave.detune.value = module.options.oscillatorDetune;
+		// 	wave.type = module.type;
+		// 	wave.frequency.value = module.options.oscillatorFrequency;
+		// 	wave.detune.value = module.options.oscillatorDetune;
 
-			wave.start( 0 );
+		// 	wave.start( 0 );
 
-			return wave;
+		// 	return wave;
 
-		},
+		// },
 
 		_createSimpleSliderControl	: function ( audioNode, property, min, max, step, units, changeEvent ) {
 
@@ -1098,25 +1165,25 @@
 
 		},
 
-		_createOscillatorDiv		: function ( $moduleEl, module, audioNode ) {
+		// _createOscillatorDiv		: function ( $moduleEl, module, audioNode ) {
 
-			var $freqDiv	= this._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
-			var $detuDiv	= this._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
+		// 	var $freqDiv	= this._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
+		// 	var $detuDiv	= this._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
 
-			$freqDiv.appendTo( $moduleEl );
-			$detuDiv.appendTo( $moduleEl );
+		// 	$freqDiv.appendTo( $moduleEl );
+		// 	$detuDiv.appendTo( $moduleEl );
 
-			// Create Play / Stop button
-			this._createPlayStopButton( $moduleEl, module, audioNode );
+		// 	// Create Play / Stop button
+		// 	this._createPlayStopButton( $moduleEl, module, audioNode );
 
-		},
+		// },
 
-		_resetOscillatorModule 		: function ( $moduleEl, module, audioNode ) {
+		// _resetOscillatorModule 		: function ( $moduleEl, module, audioNode ) {
 
-			this._resetSliderSetting( $moduleEl, audioNode, 'frequency', module.options.oscillatorFrequency );
-			this._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.oscillatorDetune );
+		// 	this._resetSliderSetting( $moduleEl, audioNode, 'frequency', module.options.oscillatorFrequency );
+		// 	this._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.oscillatorDetune );
 
-		},
+		// },
 
 		_getRadioAudioElement 		: function ( module ) {
 
@@ -2145,23 +2212,215 @@
 	};
 
 
-	$.ModuleNode				= function ( noiseModule, options, module ) {
+
+	/* ModuleNode: Class for Module representation */
+
+	$.ModuleNode				= function ( noiseModule, moduleImpl ) {
 
 		this.noiseModule	= noiseModule;
-		this.options		= options;
-		this.module			= module;
+		this.moduleImpl		= moduleImpl;
 
 	};
 
 	$.ModuleNode.prototype		= {
 
-		createModuleNode	: function ( ) {
+		createModuleAudioNode	: function ( module ) {
+
+			return this.moduleImpl.createModuleAudioNode( module );
 
 		},
 
-		createModuleDiv		: function ( $moduleEl, audioNode ) {
+		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+
+			return this.moduleImpl.createModuleDiv( $moduleEl, module, audioNode );
 
 		},
+
+		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+
+			return this.moduleImpl.resetModuleSettings( $moduleEl, module, audioNode );
+
+		},
+
+	};
+
+
+
+	/**
+	 * NoiseModuleNode: Class for 'noise' node 
+	 */
+
+	$.NoiseModuleNode			= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.NoiseModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			var type 	= module.type;
+
+			if ( type === "white" ) {
+				return this._createWhiteNoise();
+			};
+
+			if ( type === "pink" ) {
+				return this._createPinkNoise();
+			};
+
+			if ( type === "brown" ) {
+				return this._createBrownNoise();
+			};
+
+		},
+
+		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+
+			this.nm._createPlayStopButton( $moduleEl, module, audioNode );
+
+		},
+
+		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+
+		},
+
+		/* Private Methods */
+
+		_createWhiteNoise		: function ( bufferSize ) {
+
+			bufferSize = bufferSize || 4096;
+
+			var node = this.nm.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
+
+			node.onaudioprocess = function ( e ) {
+
+				var output = e.outputBuffer.getChannelData(0);
+
+				for (var i = 0; i < bufferSize; i++) { 				
+
+					output[i] = Math.random() * 2 - 1; 			
+				};
+
+			};
+
+			return node;
+
+		},
+
+		_createPinkNoise		: function ( bufferSize ) {
+
+			bufferSize = bufferSize || 4096;
+
+			var b0, b1, b2, b3, b4, b5, b6;
+			b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
+
+			var node = this.nm.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
+
+			node.onaudioprocess = function( e ) {
+
+				var output = e.outputBuffer.getChannelData ( 0 );
+
+				for (var i = 0; i < bufferSize; i++) { 				
+
+					var white = Math.random() * 2 - 1;			
+
+					b0 = 0.99886 * b0 + white * 0.0555179;
+					b1 = 0.99332 * b1 + white * 0.0750759;
+					b2 = 0.96900 * b2 + white * 0.1538520;
+					b3 = 0.86650 * b3 + white * 0.3104856;
+					b4 = 0.55000 * b4 + white * 0.5329522;
+					b5 = -0.7616 * b5 - white * 0.0168980;
+
+					output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+					output[i] *= 0.11; // (roughly) compensate for gain
+
+					b6 = white * 0.115926;
+
+				};
+			};		
+
+			return node;
+
+		},
+
+		_createBrownNoise		: function ( bufferSize ) {
+
+			bufferSize = bufferSize || 4096;
+
+			var lastOut = 0.0;
+			var node = this.nm.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
+
+			node.onaudioprocess = function( e ) {
+
+				var output = e.outputBuffer.getChannelData(0);
+
+				for (var i = 0; i < bufferSize; i++) {
+
+					var white = Math.random() * 2 - 1;
+
+					output[i] = (lastOut + (0.02 * white)) / 1.02;
+					lastOut = output[i];
+					output[i] *= 3.5; // (roughly) compensate for gain
+
+				};
+
+			};
+
+			return node;
+
+		}
+
+	};
+
+
+
+	/**
+	 * OscilatorModuleNode: Class for 'oscilator' node 
+	 */
+
+	$.OscilatorModuleNode			= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.OscilatorModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			var wave = this.nm.audioContext.createOscillator();
+
+			wave.type = module.type;
+			wave.frequency.value = module.options.oscillatorFrequency;
+			wave.detune.value = module.options.oscillatorDetune;
+
+			wave.start( 0 );
+
+			return wave;
+
+	 	},
+
+	 	createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+
+	 		var $freqDiv	= this.nm._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
+			var $detuDiv	= this.nm._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
+
+			$freqDiv.appendTo( $moduleEl );
+			$detuDiv.appendTo( $moduleEl );
+
+			// Create Play / Stop button
+			this.nm._createPlayStopButton( $moduleEl, module, audioNode );
+
+	 	},
+
+	 	resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+
+	 		this.nm._resetSliderSetting( $moduleEl, audioNode, 'frequency', module.options.oscillatorFrequency );
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.oscillatorDetune );
+
+	 	},
 
 	};
 
