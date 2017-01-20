@@ -225,6 +225,11 @@
 			this._registerModuleNode( 'kingtubbynode', new $.KingTubbyModuleNode( this ) );
 			this._registerModuleNode( 'dynamicscompressor', new $.DynamicsCompressorModuleNode( this ) );
 			this._registerModuleNode( 'gain', new $.GainModuleNode( this ) );
+			this._registerModuleNode( 'stereopannernode', new $.StereoPannerModuleNode( this ) );
+			this._registerModuleNode( 'waveshapernode', new $.WaveShaperModuleNode( this ) );
+			this._registerModuleNode( 'periodicwave', new $.PeriodWaveModuleNode( this ) );
+			this._registerModuleNode( 'analyser', new $.AnalyserModuleNode( this ) );
+			this._registerModuleNode( 'recorder', new $.RecorderModuleNode( this ) );
 
 		},
 
@@ -435,29 +440,6 @@
 				return item.createModuleDiv( $moduleEl, module, audioNode );
 			};
 
-
-
-
-			if ( nodeType === "stereopannernode" ) {
-				return this._createStreoPannerDiv( $moduleEl, audioNode );
-			};
-
-			if ( nodeType === "waveshapernode" ) {
-				return this._createWaveShaperDiv( $moduleEl, audioNode );
-			};
-
-			// if ( nodeType === "periodicwave" ) {
-
-			// };
-
-			if ( nodeType === "analyser" ) {
-				return this._createAnalyserDiv( $moduleEl, module, audioNode );
-			};
-
-			if ( nodeType === "recorder" ) {
-				return this._createRecorderDiv( $moduleEl, module, audioNode );
-			};
-
 		},
 
 		_appendModuleFooter 		: function ( $divEl, $content, module, audioNode ) {
@@ -534,27 +516,6 @@
 				return item.createModuleAudioNode( module );
 			};
 
-
-			if ( nodeType === "stereopannernode" ) {
-				return this._createStreoPanner( module );
-			};
-
-			if ( nodeType === "waveshapernode" ) {
-				return this._createWaveShaper( module );
-			};
-
-			// if ( nodeType === "periodicwave" ) {
-
-			// };
-
-			if ( nodeType === "analyser" ) {
-				return this._createAnalyser( module );
-			};
-
-			if ( nodeType === "recorder" ) {
-				return this._createRecorder( module );
-			};
-
 		},
 
 		_resetModuleSettings 		: function ( $content, module, audioNode ) {
@@ -566,16 +527,6 @@
 			if (item != undefined) {
 
 				return item.resetModuleSettings( $content, module, audioNode );
-			};
-
-
-
-			if ( nodeType === "stereopannernode" ) {
-				return this._resetStreoPannerModule( $content, module, audioNode );
-			};
-
-			if ( nodeType === "waveshapernode" ) {
-				return this._resetWaveShaperModule( $content, module, audioNode );
 			};
 
 		},
@@ -933,367 +884,6 @@
 			node.gain.value = gain === undefined ? module.options.biquadFilterGain : gain;
 
 			return node;
-
-		},
-
-
-
-		_createStreoPanner		: function ( module ) {
-
-			var node = this.audioContext.createStereoPanner ( );
-
-			node.pan.value = module.options.stereoPannerPan;
-
-			return node;
-
-		},
-
-		_createStreoPannerDiv		: function ( $moduleEl, audioNode ) {
-
-			var $panDiv		= this._createSimpleSliderControl( audioNode, 'pan', -1, 1, 0.01, "" );
-
-			$panDiv.appendTo( $moduleEl );
-
-		},
-
-		_resetStreoPannerModule 	: function ( $moduleEl, module, audioNode ) {
-
-			this._resetSliderSetting( $moduleEl, audioNode, 'pan', module.options.stereoPannerPan );
-
-		},
-
-		_createDistortionCurve		: function ( amount ) {
-
-			var k = typeof amount === 'number' ? amount : 50;
-		    	var n_samples = 44100;
-
-		    	var curve = new Float32Array(n_samples);
-		    	var deg = Math.PI / 180;
-		    	var i = 0
-		    	var x;
-
-			for ( ; i < n_samples; ++i ) {
-				
-				x = i * 2 / n_samples - 1;
-
-				curve[i] = ( 3 + k ) * x * 20 * deg / ( Math.PI + k * Math.abs(x) );
-			}
-
-			return curve;
-
-		},
-
-		_createWaveShaper		: function ( module ) {
-
-			var node = this.audioContext.createWaveShaper ( );
-
-			node.curve = this._createDistortionCurve ( module.options.waveShapperCurveAmount );
-			node.oversample = module.options.waveShapperOversample;
-
-			return node;
-
-		},
-
-		_createWaveShaperDiv		: function ( $moduleEl, audioNode ) {
-
-			var _self 	= this;
-
-			var $curveDiv	= this._createSimpleSliderControl( audioNode, 'curve', 0, 1000, 1, "", function() {
-
-				audioNode.curve = _self._createDistortionCurve ( this.value );
-			} );
-
-			var $oversampleDiv	= this._createSimpleSliderControl( audioNode, 'oversample', 0, 4, 2, "", function() {
-
-				var value = this.value == 0 ? 'none' : this.value + 'x';
-
-				audioNode.oversample = value;
-			} );
-
-			$curveDiv.appendTo( $moduleEl );
-			$oversampleDiv.appendTo( $moduleEl );
-
-		},
-
-		_resetWaveShaperModule 		: function ( $moduleEl, module, audioNode ) {
-
-			this._resetSliderSetting( $moduleEl, audioNode, 'curve', module.options.waveShapperCurveAmount );
-			this._resetSliderSetting( $moduleEl, audioNode, 'oversample', module.options.waveShapperOversample );
-
-		},
-
-		_createAnalyser			: function ( module ) {
-
-			var analyser 		= this.audioContext.createAnalyser ( );
-
-			analyser.fftSize 	= module.options.analyserFftSize;
-
-			var bufferLength 	= analyser.frequencyBinCount;
-			var dataArray		= new Uint8Array ( bufferLength );
-			
-			analyser.getByteTimeDomainData ( dataArray );
-
-			return analyser;
-
-		},
-
-		_createAnalyserDiv		: function ( $moduleEl, module, audioNode ) {
-
-			var template 	= '<canvas class="nm-analyser-canvas"></canvas>';
-			var $canvas 	= $( template );
-
-			var canvasCtx 	= $canvas[0].getContext("2d");
-
-			$canvas.appendTo( $moduleEl );
-
-			if (module.type === 'sinewave') {
-
-				this._createSinewaveAnalyser( $moduleEl, module, $canvas, canvasCtx, audioNode );
-			}
-			else if (module.type === 'frequencybars') {
-
-				this._createFequencyBarsAnalyser( $moduleEl, module, $canvas, canvasCtx, audioNode );
-			}
-			else {
-
-				this._createSinewaveAnalyser( $moduleEl, module, $canvas, canvasCtx, audioNode );
-			}
-
-		},
-
-		_createSinewaveAnalyser 	: function ( $moduleEl, module, $canvas, canvasCtx, audioNode ) {
-
-			var WIDTH 		= $canvas[ 0 ].width;
-			var HEIGHT 		= $canvas[ 0 ].height;
-
-			var mainBg 		= module.options.analyserMainBgColor;
-			var sineBg 		= module.options.analyserSineBgColor;
-
-			audioNode.fftSize 	= 2048;
-			var bufferLength 	= audioNode.fftSize;
-
-			var dataArray 		= new Uint8Array( bufferLength );
-
-			canvasCtx.clearRect( 0, 0, WIDTH, HEIGHT );
-
-			function draw( ) {
-
-				drawVisual 		= requestAnimationFrame( draw );
-
-				audioNode.getByteTimeDomainData( dataArray );
-
-				canvasCtx.fillStyle 	= 'rgb(' + mainBg + ', ' + mainBg + ', ' + mainBg + ')';
-				canvasCtx.fillRect( 0, 0, WIDTH, HEIGHT );
-
-				canvasCtx.lineWidth 	= 2;
-				canvasCtx.strokeStyle 	= 'rgb(' + sineBg + ', ' + sineBg + ', ' + sineBg + ')';
-
-				canvasCtx.beginPath();
-
-				var sliceWidth = WIDTH * 1.0 / bufferLength;
-				var x = 0;
-
-				for ( var i = 0; i < bufferLength; i++ ) {
-
-					var v = dataArray[ i ] / 128.0;
-					var y = v * HEIGHT / 2;
-
-					if ( i === 0 ) {
-						canvasCtx.moveTo( x, y );
-					} else {
-						canvasCtx.lineTo( x, y );
-					}
-
-					x += sliceWidth;
-
-				}
-
-				canvasCtx.lineTo( WIDTH, HEIGHT / 2);
-				canvasCtx.stroke( );
-			};
-
-			draw( );
-
-		},
-
-		_createFequencyBarsAnalyser	: function ( $moduleEl, module, $canvas, canvasCtx, audioNode ) {
-
-			var WIDTH 		= $canvas[ 0 ].width;
-			var HEIGHT 		= $canvas[ 0 ].height;
-
-			var mainBg 		= module.options.analyserMainBgColor;
-			var barBg 		= module.options.analyserBarBgColor;
-
-			audioNode.fftSize 	= 256;
-
-			var bufferLength 	= audioNode.frequencyBinCount;
-			var dataArray 		= new Uint8Array( bufferLength );
-
-			canvasCtx.clearRect( 0, 0, WIDTH, HEIGHT );
-
-			function draw( ) {
-
-				drawVisual	= requestAnimationFrame( draw );
-
-				audioNode.getByteFrequencyData( dataArray );
-
-				canvasCtx.fillStyle = 'rgb(' + mainBg + ', ' + mainBg + ', ' + mainBg + ')';
-				canvasCtx.fillRect( 0, 0, WIDTH, HEIGHT );
-
-				var barWidth = ( WIDTH / bufferLength ) * 2.5;
-				var barHeight;
-				var x = 0;
-
-				for(var i = 0; i < bufferLength; i++) {
-
-					barHeight = dataArray[ i ];
-
-					canvasCtx.fillStyle = 'rgb(' + ( barHeight + 100 ) + ', ' + barBg + ', ' + barBg + ')';
-					canvasCtx.fillRect( x, HEIGHT - barHeight / 2, barWidth, barHeight / 2 );
-
-					x += barWidth + 1;
-				}
-
-			}
-
-			draw( );
-
-		},
-
-		_connectPeriodicWave		: function ( oscillator ) {
-
-			var wave = this.audioContext.createPeriodicWave(
-				this.options.periodicWaveRealArray, 
-				this.options.periodicWaveImagArray, 
-				{
-					disableNormalization: this.options.periodicWaveDisableNorm
-				});
-
-			oscillator.setPeriodicWave ( wave );
-
-			return wave;
-
-		},
-
-		_createRecorder			: function ( module ) {
-
-			var recorder 		= this.audioContext.createMediaStreamDestination( );
-
-			var mediaRecorder	= new MediaRecorder( recorder.stream );
-			mediaRecorder.ignoreMutedMedia = true;
-
-			module.options.recorderMediaRecorder = mediaRecorder;
-
-
-			// push each chunk (blobs) in an array
-			mediaRecorder.ondataavailable	= function( e ) {
-			
-				module.options.recorderChunks.push(e.data);
-			};
-
-
-			// Make blob out of our blobs, and open it.
-			mediaRecorder.onstop		= function( e ) {
-
-				console.log( 'Started Download' );
-
-				var blob = new Blob(module.options.recorderChunks, { 'type' : 'audio/ogg; codecs=opus' });
-
-				var audioURL = window.URL.createObjectURL(blob);
-
-				module.options.recorderMediaRecordings.push( audioURL );
-
-				if (module.options.recorderStopCallback != undefined) {
-
-					module.options.recorderStopCallback( module );
-				};
-			};
-
-			return recorder;
-
-		},
-
-		_recorderPlayPauseClickEvent	: function ( self, $moduleEl, module, audioNode, playPause ) {
-
-			var mediaRecorder	= module.options.recorderMediaRecorder;
-			var $span 		= $( $moduleEl ).find( '.nm-label.info' );
-
-
-			if (mediaRecorder.state === 'inactive') {
-
-				module.options.recorderChunks = [ ];
-
-				mediaRecorder.start( );
-			}
-			else if (mediaRecorder.state === 'paused') {
-
-				mediaRecorder.resume( );
-			}
-			else if (mediaRecorder.state === 'recording') {
-
-				mediaRecorder.pause( );
-			};
-
-			$span.text( "Status: " + mediaRecorder.state + "..." );
-
-		},
-
-		_recorderStopClickEvent		: function ( self, $moduleEl, module, audioNode ) {
-
-			var pauseClass		= 'pause';
-			var playClass		= 'play';
-
-			var mediaRecorder	= module.options.recorderMediaRecorder;
-			var $span 		= $moduleEl.find( '.nm-label.info' );
-			var $img		= $moduleEl.find( '.nm-play-button.pause' );
-
-			if (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused') {
-
-				mediaRecorder.stop( );
-
-				if ( $img.length > 0 ) {
-
-					$img.removeClass( pauseClass );
-					$img.addClass( playClass );
-				}
-
-				$span.text( "Status: stopped" );
-			};		
-
-		},
-
-		_createRecorderDiv		: function ( $moduleEl, module, audioNode ) {
-
-			var stopImgClass	= [ 'stop' ];
-
-			var spanTemp 		= '<span class="nm-label info"></span>';
-			var $span 		= $( spanTemp );
-
-			var listTemp		= '<ul class="nm-label nm-list"></ul>';
-			var $list		= $( listTemp );
-
-			$span.text( 'Status:' );
-
-			this._createPlayPauseButton( $moduleEl, module, audioNode, this._recorderPlayPauseClickEvent );
-			this._createCustomButton( $moduleEl, module, audioNode, stopImgClass, this._recorderStopClickEvent );
-
-			module.options.recorderStopCallback = function( module ) {
-
-				$list.empty( );
-
-				$.each( module.options.recorderMediaRecordings, function( index, rec ) {
-
-					var $a = $( '<a>' );
-					$a.attr( 'href', rec );
-					$a.attr( 'target', '_blank' );
-					$a.text( 'track ' + (index + 1) );
-
-					$list.append( $('<li>').append( $a ) );
-				} );
-			};
-
-			$span.appendTo( $moduleEl );
-			$list.appendTo( $moduleEl );
 
 		},
 
@@ -2303,6 +1893,465 @@
 		},
 
 	};
+
+
+
+	/**
+	 * StereoPannerModuleNode: Class for 'stereopannernode' node
+	 */
+
+	$.StereoPannerModuleNode		= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.StereoPannerModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			var node = this.nm.audioContext.createStereoPanner ( );
+
+			node.pan.value = module.options.stereoPannerPan;
+
+			return node;
+
+		},
+
+		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
+
+			var $panDiv = this.nm._createSimpleSliderControl( audioNode, 'pan', -1, 1, 0.01, "" );
+
+			$panDiv.appendTo( $moduleEl );
+
+		},
+
+		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
+
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'pan', module.options.stereoPannerPan );
+
+		}
+
+	};
+
+
+
+	/**
+	 * WaveShaperModuleNode: Class for 'waveshapernode' node
+	 */
+
+	$.WaveShaperModuleNode			= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.WaveShaperModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			var node = this.nm.audioContext.createWaveShaper ( );
+
+			node.curve = this._createDistortionCurve ( module.options.waveShapperCurveAmount );
+			node.oversample = module.options.waveShapperOversample;
+
+			return node;
+
+		},
+
+		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
+
+			var _self 	= this;
+
+			var $curveDiv	= this.nm._createSimpleSliderControl( audioNode, 'curve', 0, 1000, 1, "", function() {
+
+				audioNode.curve = _self._createDistortionCurve ( this.value );
+			} );
+
+			var $oversampleDiv	= this.nm._createSimpleSliderControl( audioNode, 'oversample', 0, 4, 2, "", function() {
+
+				var value = this.value == 0 ? 'none' : this.value + 'x';
+
+				audioNode.oversample = value;
+			} );
+
+			$curveDiv.appendTo( $moduleEl );
+			$oversampleDiv.appendTo( $moduleEl );
+
+		},
+
+		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
+
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'curve', module.options.waveShapperCurveAmount );
+			this.nm._resetSliderSetting( $moduleEl, audioNode, 'oversample', module.options.waveShapperOversample );
+
+		},
+
+		_createDistortionCurve	: function ( amount ) {
+
+			var k = typeof amount === 'number' ? amount : 50;
+			var n_samples = 44100;
+
+			var curve = new Float32Array(n_samples);
+			var deg = Math.PI / 180;
+			var i = 0
+			var x;
+
+			for ( ; i < n_samples; ++i ) {
+				
+				x = i * 2 / n_samples - 1;
+
+				curve[i] = ( 3 + k ) * x * 20 * deg / ( Math.PI + k * Math.abs(x) );
+			}
+
+			return curve;
+
+		},
+
+	};
+
+
+
+	/**
+	 * PeriodWaveModuleNode: Class for 'periodicwave' node
+	 */
+
+	$.PeriodWaveModuleNode			= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.PeriodWaveModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+		},
+
+		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
+
+		},
+
+		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
+
+		},
+
+		_connectPeriodicWave		: function ( module, oscillator ) {
+
+			var wave = this.nm.audioContext.createPeriodicWave(
+				module.options.periodicWaveRealArray, 
+				module.options.periodicWaveImagArray, 
+				{
+					disableNormalization: module.options.periodicWaveDisableNorm
+				});
+
+			oscillator.setPeriodicWave ( wave );
+
+			return wave;
+
+		},
+
+	};
+
+
+
+	/**
+	 * AnalyserModuleNode: Class for 'analyser' node
+	 */
+
+	$.AnalyserModuleNode		= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.AnalyserModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			var analyser		= this.nm.audioContext.createAnalyser ( );
+
+			analyser.fftSize	= module.options.analyserFftSize;
+
+			var bufferLength	= analyser.frequencyBinCount;
+			var dataArray		= new Uint8Array ( bufferLength );
+			
+			analyser.getByteTimeDomainData ( dataArray );
+
+			return analyser;
+
+		},
+
+		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
+
+			var template 	= '<canvas class="nm-analyser-canvas"></canvas>';
+			var $canvas 	= $( template );
+
+			var canvasCtx 	= $canvas[0].getContext("2d");
+
+			$canvas.appendTo( $moduleEl );
+
+			if (module.type === 'sinewave') {
+
+				this._createSinewaveAnalyser( $moduleEl, module, $canvas, canvasCtx, audioNode );
+			}
+			else if (module.type === 'frequencybars') {
+
+				this._createFequencyBarsAnalyser( $moduleEl, module, $canvas, canvasCtx, audioNode );
+			}
+			else {
+
+				this._createSinewaveAnalyser( $moduleEl, module, $canvas, canvasCtx, audioNode );
+			}
+
+		},
+
+		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
+
+		},
+
+		_createSinewaveAnalyser 	: function ( $moduleEl, module, $canvas, canvasCtx, audioNode ) {
+
+			var WIDTH 		= $canvas[ 0 ].width;
+			var HEIGHT 		= $canvas[ 0 ].height;
+
+			var mainBg 		= module.options.analyserMainBgColor;
+			var sineBg 		= module.options.analyserSineBgColor;
+
+			audioNode.fftSize 	= 2048;
+			var bufferLength 	= audioNode.fftSize;
+
+			var dataArray 		= new Uint8Array( bufferLength );
+
+			canvasCtx.clearRect( 0, 0, WIDTH, HEIGHT );
+
+			function draw( ) {
+
+				drawVisual 		= requestAnimationFrame( draw );
+
+				audioNode.getByteTimeDomainData( dataArray );
+
+				canvasCtx.fillStyle 	= 'rgb(' + mainBg + ', ' + mainBg + ', ' + mainBg + ')';
+				canvasCtx.fillRect( 0, 0, WIDTH, HEIGHT );
+
+				canvasCtx.lineWidth 	= 2;
+				canvasCtx.strokeStyle 	= 'rgb(' + sineBg + ', ' + sineBg + ', ' + sineBg + ')';
+
+				canvasCtx.beginPath();
+
+				var sliceWidth = WIDTH * 1.0 / bufferLength;
+				var x = 0;
+
+				for ( var i = 0; i < bufferLength; i++ ) {
+
+					var v = dataArray[ i ] / 128.0;
+					var y = v * HEIGHT / 2;
+
+					if ( i === 0 ) {
+						canvasCtx.moveTo( x, y );
+					} else {
+						canvasCtx.lineTo( x, y );
+					}
+
+					x += sliceWidth;
+
+				}
+
+				canvasCtx.lineTo( WIDTH, HEIGHT / 2);
+				canvasCtx.stroke( );
+			};
+
+			draw( );
+
+		},
+
+		_createFequencyBarsAnalyser	: function ( $moduleEl, module, $canvas, canvasCtx, audioNode ) {
+
+			var WIDTH 		= $canvas[ 0 ].width;
+			var HEIGHT 		= $canvas[ 0 ].height;
+
+			var mainBg 		= module.options.analyserMainBgColor;
+			var barBg 		= module.options.analyserBarBgColor;
+
+			audioNode.fftSize 	= 256;
+
+			var bufferLength 	= audioNode.frequencyBinCount;
+			var dataArray 		= new Uint8Array( bufferLength );
+
+			canvasCtx.clearRect( 0, 0, WIDTH, HEIGHT );
+
+			function draw( ) {
+
+				drawVisual	= requestAnimationFrame( draw );
+
+				audioNode.getByteFrequencyData( dataArray );
+
+				canvasCtx.fillStyle = 'rgb(' + mainBg + ', ' + mainBg + ', ' + mainBg + ')';
+				canvasCtx.fillRect( 0, 0, WIDTH, HEIGHT );
+
+				var barWidth = ( WIDTH / bufferLength ) * 2.5;
+				var barHeight;
+				var x = 0;
+
+				for(var i = 0; i < bufferLength; i++) {
+
+					barHeight = dataArray[ i ];
+
+					canvasCtx.fillStyle = 'rgb(' + ( barHeight + 100 ) + ', ' + barBg + ', ' + barBg + ')';
+					canvasCtx.fillRect( x, HEIGHT - barHeight / 2, barWidth, barHeight / 2 );
+
+					x += barWidth + 1;
+				}
+
+			}
+
+			draw( );
+
+		},
+
+	};
+
+
+
+	/**
+	 * RecorderModuleNode: Class for 'recorder' node
+	 */
+
+	$.RecorderModuleNode		= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.RecorderModuleNode.prototype	= {
+
+		createModuleAudioNode	: function ( module ) {
+
+			var recorder 		= this.nm.audioContext.createMediaStreamDestination( );
+
+			var mediaRecorder	= new MediaRecorder( recorder.stream );
+			mediaRecorder.ignoreMutedMedia = true;
+
+			module.options.recorderMediaRecorder = mediaRecorder;
+
+
+			// push each chunk (blobs) in an array
+			mediaRecorder.ondataavailable	= function( e ) {
+			
+				module.options.recorderChunks.push( e.data );
+			};
+
+
+			// Make blob out of our blobs, and open it.
+			mediaRecorder.onstop		= function( e ) {
+
+				var blob = new Blob(module.options.recorderChunks, { 'type' : 'audio/ogg; codecs=opus' });
+
+				var audioURL = window.URL.createObjectURL(blob);
+
+				module.options.recorderMediaRecordings.push( audioURL );
+
+				if (module.options.recorderStopCallback != undefined) {
+
+					module.options.recorderStopCallback( module );
+				};
+			};
+
+			return recorder;
+
+		},
+
+		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
+
+			var stopImgClass	= [ 'stop' ];
+
+			var spanTemp 		= '<span class="nm-label info"></span>';
+			var $span 		= $( spanTemp );
+
+			var listTemp		= '<ul class="nm-label nm-list"></ul>';
+			var $list		= $( listTemp );
+
+			$span.text( 'Status:' );
+
+			this.nm._createPlayPauseButton( $moduleEl, module, audioNode, this._recorderPlayPauseClickEvent );
+			this.nm._createCustomButton( $moduleEl, module, audioNode, stopImgClass, this._recorderStopClickEvent );
+
+			module.options.recorderStopCallback = function( module ) {
+
+				$list.empty( );
+
+				$.each( module.options.recorderMediaRecordings, function( index, rec ) {
+
+					var $a = $( '<a>' );
+					$a.attr( 'href', rec );
+					$a.attr( 'target', '_blank' );
+					$a.text( 'track ' + (index + 1) );
+
+					$list.append( $('<li>').append( $a ) );
+				} );
+			};
+
+			$span.appendTo( $moduleEl );
+			$list.appendTo( $moduleEl );
+
+		},
+
+		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
+
+		},
+
+		_recorderPlayPauseClickEvent	: function ( self, $moduleEl, module, audioNode, playPause ) {
+
+			var mediaRecorder	= module.options.recorderMediaRecorder;
+			var $span 		= $( $moduleEl ).find( '.nm-label.info' );
+
+
+			if (mediaRecorder.state === 'inactive') {
+
+				module.options.recorderChunks = [ ];
+
+				mediaRecorder.start( );
+			}
+			else if (mediaRecorder.state === 'paused') {
+
+				mediaRecorder.resume( );
+			}
+			else if (mediaRecorder.state === 'recording') {
+
+				mediaRecorder.pause( );
+			};
+
+			$span.text( "Status: " + mediaRecorder.state + "..." );
+
+		},
+
+		_recorderStopClickEvent		: function ( self, $moduleEl, module, audioNode ) {
+
+			var pauseClass		= 'pause';
+			var playClass		= 'play';
+
+			var mediaRecorder	= module.options.recorderMediaRecorder;
+			var $span 		= $moduleEl.find( '.nm-label.info' );
+			var $img		= $moduleEl.find( '.nm-play-button.pause' );
+
+			if (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused') {
+
+				mediaRecorder.stop( );
+
+				if ( $img.length > 0 ) {
+
+					$img.removeClass( pauseClass );
+					$img.addClass( playClass );
+				}
+
+				$span.text( "Status: stopped" );
+			};		
+
+		},
+
+	};
+
+
 
 
 	/* Noise Module Factory */
