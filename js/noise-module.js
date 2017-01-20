@@ -217,18 +217,23 @@
 			this._registerModuleNode( 'noise', new $.NoiseModuleNode( this ) );
 			this._registerModuleNode( 'oscillator', new $.OscilatorModuleNode( this ) );
 			this._registerModuleNode( 'liveinput', new $.LiveInputModuleNode( this ) );
+
 			this._registerModuleNode( 'radionode', new $.RadioModuleNode( this ) );
 			this._registerModuleNode( 'soundcloudnode', new $.SoundCloudModuleNode( this ) );
 			this._registerModuleNode( 'biquadfilter', new $.BiquadFilterModuleNode( this ) );
+
 			this._registerModuleNode( 'equalizer', new $.EqualizerModuleMode( this ) );
 			this._registerModuleNode( 'delay', new $.DelayModuleNode( this ) );
 			this._registerModuleNode( 'kingtubbynode', new $.KingTubbyModuleNode( this ) );
+
 			this._registerModuleNode( 'dynamicscompressor', new $.DynamicsCompressorModuleNode( this ) );
 			this._registerModuleNode( 'gain', new $.GainModuleNode( this ) );
 			this._registerModuleNode( 'stereopannernode', new $.StereoPannerModuleNode( this ) );
+			
 			this._registerModuleNode( 'waveshapernode', new $.WaveShaperModuleNode( this ) );
 			this._registerModuleNode( 'periodicwave', new $.PeriodWaveModuleNode( this ) );
 			this._registerModuleNode( 'analyser', new $.AnalyserModuleNode( this ) );
+			
 			this._registerModuleNode( 'recorder', new $.RecorderModuleNode( this ) );
 
 		},
@@ -379,7 +384,7 @@
 				( audioNode.inNode && audioNode.inNode.numberOfInputs > 0 ) ) {
 
 				var template 	= '<img class="nm-bypass" />';
-				var $img 		= $( template );
+				var $img 	= $( template );
 
 				$img.appendTo( $divEl );
 
@@ -395,12 +400,11 @@
 				module.nodeType != 'analyser') {
 
 				var template 	= '<img class="nm-reset" />';
-				var $img 		= $( template );
+				var $img 	= $( template );
 
 				$img.appendTo( $divEl );
 
 				this._createResetEvent( $divEl, $content, module, audioNode );
-
 			}
 
 		},
@@ -419,8 +423,8 @@
 
 		_createBypassEvent		: function ( $divEl, $content, module, audioNode ) {
 
-			var _self 		= this;
-			var $bypass		= $( $divEl ).find( '.nm-bypass' );
+			var _self 	= this;
+			var $bypass	= $( $divEl ).find( '.nm-bypass' );
 
 			$bypass[0].addEventListener( 'click', function( ) {
 
@@ -1356,13 +1360,13 @@
 	 * SoundCloudModuleNode: Class for 'soundcloudnode' node
 	 */
 
-	$.SoundCloudModuleNode		= function ( noiseModule ) {
+	$.SoundCloudModuleNode			= function ( noiseModule ) {
 
 		this.nm = noiseModule;
 
 	};
 
-	$.SoundCloudModuleNode.prototype= {
+	$.SoundCloudModuleNode.prototype	= {
 
 		createModuleAudioNode		: function ( module ) {
 
@@ -1519,7 +1523,7 @@
 	 * EqualizerModuleMode: Class for 'equalizer' node
 	 */
 
-	$.EqualizerModuleMode			= function ( noiseModule ) {
+	$.EqualizerModuleMode		= function ( noiseModule ) {
 
 		this.nm = noiseModule;
 
@@ -1804,13 +1808,13 @@
 	 * DynamicsCompressorModuleNode: Class for 'dynamicscompressor' node
 	 */
 
-	$.DynamicsCompressorModuleNode		= function ( noiseModule ) {
+	$.DynamicsCompressorModuleNode			= function ( noiseModule ) {
 
 		this.nm = noiseModule;
 
 	};
 
-	$.DynamicsCompressorModuleNode.prototype= {
+	$.DynamicsCompressorModuleNode.prototype	= {
 
 		createModuleAudioNode	: function ( module ) {
 
@@ -2225,7 +2229,7 @@
 
 	$.RecorderModuleNode.prototype	= {
 
-		createModuleAudioNode	: function ( module ) {
+		createModuleAudioNode		: function ( module ) {
 
 			var recorder 		= this.nm.audioContext.createMediaStreamDestination( );
 
@@ -2261,7 +2265,7 @@
 
 		},
 
-		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
+		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
 
 			var stopImgClass	= [ 'stop' ];
 
@@ -2296,7 +2300,7 @@
 
 		},
 
-		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
+		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
 
 		},
 
@@ -2356,7 +2360,7 @@
 
 	/* Noise Module Factory */
 
-	$.fn.noiseModule 		= function ( options ) {
+	$.fn.noiseModule	= function ( options ) {
 
 		if ( typeof options === 'string' ) {
 			
