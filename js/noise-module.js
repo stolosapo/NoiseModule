@@ -2,11 +2,11 @@
 
 	/* Noise Module Object */
 
-	$.NoiseModule				= function ( options, element ) {
+	$.NoiseModule		= function ( options, element ) {
 
-		this.$el 		= $( element );
+		this.$el	= $( element );
 
-		var fileMode 	= options.fileMode;
+		var fileMode	= options.fileMode;
 
 		if (fileMode === null || fileMode === undefined || fileMode === false) {
 
@@ -21,15 +21,15 @@
 
 	};
 
-	$.NoiseModule.defaults		= {
+	$.NoiseModule.defaults	= {
 
 		/* Node Type :
-			noise 				{ white, pink, brown }
-			oscillator 			{ sine, square, sawtooth, triangle }
+			noise			{ white, pink, brown }
+			oscillator		{ sine, square, sawtooth, triangle }
 			liveinput
 			radionode
 			soundcloudnode
-			biquadfilter 		{ lowpass, highpass, bandpass, lowshelf, highshelf, peaking, notch, allpass }
+			biquadfilter		{ lowpass, highpass, bandpass, lowshelf, highshelf, peaking, notch, allpass }
 			equalizer
 			delay
 			kingtubbynode
@@ -38,49 +38,49 @@
 			stereopannernode
 			waveshapernode
 			periodicwave
-			analyser 			{ sinewave, frequencybars }
+			analyser		{ sinewave, frequencybars }
 			recorder
 		*/
-		modules 				: [
+		modules			: [
 
 			{ name: "WhiteNoise", nodeType: "noise", type: "white", options: { started: false } },
 			{ name: "Gain", nodeType: "gain", type: "", options: { gainGain: 0.7 } }
 
 		],
 
-		connections				: [
+		connections		: [
 
 			{ srcNode: "WhiteNoise", destNode: "Gain", connected: true },
 			{ srcNode: "Gain", destNode: "output", connected: true }
 
 		],
 
-		started					: true,
-		fileMode				: false,
+		started			: true,
+		fileMode		: false,
 
-		oscillatorFrequency		: 440,
-		oscillatorDetune		: 0,
+		oscillatorFrequency	: 440,
+		oscillatorDetune	: 0,
 
-		radioAudioElement	 	: undefined,
+		radioAudioElement	: undefined,
 		radioAudioIdSelector	: undefined,
 		radioAudioClassSelector	: undefined,
 
-		soundCloudClientId		: '3b2585ef4a5eff04935abe84aad5f3f3',
-		soundCloudTrackUrl		: '',
-		soundCloudAudio			: undefined,
+		soundCloudClientId	: '3b2585ef4a5eff04935abe84aad5f3f3',
+		soundCloudTrackUrl	: '',
+		soundCloudAudio		: undefined,
 
 		biquadFilterFrequency	: 440,
-		biquadFilterDetune		: 0,
-		biquadFilterQ 			: 1,
-		biquadFilterGain		: 0,
+		biquadFilterDetune	: 0,
+		biquadFilterQ 		: 1,
+		biquadFilterGain	: 0,
 
-		eqPreAmpInGain			: 1,
-		eqPreAmpOutGain			: 1,
-		eqBandControl			: 'gain',
-		eqBandMin				: -12,
-		eqBandMax				: 12,
-		eqBandStep 				: 1,
-		eqBands					: [
+		eqPreAmpInGain		: 1,
+		eqPreAmpOutGain		: 1,
+		eqBandControl		: 'gain',
+		eqBandMin		: -12,
+		eqBandMax		: 12,
+		eqBandStep 		: 1,
+		eqBands			: [
 
 			{ description: '60 Hz', type: 'lowshelf', frequency: 60, detune: 0, Q: 1, gain: 0 },
 			{ description: '170 Hz', type: 'lowshelf', frequency: 170, detune: 0, Q: 1, gain: 0 },
@@ -95,24 +95,24 @@
 
 		],
 
-		delayTime				: 0.2,
+		delayTime		: 0.2,
 
 		kingTubbyPreAmpInGain	: 1,
 		kingTubbyPreAmpOutGain	: 1,
-		kingTubbyDelayTime		: 0.5,
-		kingTubbyGain			: 0.8,
-		kingTubbyCutOffFreq		: 1000,
+		kingTubbyDelayTime	: 0.5,
+		kingTubbyGain		: 0.8,
+		kingTubbyCutOffFreq	: 1000,
 
 		compressorThreshold 	: -25,
-		compressorKnee			: 30,
-		compressorRatio 		: 12,
-		compressorReduction		: -20,
-		compressorAttack		: 0.003,
-		compressorRelease		: 0.25,
+		compressorKnee		: 30,
+		compressorRatio 	: 12,
+		compressorReduction	: -20,
+		compressorAttack	: 0.003,
+		compressorRelease	: 0.25,
 
-		gainGain				: 0.7,
+		gainGain		: 0.7,
 
-		stereoPannerPan			: 0,
+		stereoPannerPan		: 0,
 
 		waveShapperCurveAmount	: 400,
 
@@ -123,12 +123,12 @@
 		periodicWaveImagArray	: new Float32Array( [ 0, 0 ] ),
 		periodicWaveDisableNorm	: false,
 
-		analyserFftSize			: 2048,
-		analyserMainBgColor		: 200,
-		analyserBarBgColor 		: 50,
-		analyserSineBgColor		: 0,
+		analyserFftSize		: 2048,
+		analyserMainBgColor	: 200,
+		analyserBarBgColor 	: 50,
+		analyserSineBgColor	: 0,
 
-		recorderChunks			: [ ],
+		recorderChunks		: [ ],
 		recorderStopCallback	: undefined,
 		recorderMediaRecorder	: undefined,
 		recorderMediaRecordings	: [ ]
@@ -137,7 +137,7 @@
 
 	$.NoiseModule.prototype		= {
 
-		_init						: function ( options ) {
+		_init				: function ( options ) {
 
 			// the options
 			this.options 		= $.extend( true, {}, $.NoiseModule.defaults, options );
@@ -163,7 +163,7 @@
 
 		},
 
-		_initFromFile				: function ( ) {
+		_initFromFile			: function ( ) {
 
 			var _self 			= this;
 			var template 		= '<input type="file" id="nm-file-input" />';
@@ -204,7 +204,7 @@
 
 		},
 
-		_registerModuleNode			: function ( nodeType, moduleImpl ) {
+		_registerModuleNode		: function ( nodeType, moduleImpl ) {
 
 			var item	= this._createModuleNodeItem( nodeType, moduleImpl );
 
@@ -237,16 +237,14 @@
 				if (item.nodeType === nodeType) {
 					
 					itemImp = item.moduleImpl;
-
 				};
-
 			} );
 
 			return itemImp;
 
 		},
 
-		_createAudioContext			: function ( ) {
+		_createAudioContext		: function ( ) {
 
 			var audioContext; 
 
@@ -264,12 +262,12 @@
 
 		},
 
-		_createModules				: function ( ) {
+		_createModules			: function ( ) {
 
 			// create container for all modules
 			var template 		= '\
-				<section id="noise-module-container" class="noise-module-container">\
-				</section>';
+			<section id="noise-module-container" class="noise-module-container">\
+			</section>';
 
 			this.$containerEl 	= $( template );
 
@@ -282,7 +280,6 @@
 			$.each( this.options.modules, function( index, module ) {
 
 				_self._createModule( module );
-
 			} );
 
 
@@ -290,12 +287,11 @@
 			$.each( this.options.connections, function( index, connection ) {
 
 				_self._createConnection( connection );
-
 			} );
 
 		},
 
-		_createModule				: function ( module ) {
+		_createModule			: function ( module ) {
 
 			module.options 		= $.extend( true, {}, this.options, module.options );
 
@@ -336,11 +332,11 @@
 
 		},
 
-		_createModuleDiv			: function ( module, audioNode ) {
+		_createModuleDiv		: function ( module, audioNode ) {
 
-			var name 			= module.name;
-			var moduleNumber 	= this._getNextModuleNumber ( );
-			var moduleId 		= "module" + moduleNumber;
+			var name		= module.name;
+			var moduleNumber	= this._getNextModuleNumber ( );
+			var moduleId		= "module" + moduleNumber;
 			
 			var template 		= '\
 			<div id="' + moduleId + '" class="noise-module ' + module.nodeType + '">\
@@ -349,7 +345,7 @@
 				</div>\
 			</div>';
 
-			var $divEl 			= $( template );
+			var $divEl 		= $( template );
 			$divEl.attr( 'name', module.name );
 
 			// append content
@@ -383,12 +379,11 @@
 				$img.appendTo( $divEl );
 
 				this._createBypassEvent( $divEl, $content, module, audioNode );
-
 			}
 
 		},
 
-		_appendResetButton 			: function ( $divEl, $content, module, audioNode ) {
+		_appendResetButton 		: function ( $divEl, $content, module, audioNode ) {
 
 			if (module.nodeType != 'noise' && 
 				module.nodeType != 'liveinput' &&
@@ -405,20 +400,19 @@
 
 		},
 
-		_createResetEvent			: function ( $divEl, $content, module, audioNode ) {
+		_createResetEvent		: function ( $divEl, $content, module, audioNode ) {
 
-			var _self 		= this;
-			var $reset 		= $( $divEl ).find( '.nm-reset' );
+			var _self 	= this;
+			var $reset 	= $( $divEl ).find( '.nm-reset' );
 
 			$reset[0].addEventListener( 'click', function( ) {
 
 				_self._resetModuleSettings( $content, module, audioNode );
-
 			} );
 
 		},
 
-		_createBypassEvent			: function ( $divEl, $content, module, audioNode ) {
+		_createBypassEvent		: function ( $divEl, $content, module, audioNode ) {
 
 			var _self 		= this;
 			var $bypass		= $( $divEl ).find( '.nm-bypass' );
@@ -426,7 +420,6 @@
 			$bypass[0].addEventListener( 'click', function( ) {
 
 				_self._bypassModule( $content, module, audioNode );
-
 			} );
 
 		},
@@ -473,11 +466,11 @@
 				return;
 			}
 
-			var inNode 		= audioNode.inNode || audioNode;
+			var inNode 	= audioNode.inNode || audioNode;
 			var outNode 	= audioNode.outNode || audioNode;
 
 			var template 	= '<footer class="nm-footer"></footer>';
-			var $footer		= $( template );
+			var $footer	= $( template );
 
 			if (inNode.numberOfInputs > 0) {
 
@@ -530,7 +523,7 @@
 
 		},
 
-		_createAudioNode			: function ( module ) {
+		_createAudioNode		: function ( module ) {
 
 			var nodeType = module.nodeType;
 
@@ -587,7 +580,7 @@
 
 		},
 
-		_bypassModule 				: function ( $content, module, audioNode ) {
+		_bypassModule 			: function ( $content, module, audioNode ) {
 
 			var bypassedClass 	= 'bypassed';
 			var bypassed 		= $content.hasClass( bypassedClass );
@@ -603,7 +596,7 @@
 
 		},
 
-		_createConnection			: function ( connection ) {
+		_createConnection		: function ( connection ) {
 
 			var srcModule = this._findModule( connection.srcNode );
 
@@ -618,7 +611,6 @@
 			if ( connection.destNode === "output" ) {
 				
 				this._connectNodeToDestination( srcNode );
-
 			}
 			else {
 				
@@ -626,12 +618,11 @@
 				destNode = destAudio.inNode;
 
 				this._connectNodes( srcNode, destNode );
-
 			};
 
 		},
 
-		_findModule					: function ( moduleName ) {
+		_findModule			: function ( moduleName ) {
 
 			var module;
 
@@ -641,9 +632,7 @@
 					
 					module = mod;
 					return;
-
 				};
-
 			} );
 
 			return module;
@@ -673,14 +662,14 @@
 
 		_findModuleConnections 		: function ( module, direction ) {
 
-			var _self 	= this;
+			var _self 		= this;
 
-			var name 			= module.name;
+			var name 		= module.name;
 
 			var askedNodeDir 	= direction == 'in' ? 'destNode' : 'srcNode';
 			var givenNodeDir 	= direction == 'in' ? 'srcNode' : 'destNode';
 
-			var conns 			= [];
+			var conns 		= [];
 
 			$.each( this.options.connections, function( index, conn ) {
 
@@ -688,14 +677,13 @@
 					
 					conns.push( conn[ givenNodeDir ] );
 				};
-
 			} );
 
 			return conns;
 
 		},
 
-		_findAudioNode				: function ( moduleName ) {
+		_findAudioNode			: function ( moduleName ) {
 
 			var node;
 
@@ -706,16 +694,14 @@
 					node = { inNode: map.inNode, outNode: map.outNode };
 
 					return;
-
 				};
-
 			} );
 
 			return node;
 
 		},
 
-		_updateAudioNode			: function ( moduleName, audioInNode, audioOutNode ) {
+		_updateAudioNode		: function ( moduleName, audioInNode, audioOutNode ) {
 
 			$.each( this.moduleMap, function( index, map ) {
 
@@ -725,9 +711,7 @@
 					map.outNode = audioOutNode || audioInNode;
 
 					return;
-
 				};
-
 			} );
 
 		},
@@ -763,12 +747,12 @@
 				<input min="' + min + '" max="' + max + '" step="' + step + '" type="range"></input>\
 			</div>';
 
-			var $div		= $( template );
+			var $div	= $( template );
 
-			var $span		= $( $div ).find( '.nm-value' );
-			var $input 		= $( $div ).find( 'input' );
+			var $span	= $( $div ).find( '.nm-value' );
+			var $input 	= $( $div ).find( 'input' );
 
-			var value 		= audioNode[ property ].value;
+			var value 	= audioNode[ property ].value;
 
 			$input[0].value = value;
 
@@ -805,14 +789,14 @@
 
 		},
 
-		_resetSliderSettingByClasses: function ( $moduleEl, audioNode, property, classes, value ) {
+		_resetSliderSettingByClasses	: function ( $moduleEl, audioNode, property, classes, value ) {
 
 			var propertyClass	= classes.join( '.' );
 
-			var $div  			= $( $moduleEl ).find( '.' + propertyClass );
-			var $span			= $( $div ).find( '.nm-value' );
-			var $input 			= $( $div ).find( 'input' );
-			var units 			= $span.attr( 'units' );
+			var $div  		= $( $moduleEl ).find( '.' + propertyClass );
+			var $span		= $( $div ).find( '.nm-value' );
+			var $input 		= $( $div ).find( 'input' );
+			var units 		= $span.attr( 'units' );
 
 			$input[0].value	= value;
 			$span.text( value + ' ' + units );
@@ -822,13 +806,13 @@
 
 		_createPlayStopButton		: function ( $moduleEl, module, audioNode ) {
 
-			var _self 		= this;
+			var _self 	= this;
 
 			var playClass 	= 'play';
 			var stopClass 	= 'stop';
 
 			var template 	= '<img class="nm-play-button"></img>';
-			var $img 		= $( template );
+			var $img 	= $( template );
 
 			if ( module.options.started ) {
 
@@ -847,7 +831,6 @@
 
 					$(this).removeClass( playClass );
 					$(this).addClass( stopClass );
-
 				}
 				else {
 
@@ -855,7 +838,6 @@
 
 					$(this).removeClass( stopClass );
 					$(this).addClass( playClass );
-
 				}
 
 			} );
@@ -866,13 +848,13 @@
 
 		_createPlayPauseButton		: function ( $moduleEl, module, audioNode, playPauseClickEvent ) {
 
-			var _self 		= this;
+			var _self 	= this;
 
 			var playClass 	= 'play';
 			var pauseClass 	= 'pause';
 
 			var template 	= '<img class="nm-play-button"></img>';
-			var $img 		= $( template );
+			var $img 	= $( template );
 
 			if ( module.options.started ) {
 
@@ -891,7 +873,6 @@
 
 					$(this).removeClass( playClass );
 					$(this).addClass( pauseClass );
-
 				}
 				else {
 
@@ -899,7 +880,6 @@
 
 					$(this).removeClass( pauseClass );
 					$(this).addClass( playClass );
-
 				}
 
 			} );
@@ -908,32 +888,31 @@
 
 		},
 
-		_createCustomButton			: function ( $moduleEl, module, audioNode, cssClasses, clickEvent ) {
+		_createCustomButton		: function ( $moduleEl, module, audioNode, cssClasses, clickEvent ) {
 
-			var _self 		= this;
+			var _self 	= this;
 
 			var template 	= '<img class="nm-play-button"></img>';
-			var $img 		= $( template );
+			var $img 	= $( template );
 
 			if (cssClasses != undefined) {
+
 				$.each( cssClasses, function( index, cssClass ) {
 
 					$img.addClass( cssClass );
-
 				} );
 			};
 
 			$img[0].addEventListener( 'click', function( ) {
 
 				clickEvent( _self, $moduleEl, module, audioNode );
-
 			} );
 
 			$img.appendTo( $moduleEl );
 
 		},
 
-		_createGain					: function ( module, value ) {
+		_createGain			: function ( module, value ) {
 
 			var gain = this.audioContext.createGain ();
 
@@ -943,7 +922,7 @@
 
 		},
 
-		_createBiquadFilter			: function ( module, type, frequency, detune, Q, gain ) {
+		_createBiquadFilter		: function ( module, type, frequency, detune, Q, gain ) {
 
 			var node = this.audioContext.createBiquadFilter();
 
@@ -959,7 +938,7 @@
 
 
 
-		_createStreoPanner			: function ( module ) {
+		_createStreoPanner		: function ( module ) {
 
 			var node = this.audioContext.createStereoPanner ( );
 
@@ -986,12 +965,12 @@
 		_createDistortionCurve		: function ( amount ) {
 
 			var k = typeof amount === 'number' ? amount : 50;
-		    var n_samples = 44100;
+		    	var n_samples = 44100;
 
-		    var curve = new Float32Array(n_samples);
-		    var deg = Math.PI / 180;
-		    var i = 0
-		    var x;
+		    	var curve = new Float32Array(n_samples);
+		    	var deg = Math.PI / 180;
+		    	var i = 0
+		    	var x;
 
 			for ( ; i < n_samples; ++i ) {
 				
@@ -1004,7 +983,7 @@
 
 		},
 
-		_createWaveShaper			: function ( module ) {
+		_createWaveShaper		: function ( module ) {
 
 			var node = this.audioContext.createWaveShaper ( );
 
@@ -1017,20 +996,18 @@
 
 		_createWaveShaperDiv		: function ( $moduleEl, audioNode ) {
 
-			var _self = this;
+			var _self 	= this;
 
-			var $curveDiv		= this._createSimpleSliderControl( audioNode, 'curve', 0, 1000, 1, "", function() {
+			var $curveDiv	= this._createSimpleSliderControl( audioNode, 'curve', 0, 1000, 1, "", function() {
 
 				audioNode.curve = _self._createDistortionCurve ( this.value );
-
 			} );
 
-			var $oversampleDiv		= this._createSimpleSliderControl( audioNode, 'oversample', 0, 4, 2, "", function() {
+			var $oversampleDiv	= this._createSimpleSliderControl( audioNode, 'oversample', 0, 4, 2, "", function() {
 
 				var value = this.value == 0 ? 'none' : this.value + 'x';
 
 				audioNode.oversample = value;
-
 			} );
 
 			$curveDiv.appendTo( $moduleEl );
@@ -1045,7 +1022,7 @@
 
 		},
 
-		_createAnalyser				: function ( module ) {
+		_createAnalyser			: function ( module ) {
 
 			var analyser 		= this.audioContext.createAnalyser ( );
 
@@ -1060,7 +1037,7 @@
 
 		},
 
-		_createAnalyserDiv			: function ( $moduleEl, module, audioNode ) {
+		_createAnalyserDiv		: function ( $moduleEl, module, audioNode ) {
 
 			var template 	= '<canvas class="nm-analyser-canvas"></canvas>';
 			var $canvas 	= $( template );
@@ -1086,11 +1063,11 @@
 
 		_createSinewaveAnalyser 	: function ( $moduleEl, module, $canvas, canvasCtx, audioNode ) {
 
-			var WIDTH 			= $canvas[ 0 ].width;
-			var HEIGHT 			= $canvas[ 0 ].height;
+			var WIDTH 		= $canvas[ 0 ].width;
+			var HEIGHT 		= $canvas[ 0 ].height;
 
-			var mainBg 			= module.options.analyserMainBgColor;
-			var sineBg 			= module.options.analyserSineBgColor;
+			var mainBg 		= module.options.analyserMainBgColor;
+			var sineBg 		= module.options.analyserSineBgColor;
 
 			audioNode.fftSize 	= 2048;
 			var bufferLength 	= audioNode.fftSize;
@@ -1139,13 +1116,13 @@
 
 		},
 
-		_createFequencyBarsAnalyser : function ( $moduleEl, module, $canvas, canvasCtx, audioNode ) {
+		_createFequencyBarsAnalyser	: function ( $moduleEl, module, $canvas, canvasCtx, audioNode ) {
 
-			var WIDTH 			= $canvas[ 0 ].width;
-			var HEIGHT 			= $canvas[ 0 ].height;
+			var WIDTH 		= $canvas[ 0 ].width;
+			var HEIGHT 		= $canvas[ 0 ].height;
 
-			var mainBg 			= module.options.analyserMainBgColor;
-			var barBg 			= module.options.analyserBarBgColor;
+			var mainBg 		= module.options.analyserMainBgColor;
+			var barBg 		= module.options.analyserBarBgColor;
 
 			audioNode.fftSize 	= 256;
 
@@ -1156,7 +1133,7 @@
 
 			function draw( ) {
 
-				drawVisual 		= requestAnimationFrame( draw );
+				drawVisual	= requestAnimationFrame( draw );
 
 				audioNode.getByteFrequencyData( dataArray );
 
@@ -1198,9 +1175,9 @@
 
 		},
 
-		_createRecorder				: function ( module ) {
+		_createRecorder			: function ( module ) {
 
-			var recorder 		= this.audioContext.createMediaStreamDestination ( );
+			var recorder 		= this.audioContext.createMediaStreamDestination( );
 
 			var mediaRecorder	= new MediaRecorder( recorder.stream );
 			mediaRecorder.ignoreMutedMedia = true;
@@ -1216,7 +1193,7 @@
 
 
 			// Make blob out of our blobs, and open it.
-			mediaRecorder.onstop			= function( e ) {
+			mediaRecorder.onstop		= function( e ) {
 
 				console.log( 'Started Download' );
 
@@ -1230,17 +1207,16 @@
 
 					module.options.recorderStopCallback( module );
 				};
-
 			};
 
 			return recorder;
 
 		},
 
-		_recorderPlayPauseClickEvent: function ( self, $moduleEl, module, audioNode, playPause ) {
+		_recorderPlayPauseClickEvent	: function ( self, $moduleEl, module, audioNode, playPause ) {
 
 			var mediaRecorder	= module.options.recorderMediaRecorder;
-			var $span 			= $( $moduleEl ).find( '.nm-label.info' );
+			var $span 		= $( $moduleEl ).find( '.nm-label.info' );
 
 
 			if (mediaRecorder.state === 'inactive') {
@@ -1268,8 +1244,8 @@
 			var playClass		= 'play';
 
 			var mediaRecorder	= module.options.recorderMediaRecorder;
-			var $span 			= $moduleEl.find( '.nm-label.info' );
-			var $img			= $moduleEl.find( '.nm-play-button.pause' );
+			var $span 		= $moduleEl.find( '.nm-label.info' );
+			var $img		= $moduleEl.find( '.nm-play-button.pause' );
 
 			if (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused') {
 
@@ -1286,15 +1262,15 @@
 
 		},
 
-		_createRecorderDiv			: function ( $moduleEl, module, audioNode ) {
+		_createRecorderDiv		: function ( $moduleEl, module, audioNode ) {
 
 			var stopImgClass	= [ 'stop' ];
 
 			var spanTemp 		= '<span class="nm-label info"></span>';
-			var $span 			= $( spanTemp );
+			var $span 		= $( spanTemp );
 
 			var listTemp		= '<ul class="nm-label nm-list"></ul>';
-			var $list			= $( listTemp );
+			var $list		= $( listTemp );
 
 			$span.text( 'Status:' );
 
@@ -1313,9 +1289,7 @@
 					$a.text( 'track ' + (index + 1) );
 
 					$list.append( $('<li>').append( $a ) );
-
 				} );
-
 			};
 
 			$span.appendTo( $moduleEl );
@@ -1329,7 +1303,7 @@
 
 		},
 
-		_connectNodes				: function ( srcNode, destNode ) {
+		_connectNodes			: function ( srcNode, destNode ) {
 
 			if (srcNode === null || srcNode === undefined || 
 				destNode === null || destNode === undefined) {
@@ -1340,7 +1314,7 @@
 
 		},
 
-		_disconnectNodes			: function ( srcNode, destNode ) {
+		_disconnectNodes		: function ( srcNode, destNode ) {
 
 			if (srcNode === null || srcNode === undefined || 
 				destNode === null || destNode === undefined) {
@@ -1363,9 +1337,7 @@
 					var destNode 	= _self._findAudioNode( conn.destNode ).inNode;
 
 					_self._connectNodes( srcNode, destNode );
-
 				};
-
 			} );
 
 		},
@@ -1382,14 +1354,12 @@
 					var destNode 	= _self._findAudioNode( conn.destNode ).inNode;
 
 					_self._disconnectNodes( srcNode, destNode );
-
 				};
-
 			} );
 
 		},
 
-		_requestGET					: function ( url, callback ) {
+		_requestGET			: function ( url, callback ) {
 
 			var request = new XMLHttpRequest( );
 
@@ -1399,8 +1369,7 @@
 					request.status === 200) {
 					callback( request.responseText );
 				}
-
-			}
+			};
 
 			request.open( "GET", url, true );
 			request.send( null );
@@ -1413,7 +1382,7 @@
 
 	/* ModuleNode: Class for Module representation */
 
-	$.ModuleNode				= function ( noiseModule, moduleImpl ) {
+	$.ModuleNode			= function ( noiseModule, moduleImpl ) {
 
 		this.noiseModule	= noiseModule;
 		this.moduleImpl		= moduleImpl;
@@ -1428,13 +1397,13 @@
 
 		},
 
-		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
 
 			return this.moduleImpl.createModuleDiv( $moduleEl, module, audioNode );
 
 		},
 
-		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
 
 			return this.moduleImpl.resetModuleSettings( $moduleEl, module, audioNode );
 
@@ -1448,7 +1417,7 @@
 	 * NoiseModuleNode: Class for 'noise' node 
 	 */
 
-	$.NoiseModuleNode			= function ( noiseModule ) {
+	$.NoiseModuleNode		= function ( noiseModule ) {
 
 		this.nm = noiseModule;
 
@@ -1474,19 +1443,19 @@
 
 		},
 
-		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
 
 			this.nm._createPlayStopButton( $moduleEl, module, audioNode );
 
 		},
 
-		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
 
 		},
 
 		/* Private Methods */
 
-		_createWhiteNoise		: function ( bufferSize ) {
+		_createWhiteNoise	: function ( bufferSize ) {
 
 			bufferSize = bufferSize || 4096;
 
@@ -1500,14 +1469,13 @@
 
 					output[i] = Math.random() * 2 - 1; 			
 				};
-
 			};
 
 			return node;
 
 		},
 
-		_createPinkNoise		: function ( bufferSize ) {
+		_createPinkNoise	: function ( bufferSize ) {
 
 			bufferSize = bufferSize || 4096;
 
@@ -1535,7 +1503,6 @@
 					output[i] *= 0.11; // (roughly) compensate for gain
 
 					b6 = white * 0.115926;
-
 				};
 			};		
 
@@ -1543,7 +1510,7 @@
 
 		},
 
-		_createBrownNoise		: function ( bufferSize ) {
+		_createBrownNoise	: function ( bufferSize ) {
 
 			bufferSize = bufferSize || 4096;
 
@@ -1561,9 +1528,7 @@
 					output[i] = (lastOut + (0.02 * white)) / 1.02;
 					lastOut = output[i];
 					output[i] *= 3.5; // (roughly) compensate for gain
-
 				};
-
 			};
 
 			return node;
@@ -1578,7 +1543,7 @@
 	 * OscilatorModuleNode: Class for 'oscilator' node 
 	 */
 
-	$.OscilatorModuleNode			= function ( noiseModule ) {
+	$.OscilatorModuleNode		= function ( noiseModule ) {
 
 		this.nm = noiseModule;
 
@@ -1600,7 +1565,7 @@
 
 	 	},
 
-	 	createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+	 	createModuleDiv		: function ( $moduleEl, module, audioNode ) {
 
 	 		var $freqDiv	= this.nm._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
 			var $detuDiv	= this.nm._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
@@ -1613,7 +1578,7 @@
 
 	 	},
 
-	 	resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+	 	resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
 
 	 		this.nm._resetSliderSetting( $moduleEl, audioNode, 'frequency', module.options.oscillatorFrequency );
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.oscillatorDetune );
@@ -1628,7 +1593,7 @@
 	 * LiveInputModuleNode: Class for 'liveinput' node
 	 */
 
-	$.LiveInputModuleNode			= function ( noiseModule ) {
+	$.LiveInputModuleNode		= function ( noiseModule ) {
 
 		this.nm = noiseModule;
 
@@ -1639,8 +1604,8 @@
 		createModuleAudioNode	: function ( module ) {
 
 			navigator.getUserMedia = navigator.getUserMedia || 
-									navigator.webkitGetUserMedia || 
-									navigator.mozGetUserMedia;
+						navigator.webkitGetUserMedia || 
+						navigator.mozGetUserMedia;
 
 			if (navigator.mediaDevices) {
 
@@ -1661,12 +1626,12 @@
 					},
 				}).then( function( stream ) {
 
-					source 			= _self.nm.audioContext.createMediaStreamSource( stream );
+					source 		= _self.nm.audioContext.createMediaStreamSource( stream );
 
 					/* Update source node map with this new instance */
 					_self.nm._updateAudioNode( module.name, source );
 
-					var $divEl 		= _self.nm._findModuleDivByName( module );
+					var $divEl 	= _self.nm._findModuleDivByName( module );
 					var $content 	= $( $divEl ).find( '.nm-content' );
 
 					_self.nm._appendModuleFooter( $( $divEl ), $content, module, source );
@@ -1684,13 +1649,13 @@
 
 		},
 
-		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
 
 			this.nm._createPlayStopButton( $moduleEl, module, audioNode );
 
 		},
 
-		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
 
 		}
 
@@ -1702,7 +1667,7 @@
 	 * RadioModuleNode: Class for 'radionode' node
 	 */
 
-	$.RadioModuleNode			= function ( noiseModule ) {
+	$.RadioModuleNode		= function ( noiseModule ) {
 
 		this.nm = noiseModule;
 
@@ -1724,10 +1689,10 @@
 
 		},
 
-		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
 
 			var template 	= '<span class="nm-label"></span>';
-			var $span 		= $( template );
+			var $span 	= $( template );
 
 			var audio = module.options.radioAudioElement;
 
@@ -1756,7 +1721,7 @@
 
 		},
 
-		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
 
 			var audio = module.options.radioAudioElement.get( 0 );
 
@@ -1801,25 +1766,25 @@
 	 * SoundCloudModuleNode: Class for 'soundcloudnode' node
 	 */
 
-	$.SoundCloudModuleNode				= function ( noiseModule ) {
+	$.SoundCloudModuleNode		= function ( noiseModule ) {
 
 		this.nm = noiseModule;
 
 	};
 
-	$.SoundCloudModuleNode.prototype	= {
+	$.SoundCloudModuleNode.prototype= {
 
-		createModuleAudioNode	: function ( module ) {
+		createModuleAudioNode		: function ( module ) {
 
-			var _self 			= this;
+			var _self 		= this;
 
 			var source;
 
-			var baseUrl			= 'https://api.soundcloud.com/resolve.json?url=';
-			var clientParameter = 'client_id=' + module.options.soundCloudClientId;
-			var url				= baseUrl + module.options.soundCloudTrackUrl + '&' + clientParameter;
+			var baseUrl		= 'https://api.soundcloud.com/resolve.json?url=';
+			var clientParameter 	= 'client_id=' + module.options.soundCloudClientId;
+			var url			= baseUrl + module.options.soundCloudTrackUrl + '&' + clientParameter;
 
-			var audio 			= new Audio( );
+			var audio 		= new Audio( );
 			audio.crossOrigin	= "anonymous";
 
 			module.options.soundCloudAudio = audio;
@@ -1829,14 +1794,14 @@
 				var trackInfo 	= JSON.parse( response );
 				var streamUrl 	= trackInfo.stream_url + "?" + clientParameter;
 		
-				audio.src 		= streamUrl;
+				audio.src 	= streamUrl;
 
-				source 			= _self.nm.audioContext.createMediaElementSource( audio );
+				source 		= _self.nm.audioContext.createMediaElementSource( audio );
 
 				/* Update source node map with this new instance */
 				_self.nm._updateAudioNode( module.name, source );
 
-				var $divEl 		= _self.nm._findModuleDivByName( module );
+				var $divEl 	= _self.nm._findModuleDivByName( module );
 				var $content 	= $( $divEl ).find( '.nm-content' );
 
 				_self.nm._appendModuleFooter( $( $divEl ), $content, module, source );
@@ -1846,8 +1811,6 @@
 				if (module.options.started) {
 					audio.play( );
 				}
-
-
 			} );
 
 		},
@@ -1855,9 +1818,9 @@
 		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
 
 			var template 	= '<span class="nm-label"></span>';
-			var $span 		= $( template );
+			var $span 	= $( template );
 
-			var audio 		= module.options.soundCloudAudio;
+			var audio 	= module.options.soundCloudAudio;
 
 			if (!audio) {
 
@@ -1921,7 +1884,7 @@
 	 * BiquadFilterModuleNode: Class for 'biquadfilter' node
 	 */
 
-	$.BiquadFilterModuleNode			= function ( noiseModule ) {
+	$.BiquadFilterModuleNode		= function ( noiseModule ) {
 
 		this.nm = noiseModule;
 
@@ -1935,11 +1898,11 @@
 
 		},
 
-		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
 
 			var $freqDiv	= this.nm._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
 			var $detuDiv	= this.nm._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
-			var $qDiv		= this.nm._createSimpleSliderControl( audioNode, 'Q', 1, 100, 0.1, "" );
+			var $qDiv	= this.nm._createSimpleSliderControl( audioNode, 'Q', 1, 100, 0.1, "" );
 			var $gainDiv	= this.nm._createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
 
 			$freqDiv.appendTo( $moduleEl );
@@ -1949,7 +1912,7 @@
 
 		},
 
-		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
 
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'frequency', module.options.biquadFilterFrequency );
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.biquadFilterDetune );
@@ -1976,12 +1939,12 @@
 
 		createModuleAudioNode	: function ( module ) {
 
-			var _self 		= this;
+			var _self 	= this;
 
-			var preAmp 		= _self.nm._createGain( module, module.options.eqPreAmpInGain );
+			var preAmp 	= _self.nm._createGain( module, module.options.eqPreAmpInGain );
 			var outputGain	= _self.nm._createGain( module, module.options.eqPreAmpOutGain );
 
-			var nodes 		= [ ];
+			var nodes 	= [ ];
 			var prevNode 	= preAmp;
 
 			nodes.push( preAmp );
@@ -2108,7 +2071,7 @@
 	 * DelayModuleNode: Class for 'delay' node
 	 */
 
-	$.DelayModuleNode			= function ( noiseModule ) {
+	$.DelayModuleNode		= function ( noiseModule ) {
 
 		this.nm = noiseModule;
 
@@ -2126,7 +2089,7 @@
 
 		},
 
-		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
 
 			var $timeDiv	= this.nm._createSimpleSliderControl( audioNode, 'delayTime', 0, 10, 0.01, "Sec" );
 
@@ -2134,7 +2097,7 @@
 
 		},
 
-		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
 
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'delayTime', module.options.delayTime );
 
@@ -2148,7 +2111,7 @@
 	 * KingTubbyModuleNode: Class for 'kingtubbynode' node
 	 */
 
-	$.KingTubbyModuleNode			= function ( noiseModule ) {
+	$.KingTubbyModuleNode		= function ( noiseModule ) {
 
 		this.nm = noiseModule;
 
@@ -2158,22 +2121,22 @@
 
 		createModuleAudioNode	: function ( module ) {
 
-			var nodes				= [ ];
+			var nodes		= [ ];
 
-			var preAmp 				= this.nm._createGain( module, module.options.kingTubbyPreAmpInGain );
-			var outputGain			= this.nm._createGain( module, module.options.kingTubbyPreAmpOutGain );
+			var preAmp 		= this.nm._createGain( module, module.options.kingTubbyPreAmpInGain );
+			var outputGain		= this.nm._createGain( module, module.options.kingTubbyPreAmpOutGain );
 
 			nodes.push( preAmp );
 
-			var delay				= this.nm.audioContext.createDelay( );
+			var delay		= this.nm.audioContext.createDelay( );
 			delay.delayTime.value	= module.options.kingTubbyDelayTime;
 			nodes.push( delay );
 
-			var feedback			= this.nm.audioContext.createGain( );
-			feedback.gain.value		= module.options.kingTubbyGain;
+			var feedback		= this.nm.audioContext.createGain( );
+			feedback.gain.value	= module.options.kingTubbyGain;
 			nodes.push( feedback );
 
-			var filter				= this.nm.audioContext.createBiquadFilter( );
+			var filter		= this.nm.audioContext.createBiquadFilter( );
 			filter.frequency.value	= module.options.kingTubbyCutOffFreq;
 			nodes.push( filter );
 
@@ -2251,13 +2214,13 @@
 	 * DynamicsCompressorModuleNode: Class for 'dynamicscompressor' node
 	 */
 
-	$.DynamicsCompressorModuleNode				= function ( noiseModule ) {
+	$.DynamicsCompressorModuleNode		= function ( noiseModule ) {
 
 		this.nm = noiseModule;
 
 	};
 
-	$.DynamicsCompressorModuleNode.prototype	= {
+	$.DynamicsCompressorModuleNode.prototype= {
 
 		createModuleAudioNode	: function ( module ) {
 
@@ -2274,7 +2237,7 @@
 
 		},
 
-		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
 
 			var $thresholdDiv	= this.nm._createSimpleSliderControl( audioNode, 'threshold', -36, 0, 0.01, "DB" );
 			var $kneeDiv		= this.nm._createSimpleSliderControl( audioNode, 'knee', 0, 40, 0.01, "DB" );
@@ -2292,7 +2255,7 @@
 
 		},
 
-		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
 
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'threshold', module.options.compressorThreshold );
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'knee', module.options.compressorKnee );
@@ -2311,7 +2274,7 @@
 	 * GainModuleNode: Class for 'gain' node
 	 */
 
-	$.GainModuleNode			= function ( noiseModule ) {
+	$.GainModuleNode		= function ( noiseModule ) {
 
 		this.nm = noiseModule;
 
@@ -2325,7 +2288,7 @@
 
 		},
 
-		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
 
 			var $gainDiv	= this.nm._createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
 
@@ -2333,7 +2296,7 @@
 
 		},
 
-		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
 
 			this.nm._resetSliderSetting( $moduleEl, audioNode, 'gain', module.options.gainGain );
 
@@ -2344,7 +2307,7 @@
 
 	/* Noise Module Factory */
 
-	$.fn.noiseModule 			= function ( options ) {
+	$.fn.noiseModule 		= function ( options ) {
 
 		if ( typeof options === 'string' ) {
 			
