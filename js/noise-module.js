@@ -196,17 +196,12 @@
 
 		},
 
-		_createModuleNodeItem		: function ( nodeType, moduleImpl ) {
-
-			var abstractModule	= new $.ModuleNode( this, moduleImpl );
-
-			return { nodeType: nodeType, moduleImpl: abstractModule };
-
-		},
-
 		_registerModuleNode		: function ( nodeType, moduleImpl ) {
 
-			var item	= this._createModuleNodeItem( nodeType, moduleImpl );
+			var item = {
+				nodeType	: nodeType,
+				moduleImpl	: moduleImpl
+			};
 
 			this.registeredNode.push( item );
 
@@ -303,9 +298,16 @@
 
 		_createModule			: function ( module ) {
 
+			// Find ModuleNode Implamentation
+			var moduleImpl	= this._findRegisteredModuleImpl( module.nodeType );
+
+			if (moduleImpl === undefined) {
+				return;
+			};
+
 			module.options 		= $.extend( true, {}, this.options, module.options );
 
-			var audioNode 		= this._createAudioNode( module );
+			var audioNode 		= moduleImpl.createModuleAudioNode( module );
 
 			var inNode;
 			var outNode;
@@ -325,7 +327,7 @@
 			}
 
 			// create div for module
-			this._createModuleDiv( module, audioNode );
+			this._createModuleDiv( module, audioNode, moduleImpl );
 
 			// register audio node
 			var moduleItem = { 
@@ -342,7 +344,7 @@
 
 		},
 
-		_createModuleDiv		: function ( module, audioNode ) {
+		_createModuleDiv		: function ( module, audioNode, moduleImpl ) {
 
 			var name		= module.name;
 			var moduleNumber	= this._getNextModuleNumber ( );
@@ -360,7 +362,7 @@
 
 			// append content
 			var $content 		= $( $divEl ).find( '.nm-content' );
-			this._appendContentToModule( $content, module, audioNode );
+			moduleImpl.createModuleDiv( $content, module, audioNode );
 
 			// add bypass and reset modes
 			this._appendBypassButton( $divEl, $content, module, audioNode );
@@ -433,19 +435,6 @@
 
 		},
 
-		_appendContentToModule		: function ( $moduleEl, module, audioNode ) {
-
-			var nodeType 	= module.nodeType;
-
-			var item = this._findRegisteredModuleImpl( nodeType );
-
-			if (item != undefined) {
-
-				return item.createModuleDiv( $moduleEl, module, audioNode );
-			};
-
-		},
-
 		_appendModuleFooter 		: function ( $divEl, $content, module, audioNode ) {
 
 			if (audioNode === null || audioNode === undefined) {
@@ -506,19 +495,6 @@
 			}
 
 			$footer.appendTo( $divEl );
-
-		},
-
-		_createAudioNode		: function ( module ) {
-
-			var nodeType = module.nodeType;
-
-			var item = this._findRegisteredModuleImpl( nodeType );
-
-			if (item != undefined) {
-
-				return item.createModuleAudioNode( module );
-			};
 
 		},
 
@@ -973,37 +949,6 @@
 	};
 
 
-
-	/* ModuleNode: Class for Module representation */
-
-	$.ModuleNode			= function ( noiseModule, moduleImpl ) {
-
-		this.noiseModule	= noiseModule;
-		this.moduleImpl		= moduleImpl;
-
-	};
-
-	$.ModuleNode.prototype		= {
-
-		createModuleAudioNode	: function ( module ) {
-
-			return this.moduleImpl.createModuleAudioNode( module );
-
-		},
-
-		createModuleDiv		: function ( $moduleEl, module, audioNode ) {
-
-			return this.moduleImpl.createModuleDiv( $moduleEl, module, audioNode );
-
-		},
-
-		resetModuleSettings	: function ( $moduleEl, module, audioNode ) {
-
-			return this.moduleImpl.resetModuleSettings( $moduleEl, module, audioNode );
-
-		},
-
-	};
 
 
 
