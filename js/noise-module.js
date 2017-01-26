@@ -453,12 +453,15 @@
 
 				var fromTem	= '\
 				<div class="nm-direction direction-from">\
-					<img class="nm-icon icon-from" />\
 					<ul class="nm-list list-from">\
 					</ul>\
 				</div>';
 
 				var $from 	= $( fromTem );
+				var $imgFrom	= this._createFooterImage( true, 'icon-from');
+
+				$from.prepend( $imgFrom );
+
 				var $list 	= ( $from ).find( '.nm-list' );
 				
 				$.each( conns, function( index, conn ) {
@@ -477,12 +480,15 @@
 
 				var toTem	= '\
 				<div class="nm-direction direction-to">\
-					<img class="nm-icon icon-to" />\
 					<ul class="nm-list list-to">\
 					</ul>\
 				</div>';
 
 				var $to 	= $( toTem );
+				var $imgTo	= this._createFooterImage( true, 'icon-to');
+
+				$to.prepend( $imgTo );
+
 				var $list 	= ( $to ).find( '.nm-list' );
 
 				$.each( conns, function( index, conn ) {
@@ -495,6 +501,22 @@
 			}
 
 			$footer.appendTo( $divEl );
+
+		},
+
+		_createFooterImage		: function ( inOut, cssClass ) {
+
+			var template	= '<img class="nm-icon" />';
+
+			$img		= $( template );
+			$img.addClass( cssClass );
+
+			$img[0].addEventListener( 'click', function( e ) {
+
+				console.log( 'cliked', this );
+			} );
+
+			return $img;
 
 		},
 
