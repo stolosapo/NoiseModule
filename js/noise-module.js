@@ -485,7 +485,7 @@
 				</div>';
 
 				var $to 	= $( toTem );
-				var $imgTo	= this._createFooterImage( true, 'icon-to');
+				var $imgTo	= this._createFooterImage( false, 'icon-to');
 
 				$to.prepend( $imgTo );
 
@@ -506,6 +506,8 @@
 
 		_createFooterImage		: function ( inOut, cssClass ) {
 
+			var _self	= this;
+
 			var template	= '<img class="nm-icon" />';
 
 			$img		= $( template );
@@ -513,10 +515,31 @@
 
 			$img[0].addEventListener( 'click', function( e ) {
 
-				console.log( 'cliked', this );
+				_self._footerImageClicked( this, e, inOut );
+
 			} );
 
 			return $img;
+
+		},
+
+		_footerImageClicked		: function ( sender, e, inOut ) {
+
+
+			var $moduleEl = $( sender.parentNode.parentNode.parentNode );
+
+			// Check to see if exist open connections for the oposite direction
+
+			var openExists = this._openConnectionsExists( !inOut );
+
+			if (openExists) {
+
+				this._endConnection( !inOut, $moduleEl );
+			}
+			else {
+
+				this._beginConnection( inOut, $moduleEl );
+			};
 
 		},
 
@@ -947,6 +970,72 @@
 
 					_self._disconnectNodes( srcNode, destNode );
 				};
+			} );
+
+		},
+
+		_getBeginConnectionClass	: function ( inOut ) {
+
+			if (inOut) {
+				return 'begin-in-connection';
+			};
+
+			return 'begin-out-connection';
+
+		},
+
+		_openConnectionsExists		: function ( inOut ) {
+
+			return this._getOpenConnections( inOut ).length > 0;
+
+		},
+
+		_getOpenConnections		: function ( inOut ) {
+
+			var beginClass = this._getBeginConnectionClass( inOut );
+
+			var $openConnModules = this.$el.find( '.' + beginClass );
+
+			return $openConnModules;
+
+		},
+
+		_beginConnection		: function ( inOut, $moduleEl ) {
+
+			var beginClass = this._getBeginConnectionClass( inOut );
+
+			if (!$moduleEl.hasClass( beginClass )) {
+
+				$moduleEl.addClass( beginClass );
+
+			};
+
+		},
+
+		_endConnection			: function ( inOut, $sourceModuleEl ) {
+
+			var _self = this;
+
+			var beginClass = this._getBeginConnectionClass( inOut );
+			var $openConnModules = this._getOpenConnections( inOut );
+			var sourceName = $sourceModuleEl.attr( 'name' );
+			var sourceNode = this._findAudioNode( sourceName );
+
+			var $destEl;
+			var destName;
+			var destNode;
+
+			$.each( $openConnModules, function( index, el ) {
+
+				$destEl = $( el );
+
+				destName = $destEl.attr( 'name' );
+				destNode = _self._findAudioNode( destName );
+
+				console.log( 'Connect', sourceName, 'with', destName );
+
+				$destEl.removeClass( beginClass );
+
 			} );
 
 		},

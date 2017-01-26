@@ -178,6 +178,7 @@
 	text-indent: -999em;
 	position: relative;
 	display: inline-block;
+	cursor: pointer;
 } 
 
 .noise-module .nm-footer .nm-direction .nm-list {
