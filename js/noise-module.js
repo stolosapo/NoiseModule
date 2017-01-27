@@ -10,8 +10,8 @@
 
 		if (fileMode === null || fileMode === undefined || fileMode === false) {
 
-			this._init ( options );	
-		
+			this._init ( options );
+
 		}
 		else {
 
@@ -65,7 +65,7 @@
 		radioAudioIdSelector	: undefined,
 		radioAudioClassSelector	: undefined,
 
-		soundCloudClientId	: '3b2585ef4a5eff04935abe84aad5f3f3',
+		soundCloudClientId	: '8n0A1crHP5gI2tR3j3uSHGDWOMMM9xyo',
 		soundCloudTrackUrl	: '',
 		soundCloudAudio		: undefined,
 
@@ -117,7 +117,7 @@
 		waveShapperCurveAmount	: 400,
 
 		/* none, 2x, 4x */
-		waveShapperOversample	: '4x', 
+		waveShapperOversample	: '4x',
 
 		periodicWaveRealArray	: new Float32Array( [ 0, 1 ] ),
 		periodicWaveImagArray	: new Float32Array( [ 0, 0 ] ),
@@ -172,13 +172,13 @@
 			$fileInput[0].addEventListener( 'change', function ( e ) {
 
 				var file 	= e.target.files[0];
-				
+
 				if (!file) {
 					return;
 				}
-				
+
 				var reader 	= new FileReader();
-				
+
 				reader.onload = function( e ) {
 
 					var content 		= e.target.result;
@@ -224,11 +224,11 @@
 			this._registerModuleNode( 'dynamicscompressor', new $.DynamicsCompressorModuleNode( this ) );
 			this._registerModuleNode( 'gain', new $.GainModuleNode( this ) );
 			this._registerModuleNode( 'stereopannernode', new $.StereoPannerModuleNode( this ) );
-			
+
 			this._registerModuleNode( 'waveshapernode', new $.WaveShaperModuleNode( this ) );
 			this._registerModuleNode( 'periodicwave', new $.PeriodWaveModuleNode( this ) );
 			this._registerModuleNode( 'analyser', new $.AnalyserModuleNode( this ) );
-			
+
 			this._registerModuleNode( 'recorder', new $.RecorderModuleNode( this ) );
 
 		},
@@ -240,7 +240,7 @@
 			$.each( this.registeredNode, function( index, item ) {
 
 				if (item.nodeType === nodeType) {
-					
+
 					itemImp = item.moduleImpl;
 				};
 			} );
@@ -251,16 +251,16 @@
 
 		_createAudioContext		: function ( ) {
 
-			var audioContext; 
+			var audioContext;
 
-			if (typeof AudioContext !== "undefined") {     
-				audioContext = new AudioContext(); 
-			} 
-			else if (typeof webkitAudioContext !== "undefined") {     
-				audioContext = new webkitAudioContext(); 
-			} 
-			else {     
-				throw new Error('AudioContext not supported. :('); 
+			if (typeof AudioContext !== "undefined") {
+				audioContext = new AudioContext();
+			}
+			else if (typeof webkitAudioContext !== "undefined") {
+				audioContext = new webkitAudioContext();
+			}
+			else {
+				throw new Error('AudioContext not supported. :(');
 			}
 
 			this.audioContext = audioContext;
@@ -280,7 +280,7 @@
 
 			var _self = this;
 
-			
+
 			// create all modules
 			$.each( this.options.modules, function( index, module ) {
 
@@ -330,9 +330,9 @@
 			this._createModuleDiv( module, audioNode, moduleImpl );
 
 			// register audio node
-			var moduleItem = { 
-				name 		: module.name, 
-				inNode 		: inNode, 
+			var moduleItem = {
+				name 		: module.name,
+				inNode 		: inNode,
 				outNode 	: outNode,
 				allNodes 	: allNodes
 			};
@@ -349,7 +349,7 @@
 			var name		= module.name;
 			var moduleNumber	= this._getNextModuleNumber ( );
 			var moduleId		= "module" + moduleNumber;
-			
+
 			var template 		= '\
 			<div id="' + moduleId + '" class="noise-module ' + module.nodeType + '">\
 				<div class="nm-content">\
@@ -382,7 +382,7 @@
 				return;
 			}
 
-			if ( audioNode.numberOfInputs > 0 || 
+			if ( audioNode.numberOfInputs > 0 ||
 				( audioNode.inNode && audioNode.inNode.numberOfInputs > 0 ) ) {
 
 				var template 	= '<img class="nm-bypass" />';
@@ -397,7 +397,7 @@
 
 		_appendResetButton 		: function ( $divEl, $content, module, audioNode ) {
 
-			if (module.nodeType != 'noise' && 
+			if (module.nodeType != 'noise' &&
 				module.nodeType != 'liveinput' &&
 				module.nodeType != 'analyser') {
 
@@ -463,7 +463,7 @@
 				$from.prepend( $imgFrom );
 
 				var $list 	= ( $from ).find( '.nm-list' );
-				
+
 				$.each( conns, function( index, conn ) {
 
 					$list.append( $('<li>').text( conn ) );
@@ -567,7 +567,7 @@
 			}
 			else {
 
-				$content.addClass( bypassedClass );	
+				$content.addClass( bypassedClass );
 			}
 
 		},
@@ -585,11 +585,11 @@
 			var destNode;
 
 			if ( connection.destNode === "output" ) {
-				
+
 				this._connectNodeToDestination( srcNode );
 			}
 			else {
-				
+
 				var destAudio	= this._findAudioNode( connection.destNode );
 				destNode = destAudio.inNode;
 
@@ -605,7 +605,7 @@
 			$.each( this.options.modules, function( index, mod ) {
 
 				if ( mod.name === moduleName ) {
-					
+
 					module = mod;
 					return;
 				};
@@ -625,7 +625,7 @@
 				var name = $( div ).attr( 'name' );
 
 				if ( name === module.name ) {
-					
+
 					$divEl = div;
 					return;
 				};
@@ -650,7 +650,7 @@
 			$.each( this.options.connections, function( index, conn ) {
 
 				if ( name === conn[ askedNodeDir ] ) {
-					
+
 					conns.push( conn[ givenNodeDir ] );
 				};
 			} );
@@ -666,7 +666,7 @@
 			$.each( this.moduleMap, function( index, map ) {
 
 				if ( map.name === moduleName ) {
-					
+
 					node = { inNode: map.inNode, outNode: map.outNode };
 
 					return;
@@ -682,7 +682,7 @@
 			$.each( this.moduleMap, function( index, map ) {
 
 				if ( map.name === moduleName ) {
-					
+
 					map.inNode 	= audioInNode;
 					map.outNode = audioOutNode || audioInNode;
 
@@ -700,9 +700,9 @@
 
 		_createSimpleSliderControl	: function ( audioNode, property, min, max, step, units, changeEvent ) {
 
-			return this._createSliderControl( 
-				audioNode, 
-				property, 
+			return this._createSliderControl(
+				audioNode,
+				property,
 				property,
 				min,
 				max,
@@ -795,7 +795,7 @@
 				$img.addClass( stopClass );
 			}
 			else {
-				
+
 				$img.addClass( playClass );
 			}
 
@@ -837,7 +837,7 @@
 				$img.addClass( pauseClass );
 			}
 			else {
-				
+
 				$img.addClass( playClass );
 			}
 
@@ -920,7 +920,7 @@
 
 		_connectNodes			: function ( srcNode, destNode ) {
 
-			if (srcNode === null || srcNode === undefined || 
+			if (srcNode === null || srcNode === undefined ||
 				destNode === null || destNode === undefined) {
 				return;
 			}
@@ -931,7 +931,7 @@
 
 		_disconnectNodes		: function ( srcNode, destNode ) {
 
-			if (srcNode === null || srcNode === undefined || 
+			if (srcNode === null || srcNode === undefined ||
 				destNode === null || destNode === undefined) {
 				return;
 			}
@@ -947,7 +947,7 @@
 			$.each( this.options.connections, function( index, conn ) {
 
 				if ( conn.srcNode === module.name ) {
-					
+
 					var srcNode 	= _self._findAudioNode( conn.srcNode ).outNode;
 					var destNode 	= _self._findAudioNode( conn.destNode ).inNode;
 
@@ -964,7 +964,7 @@
 			$.each( this.options.connections, function( index, conn ) {
 
 				if ( conn.srcNode === module.name ) {
-					
+
 					var srcNode 	= _self._findAudioNode( conn.srcNode ).outNode;
 					var destNode 	= _self._findAudioNode( conn.destNode ).inNode;
 
@@ -1044,9 +1044,9 @@
 
 			var request = new XMLHttpRequest( );
 
-			request.onreadystatechange = function( ) { 
+			request.onreadystatechange = function( ) {
 
-				if (request.readyState === 4 && 
+				if (request.readyState === 4 &&
 					request.status === 200) {
 					callback( request.responseText );
 				}
@@ -1064,7 +1064,7 @@
 
 
 	/**
-	 * NoiseModuleNode: Class for 'noise' node 
+	 * NoiseModuleNode: Class for 'noise' node
 	 */
 
 	$.NoiseModuleNode		= function ( noiseModule ) {
@@ -1115,9 +1115,9 @@
 
 				var output = e.outputBuffer.getChannelData(0);
 
-				for (var i = 0; i < bufferSize; i++) { 				
+				for (var i = 0; i < bufferSize; i++) {
 
-					output[i] = Math.random() * 2 - 1; 			
+					output[i] = Math.random() * 2 - 1;
 				};
 			};
 
@@ -1138,9 +1138,9 @@
 
 				var output = e.outputBuffer.getChannelData ( 0 );
 
-				for (var i = 0; i < bufferSize; i++) { 				
+				for (var i = 0; i < bufferSize; i++) {
 
-					var white = Math.random() * 2 - 1;			
+					var white = Math.random() * 2 - 1;
 
 					b0 = 0.99886 * b0 + white * 0.0555179;
 					b1 = 0.99332 * b1 + white * 0.0750759;
@@ -1154,7 +1154,7 @@
 
 					b6 = white * 0.115926;
 				};
-			};		
+			};
 
 			return node;
 
@@ -1190,7 +1190,7 @@
 
 
 	/**
-	 * OscilatorModuleNode: Class for 'oscilator' node 
+	 * OscilatorModuleNode: Class for 'oscilator' node
 	 */
 
 	$.OscilatorModuleNode		= function ( noiseModule ) {
@@ -1253,8 +1253,8 @@
 
 		createModuleAudioNode	: function ( module ) {
 
-			navigator.getUserMedia = navigator.getUserMedia || 
-						navigator.webkitGetUserMedia || 
+			navigator.getUserMedia = navigator.getUserMedia ||
+						navigator.webkitGetUserMedia ||
 						navigator.mozGetUserMedia;
 
 			if (navigator.mediaDevices) {
@@ -1334,7 +1334,7 @@
 			};
 
 			var source = this.nm.audioContext.createMediaElementSource( audio );
-		
+
 			return source;
 
 		},
@@ -1352,7 +1352,7 @@
 				$span.appendTo( $moduleEl );
 
 				return $span;
-			};	
+			};
 
 
 			audio.on( 'playing', function( e ) { $span.text( 'Playing' ); } );
@@ -1385,7 +1385,7 @@
 
 		},
 
-		
+
 		/* Private Methods */
 
 		_getRadioAudioElement 	: function ( module ) {
@@ -1443,7 +1443,7 @@
 
 				var trackInfo 	= JSON.parse( response );
 				var streamUrl 	= trackInfo.stream_url + "?" + clientParameter;
-		
+
 				audio.src 	= streamUrl;
 
 				source 		= _self.nm.audioContext.createMediaElementSource( audio );
@@ -1478,7 +1478,7 @@
 				$span.appendTo( $moduleEl );
 
 				return $span;
-			};	
+			};
 
 			var $audioEl 	= $( audio );
 
@@ -1602,11 +1602,11 @@
 			// Create all bands
 			$.each( module.options.eqBands, function( index, band ) {
 
-				var bandNode 	= _self.nm._createBiquadFilter( 
+				var bandNode 	= _self.nm._createBiquadFilter(
 					module,
 					band.type,
 					band.frequency,
-					band.detune, 
+					band.detune,
 					band.Q,
 					band.gain );
 
@@ -1657,13 +1657,13 @@
 				var bandIndex 	= index - 1;
 				var description	= module.options.eqBands[ bandIndex ].description;
 
-				var $filterDiv	= _self.nm._createSliderControl( 
-					node, 
-					module.options.eqBandControl, 
-					description, 
-					min, 
-					max, 
-					step, 
+				var $filterDiv	= _self.nm._createSliderControl(
+					node,
+					module.options.eqBandControl,
+					description,
+					min,
+					max,
+					step,
 					'' );
 
 				$filterDiv.addClass( 'eq-band' );
@@ -1673,7 +1673,7 @@
 
 			} );
 
-			
+
 			$outGainDiv.appendTo( $moduleEl );
 
 		},
@@ -1687,7 +1687,7 @@
 
 			this.nm._resetSliderSettingByClasses( $moduleEl, audioNode.inNode, 'gain', inClasses, module.options.eqPreAmpInGain );
 			this.nm._resetSliderSettingByClasses( $moduleEl, audioNode.outNode, 'gain', outClasses, module.options.eqPreAmpOutGain );
-			
+
 			var lastIndex 	= audioNode.allNodes.length - 1;
 
 			$.each( audioNode.allNodes, function( index, node ) {
@@ -1702,11 +1702,11 @@
 				var classes 	= [ bandControlType, 'eq-band', 'band' + bandIndex ];
 				var value 		= module.options.eqBands[ bandIndex ][ bandControlType ];
 
-				_self.nm._resetSliderSettingByClasses( 
-					$moduleEl, 
-					node, 
-					bandControlType, 
-					classes, 
+				_self.nm._resetSliderSettingByClasses(
+					$moduleEl,
+					node,
+					bandControlType,
+					classes,
 					value );
 
 			} );
@@ -1818,7 +1818,7 @@
 			var $outGainDiv	= this.nm._createSliderControl( audioNode.outNode, 'gain', 'preAmp Out', 0, 2, 0.1, '' );
 			$outGainDiv.addClass( 'pre-amp' );
 			$outGainDiv.addClass( 'out' );
-			
+
 			var $delayDiv		= this.nm._createSliderControl( delay, 'delayTime', 'delay', 0, 10, 0.01, "Sec" );
 			$delayDiv.addClass( 'delay' );
 
@@ -2058,7 +2058,7 @@
 			var x;
 
 			for ( ; i < n_samples; ++i ) {
-				
+
 				x = i * 2 / n_samples - 1;
 
 				curve[i] = ( 3 + k ) * x * 20 * deg / ( Math.PI + k * Math.abs(x) );
@@ -2099,8 +2099,8 @@
 		_connectPeriodicWave		: function ( module, oscillator ) {
 
 			var wave = this.nm.audioContext.createPeriodicWave(
-				module.options.periodicWaveRealArray, 
-				module.options.periodicWaveImagArray, 
+				module.options.periodicWaveRealArray,
+				module.options.periodicWaveImagArray,
 				{
 					disableNormalization: module.options.periodicWaveDisableNorm
 				});
@@ -2135,7 +2135,7 @@
 
 			var bufferLength	= analyser.frequencyBinCount;
 			var dataArray		= new Uint8Array ( bufferLength );
-			
+
 			analyser.getByteTimeDomainData ( dataArray );
 
 			return analyser;
@@ -2297,7 +2297,7 @@
 
 			// push each chunk (blobs) in an array
 			mediaRecorder.ondataavailable	= function( e ) {
-			
+
 				module.options.recorderChunks.push( e.data );
 			};
 
@@ -2405,7 +2405,7 @@
 				}
 
 				$span.text( "Status: stopped" );
-			};		
+			};
 
 		},
 
@@ -2419,43 +2419,43 @@
 	$.fn.noiseModule	= function ( options ) {
 
 		if ( typeof options === 'string' ) {
-			
+
 			var args = Array.prototype.slice.call( arguments, 1 );
-			
+
 			this.each(function() {
-			
+
 				var instance = $.data( this, 'noiseModule' );
-				
+
 				if ( !instance ) {
 
 					window.console.error( "cannot call methods on noiseModule prior to initialization; " +
 					"attempted to call method '" + options + "'" );
 					return;
-				
+
 				}
-				
+
 				if ( !$.isFunction( instance[ options ] ) || options.charAt(0) === "_" ) {
 
 					window.console.error( "no such method '" + options + "' for noiseModule instance" );
 					return;
-				
+
 				}
-				
+
 				instance[ options ].apply( instance, args );
-			
+
 			});
 
 			return this;
-		
-		} 
+
+		}
 		else {
-		
+
 			var instance;
 
 			this.each(function() {
-			
+
 				instance = $.data( this, 'noiseModule' );
-				
+
 				if ( !instance ) {
 
 					instance = new $.NoiseModule( options, this );
@@ -2466,7 +2466,7 @@
 			});
 
 			return instance;
-		
+
 		}
 
 	};
