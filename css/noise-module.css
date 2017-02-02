@@ -181,6 +181,14 @@
 	cursor: pointer;
 } 
 
+.noise-module.begin-out-connection .nm-footer img.icon-to {
+	background-color: red;
+}
+
+.noise-module.begin-in-connection .nm-footer img.icon-from {
+	background-color: green;
+}
+
 .noise-module .nm-footer .nm-direction .nm-list {
 	list-style-type: none;
 	padding: 0px;

@@ -1019,22 +1019,47 @@
 			var beginClass = this._getBeginConnectionClass( inOut );
 			var $openConnModules = this._getOpenConnections( inOut );
 			var sourceName = $sourceModuleEl.attr( 'name' );
-			var sourceNode = this._findAudioNode( sourceName );
+			var sourceAudioNode = this._findAudioNode( sourceName );
+			var sourceNode = inOut ? sourceAudioNode.outNode : sourceAudioNode.inNode;
 
 			var $destEl;
 			var destName;
+			var destAudioNode;
 			var destNode;
+
+			var inNode;
+			var outNode;
 
 			$.each( $openConnModules, function( index, el ) {
 
 				$destEl = $( el );
 
 				destName = $destEl.attr( 'name' );
-				destNode = _self._findAudioNode( destName );
+				destAudioNode = _self._findAudioNode( destName );
+				destNode = inOut ? destAudioNode.inNode : destAudioNode.outNode;
 
 				console.log( 'Connect', sourceName, 'with', destName );
 
 				$destEl.removeClass( beginClass );
+
+				if (inOut) {
+					inNode = destNode;
+					outNode = sourceNode;
+				}
+				else {
+					inNode = sourceNode;
+					outNode = destNode;
+				};
+
+
+				// do the connection
+				_self._connectNodes( outNode, inNode );
+
+
+				// store connection
+
+
+				// change footer of the module
 
 			} );
 
