@@ -33,6 +33,7 @@
 			equalizer
 			delay
 			kingtubbynode
+			convolver		{  }
 			dynamicscompressor
 			gain
 			stereopannernode
@@ -220,6 +221,7 @@
 			this._registerModuleNode( 'equalizer', new $.EqualizerModuleMode( this ) );
 			this._registerModuleNode( 'delay', new $.DelayModuleNode( this ) );
 			this._registerModuleNode( 'kingtubbynode', new $.KingTubbyModuleNode( this ) );
+			this._registerModuleNode( 'convolver', new $.ConvolverModuleNode( this ) );
 
 			this._registerModuleNode( 'dynamicscompressor', new $.DynamicsCompressorModuleNode( this ) );
 			this._registerModuleNode( 'gain', new $.GainModuleNode( this ) );
@@ -1794,7 +1796,7 @@
 
 	$.KingTubbyModuleNode.prototype	= {
 
-		createModuleAudioNode	: function ( module ) {
+		createModuleAudioNode		: function ( module ) {
 
 			var nodes		= [ ];
 
@@ -1880,6 +1882,54 @@
 			this.nm._resetSliderSettingByClasses( $moduleEl, filter, 'frequency', [ 'frequency', 'biquadfilter' ], module.options.kingTubbyCutOffFreq );
 
 		},
+
+	};
+
+
+
+	/**
+	 * ConvolverModuleNode: Class for 'convolver' node
+	 */
+	$.ConvolverModuleNode		= function ( noiseModule ) {
+
+		this.nm = noiseModule;
+
+	};
+
+	$.ConvolverModuleNode.prototype	= {
+
+		createModuleAudioNode		: function ( module ) {
+
+			var node = this.nm.audioContext.createConvolver( );
+
+			console.log(node);
+
+			return node;
+
+		},
+
+		createModuleDiv			: function ( $moduleEl, module, audioNode ) {
+
+			var spanTemplate 	= '<span class="nm-label info"></span>'
+			var $normSpan 		= $( spanTemplate );
+
+			$normSpan.text( 'normalize: ' + audioNode.normalize );
+
+			$normSpan[0].addEventListener( 'click', function( e ) {
+
+				audioNode.normalize = !audioNode.normalize;
+
+				$normSpan.text( 'normalize: ' + audioNode.normalize );
+
+			} );
+
+			$normSpan.appendTo( $moduleEl );
+
+		},
+
+		resetModuleSettings		: function ( $moduleEl, module, audioNode ) {
+
+		}
 
 	};
 
