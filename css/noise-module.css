@@ -77,6 +77,10 @@
 	width: 98%;
 }
 
+.nm-label.info.link {
+	cursor: pointer;
+}
+
 .nm-label.nm-list {
 	list-style-type: none;
 	padding: 0px;
