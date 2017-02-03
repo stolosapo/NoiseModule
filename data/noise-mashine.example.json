@@ -1,103 +1,103 @@
 {
 	"modules": [
-		{ 
-			"name": "WhiteNoise", 
-			"nodeType": "noise", 
-			"type": "white", 
-			"options": { 
-				"started": false 
-			} 
+		{
+			"name": "WhiteNoise",
+			"nodeType": "noise",
+			"type": "white",
+			"options": {
+				"started": false
+			}
 		},
-		{ 
-			"name": "Filter", 
+		{
+			"name": "Filter",
 			"nodeType": "biquadfilter"
 		},
-		{ 
-			"name": "Delay", 
+		{
+			"name": "Delay",
 			"nodeType": "delay"
 		},
-		{ 
-			"name": "Compressor", 
+		{
+			"name": "Compressor",
 			"nodeType": "dynamicscompressor"
 		},
-		{ 
-			"name": "Eq", 
+		{
+			"name": "Eq",
 			"nodeType": "equalizer"
 		},
-		{ 
-			"name": "Shapper", 
-			"nodeType": "waveshapernode" 
+		{
+			"name": "Shapper",
+			"nodeType": "waveshapernode"
 		},
-		{ 
-			"name": "KingTubby", 
-			"nodeType": "kingtubbynode" 
+		{
+			"name": "KingTubby",
+			"nodeType": "kingtubbynode"
 		},
-		{ 
-			"name": "Master", 
-			"nodeType": "gain", 
-			"type": "" 
+		{
+			"name": "Master",
+			"nodeType": "gain",
+			"type": ""
 		},
-		{ 
-			"name": "Pan", 
-			"nodeType": "stereopannernode" 
+		{
+			"name": "Pan",
+			"nodeType": "stereopannernode"
 		},
-		{ 
-			"name": "MasterAnalyser", 
-			"nodeType": "analyser", 
+		{
+			"name": "MasterAnalyser",
+			"nodeType": "analyser",
 			"type": "frequencybars"
 		},
-		{ 
-			"name": "Recorder", 
-			"nodeType": "recorder", 
-			"options": { 
-				"started": false 
-			} 
-		},
+		{
+			"name": "Recorder",
+			"nodeType": "recorder",
+			"options": {
+				"started": false
+			}
+		}
 	],
 	"connections": [
-		{ 
-			"srcNode": "WhiteNoise", 
+		{
+			"srcNode": "WhiteNoise",
 			"destNode": "Filter"
 		},
-		{ 
-			"srcNode": "Filter", 
+		{
+			"srcNode": "Filter",
 			"destNode": "Delay"
 		},
-		{ 
-			"srcNode": "Delay", 
-			"destNode": "Compressor" 
+		{
+			"srcNode": "Delay",
+			"destNode": "Compressor"
 		},
-		{ 
-			"srcNode": "Compressor", 
-			"destNode": "Eq" 
+		{
+			"srcNode": "Compressor",
+			"destNode": "Eq"
 		},
-		{ 
-			"srcNode": "Eq", 
-			"destNode": "Shapper" 
+		{
+			"srcNode": "Eq",
+			"destNode": "Shapper"
 		},
-		{ 
-			"srcNode": "Shapper", 
-			"destNode": "KingTubby" 
+		{
+			"srcNode": "Shapper",
+			"destNode": "KingTubby"
 		},
-		{ 
-			"srcNode": "KingTubby", 
-			"destNode": "Master" 
+		{
+			"srcNode": "KingTubby",
+			"destNode": "Master"
 		},
-		{ 
-			"srcNode": "Master", 
-			"destNode": "Pan" 
+		{
+			"srcNode": "Master",
+			"destNode": "Pan"
 		},
-		{ 
-			"srcNode": "Pan", 
-			"destNode": "MasterAnalyser" 
+		{
+			"srcNode": "Pan",
+			"destNode": "MasterAnalyser"
 		},
-		{ 
-			"srcNode": "Pan", 
-			"destNode": "Recorder" 
+		{
+			"srcNode": "Pan",
+			"destNode": "Recorder"
 		},
-		{ 
-			"srcNode": "MasterAnalyser", 
-			"destNode": "output" 
+		{
+			"srcNode": "MasterAnalyser",
+			"destNode": "output"
 		}
 	]
 }
