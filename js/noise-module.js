@@ -136,7 +136,7 @@
 
 	};
 
-	$.NoiseModule.prototype		= {
+	$.NoiseModule.prototype	= {
 
 		_init				: function ( options ) {
 
@@ -1087,9 +1087,6 @@
 		},
 
 	};
-
-
-
 
 
 	/* Noise Module Factory */
