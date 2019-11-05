@@ -210,31 +210,18 @@
 
 		_registerModuleNodes		: function ( ) {
 
-			this._registerModuleNode( 'noise', new $.NoiseModuleNode( this ) );
-			this._registerModuleNode( 'moogfilter', new $.MoogFilterModuleNode( this ) );
+			if (!this.options._nodeRegistrationConfig) {
+				return;
+			}
 
-			this._registerModuleNode( 'oscillator', new $.OscilatorModuleNode( this ) );
-			this._registerModuleNode( 'liveinput', new $.LiveInputModuleNode( this ) );
+            let _self = this;
 
-			this._registerModuleNode( 'radionode', new $.RadioModuleNode( this ) );
-			this._registerModuleNode( 'soundcloudnode', new $.SoundCloudModuleNode( this ) );
-			this._registerModuleNode( 'biquadfilter', new $.BiquadFilterModuleNode( this ) );
+            let nodeRegistrationConfig = this.options._nodeRegistrationConfig(_self);
 
-			this._registerModuleNode( 'equalizer', new $.EqualizerModuleNode( this ) );
-			this._registerModuleNode( 'delay', new $.DelayModuleNode( this ) );
-			this._registerModuleNode( 'kingtubbynode', new $.KingTubbyModuleNode( this ) );
-			this._registerModuleNode( 'convolver', new $.ConvolverModuleNode( this ) );
+            $.each( nodeRegistrationConfig, function( index, item ) {
 
-			this._registerModuleNode( 'dynamicscompressor', new $.DynamicsCompressorModuleNode( this ) );
-			this._registerModuleNode( 'gain', new $.GainModuleNode( this ) );
-			this._registerModuleNode( 'stereopannernode', new $.StereoPannerModuleNode( this ) );
-
-			this._registerModuleNode( 'waveshapernode', new $.WaveShaperModuleNode( this ) );
-			this._registerModuleNode( 'periodicwave', new $.PeriodWaveModuleNode( this ) );
-			this._registerModuleNode( 'analyser', new $.AnalyserModuleNode( this ) );
-
-			this._registerModuleNode( 'recorder', new $.RecorderModuleNode( this ) );
-
+				_self._registerModuleNode(item.nodeType, item.nodeImpl);
+			} );
 		},
 
 		_findRegisteredModuleImpl	: function ( nodeType ) {
