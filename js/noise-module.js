@@ -2,7 +2,7 @@
 
     /* Noise Module Object */
 
-    $.NoiseModule       = function ( options, element ) {
+    $.NoiseModule           = function ( options, element ) {
 
         this.$el    = $( element );
 
@@ -69,7 +69,7 @@
 
     $.NoiseModule.prototype = {
 
-        _init               : function ( options ) {
+        _init                           : function ( options ) {
 
             // the options
             this.options        = $.extend( true, {}, $.NoiseModule.defaults, options );
@@ -95,7 +95,7 @@
 
         },
 
-        _initFromFile           : function ( ) {
+        _initFromFile                   : function ( ) {
 
             var _self           = this;
             var template        = '<input type="file" id="nm-file-input" />';
@@ -128,7 +128,7 @@
 
         },
 
-        _registerModuleNode     : function ( nodeModuleImpl ) {
+        _registerModuleNode             : function ( nodeModuleImpl ) {
 
             var item = {
                 nodeType    : nodeModuleImpl.nodeTypeName,
@@ -138,7 +138,7 @@
             this.registeredNode.push( item );
         },
 
-        _registerModuleNodes        : function ( ) {
+        _registerModuleNodes            : function ( ) {
 
             if (!this.options._nodeRegistrationConfig) {
                 console.error("Could not find Node Registration Configuration for the NoiseModule");
@@ -155,7 +155,7 @@
             } );
         },
 
-        _findRegisteredModuleImpl   : function ( nodeType ) {
+        _findRegisteredModuleImpl       : function ( nodeType ) {
 
             var itemImp;
 
@@ -171,7 +171,7 @@
 
         },
 
-        _createAudioContext     : function ( ) {
+        _createAudioContext             : function ( ) {
 
             var audioContext;
 
@@ -189,7 +189,7 @@
 
         },
 
-        _createModules          : function ( ) {
+        _createModules                  : function ( ) {
 
             // create container for all modules
             var template        = '\
@@ -215,10 +215,9 @@
 
                 _self._createConnection( connection );
             } );
-
         },
 
-        _createModule           : function ( module ) {
+        _createModule                   : function ( module ) {
 
             // Find ModuleNode Implamentation
             var moduleImpl  = this._findRegisteredModuleImpl( module.nodeType );
@@ -233,13 +232,13 @@
             module.options =
                 $.extend( true, {}, moduleDefaultOptions, module.options );
 
-            var audioNode       = moduleImpl.createModuleAudioNode( module );
+            var audioNode = moduleImpl.createModuleAudioNode( module );
 
             var inNode;
             var outNode;
             var allNodes;
 
-            if (audioNode === null || audioNode === undefined) {
+            if (!audioNode) {
 
                 inNode      = undefined;
                 outNode     = undefined;
@@ -267,12 +266,11 @@
 
             // increase module counter
             this.moduleCounter++;
-
         },
 
-        _createModuleDiv        : function ( module, audioNode, moduleImpl ) {
+        _createModuleDiv                : function ( module, audioNode, moduleImpl ) {
 
-            var name        = module.name;
+            var name            = module.name;
             var moduleNumber    = this._getNextModuleNumber ( );
             var moduleId        = "module" + moduleNumber;
 
@@ -283,7 +281,7 @@
                 </div>\
             </div>';
 
-            var $divEl      = $( template );
+            var $divEl          = $( template );
             $divEl.attr( 'name', module.name );
 
             // append content
@@ -302,7 +300,7 @@
 
         },
 
-        _appendBypassButton         : function ( $divEl, $content, module, audioNode ) {
+        _appendBypassButton             : function ( $divEl, $content, module, audioNode ) {
 
             if (audioNode === null || audioNode === undefined) {
                 return;
@@ -321,7 +319,7 @@
 
         },
 
-        _appendResetButton      : function ( $divEl, $content, module, audioNode ) {
+        _appendResetButton              : function ( $divEl, $content, module, audioNode ) {
 
             if (module.nodeType != 'noise' &&
                 module.nodeType != 'liveinput' &&
@@ -337,7 +335,7 @@
 
         },
 
-        _createResetEvent       : function ( $divEl, $content, module, audioNode ) {
+        _createResetEvent               : function ( $divEl, $content, module, audioNode ) {
 
             var _self   = this;
             var $reset  = $( $divEl ).find( '.nm-reset' );
@@ -349,7 +347,7 @@
 
         },
 
-        _createBypassEvent      : function ( $divEl, $content, module, audioNode ) {
+        _createBypassEvent              : function ( $divEl, $content, module, audioNode ) {
 
             var _self   = this;
             var $bypass = $( $divEl ).find( '.nm-bypass' );
@@ -361,7 +359,7 @@
 
         },
 
-        _appendModuleFooter         : function ( $divEl, $content, module, audioNode ) {
+        _appendModuleFooter             : function ( $divEl, $content, module, audioNode ) {
 
             if (audioNode === null || audioNode === undefined) {
                 return;
@@ -430,7 +428,7 @@
 
         },
 
-        _createFooterImage      : function ( inOut, cssClass ) {
+        _createFooterImage              : function ( inOut, cssClass ) {
 
             var _self   = this;
 
@@ -449,7 +447,7 @@
 
         },
 
-        _footerImageClicked     : function ( sender, e, inOut ) {
+        _footerImageClicked             : function ( sender, e, inOut ) {
 
 
             var $moduleEl = $( sender.parentNode.parentNode.parentNode );
@@ -469,7 +467,7 @@
 
         },
 
-        _resetModuleSettings        : function ( $content, module, audioNode ) {
+        _resetModuleSettings            : function ( $content, module, audioNode ) {
 
             var nodeType = module.nodeType;
 
@@ -482,7 +480,7 @@
 
         },
 
-        _bypassModule           : function ( $content, module, audioNode ) {
+        _bypassModule                   : function ( $content, module, audioNode ) {
 
             var bypassedClass   = 'bypassed';
             var bypassed        = $content.hasClass( bypassedClass );
@@ -498,7 +496,7 @@
 
         },
 
-        _createConnection       : function ( connection ) {
+        _createConnection               : function ( connection ) {
 
             var srcModule = this._findModule( connection.srcNode );
 
@@ -524,7 +522,7 @@
 
         },
 
-        _findModule         : function ( moduleName ) {
+        _findModule                     : function ( moduleName ) {
 
             var module;
 
@@ -541,7 +539,7 @@
 
         },
 
-        _findModuleDivByName        : function ( module ) {
+        _findModuleDivByName            : function ( module ) {
 
             var $allDivs    = this.$containerEl.find( '.noise-module.' + module.nodeType );
             var $divEl      = undefined;
@@ -562,7 +560,7 @@
 
         },
 
-        _findModuleConnections      : function ( module, direction ) {
+        _findModuleConnections          : function ( module, direction ) {
 
             var _self       = this;
 
@@ -585,7 +583,7 @@
 
         },
 
-        _findAudioNode          : function ( moduleName ) {
+        _findAudioNode                  : function ( moduleName ) {
 
             var node;
 
@@ -603,7 +601,7 @@
 
         },
 
-        _updateAudioNode        : function ( moduleName, audioInNode, audioOutNode ) {
+        _updateAudioNode                : function ( moduleName, audioInNode, audioOutNode ) {
 
             $.each( this.moduleMap, function( index, map ) {
 
@@ -618,13 +616,13 @@
 
         },
 
-        _getNextModuleNumber        : function ( ) {
+        _getNextModuleNumber            : function ( ) {
 
             return this.moduleCounter + 1;
 
         },
 
-        _createSimpleSliderControl  : function ( audioNode, property, min, max, step, units, changeEvent ) {
+        _createSimpleSliderControl      : function ( audioNode, property, min, max, step, units, changeEvent ) {
 
             return this._createSliderControl(
                 audioNode,
@@ -638,7 +636,7 @@
 
         },
 
-        _createSliderControl        : function ( audioNode, property, description, min, max, step, units, changeEvent ) {
+        _createSliderControl            : function ( audioNode, property, description, min, max, step, units, changeEvent ) {
 
             var template    = '\
             <div class="' + property + '" name="' + description + '">\
@@ -678,7 +676,7 @@
 
         },
 
-        _resetSliderSetting         : function ( $moduleEl, audioNode, property, value ) {
+        _resetSliderSetting             : function ( $moduleEl, audioNode, property, value ) {
 
             var $div        = $( $moduleEl ).find( '.' + property );
             var $span       = $( $div ).find( '.nm-value' );
@@ -706,7 +704,7 @@
 
         },
 
-        _createPlayStopButton       : function ( $moduleEl, module, audioNode ) {
+        _createPlayStopButton           : function ( $moduleEl, module, audioNode ) {
 
             var _self   = this;
 
@@ -748,7 +746,7 @@
 
         },
 
-        _createPlayPauseButton      : function ( $moduleEl, module, audioNode, playPauseClickEvent ) {
+        _createPlayPauseButton          : function ( $moduleEl, module, audioNode, playPauseClickEvent ) {
 
             var _self   = this;
 
@@ -790,7 +788,7 @@
 
         },
 
-        _createCustomButton     : function ( $moduleEl, module, audioNode, cssClasses, clickEvent ) {
+        _createCustomButton             : function ( $moduleEl, module, audioNode, cssClasses, clickEvent ) {
 
             var _self   = this;
 
@@ -814,13 +812,13 @@
 
         },
 
-        _connectNodeToDestination   : function ( node ) {
+        _connectNodeToDestination       : function ( node ) {
 
             this.connectNodes ( node, this.audioContext.destination );
 
         },
 
-        connectNodes            : function ( srcNode, destNode ) {
+        connectNodes                    : function ( srcNode, destNode ) {
 
             if (srcNode === null || srcNode === undefined ||
                 destNode === null || destNode === undefined) {
@@ -831,7 +829,7 @@
 
         },
 
-        _disconnectNodes        : function ( srcNode, destNode ) {
+        _disconnectNodes                : function ( srcNode, destNode ) {
 
             if (srcNode === null || srcNode === undefined ||
                 destNode === null || destNode === undefined) {
@@ -842,7 +840,7 @@
 
         },
 
-        _connectAllDestinations     : function ( module ) {
+        _connectAllDestinations         : function ( module ) {
 
             var _self = this;
 
@@ -859,7 +857,7 @@
 
         },
 
-        _disconnectAllDestinations  : function ( module ) {
+        _disconnectAllDestinations      : function ( module ) {
 
             var _self = this;
 
@@ -876,7 +874,7 @@
 
         },
 
-        _getBeginConnectionClass    : function ( inOut ) {
+        _getBeginConnectionClass        : function ( inOut ) {
 
             if (inOut) {
                 return 'begin-in-connection';
@@ -886,13 +884,13 @@
 
         },
 
-        _openConnectionsExists      : function ( inOut ) {
+        _openConnectionsExists          : function ( inOut ) {
 
             return this._getOpenConnections( inOut ).length > 0;
 
         },
 
-        _getOpenConnections     : function ( inOut ) {
+        _getOpenConnections             : function ( inOut ) {
 
             var beginClass = this._getBeginConnectionClass( inOut );
 
@@ -902,7 +900,7 @@
 
         },
 
-        _beginConnection        : function ( inOut, $moduleEl ) {
+        _beginConnection                : function ( inOut, $moduleEl ) {
 
             var beginClass = this._getBeginConnectionClass( inOut );
 
@@ -914,7 +912,7 @@
 
         },
 
-        _endConnection          : function ( inOut, $sourceModuleEl ) {
+        _endConnection                  : function ( inOut, $sourceModuleEl ) {
 
             var _self = this;
 
@@ -967,7 +965,7 @@
 
         },
 
-        _requestGET         : function ( url, callback ) {
+        _requestGET                     : function ( url, callback ) {
 
             var request = new XMLHttpRequest( );
 
