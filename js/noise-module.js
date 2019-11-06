@@ -59,81 +59,12 @@
 		started			: true,
 		fileMode		: false,
 
-		oscillatorFrequency	: 440,
-		oscillatorDetune	: 0,
+		biquadFilterFrequency     : 440,
+		biquadFilterDetune        : 0,
+		biquadFilterQ             : 1,
+		biquadFilterGain          : 0,
 
-		radioAudioElement	: undefined,
-		radioAudioIdSelector	: undefined,
-		radioAudioClassSelector	: undefined,
-
-		soundCloudClientId	: '8n0A1crHP5gI2tR3j3uSHGDWOMMM9xyo',
-		soundCloudTrackUrl	: '',
-		soundCloudAudio		: undefined,
-
-		biquadFilterFrequency	: 440,
-		biquadFilterDetune	: 0,
-		biquadFilterQ 		: 1,
-		biquadFilterGain	: 0,
-
-		eqPreAmpInGain		: 1,
-		eqPreAmpOutGain		: 1,
-		eqBandControl		: 'gain',
-		eqBandMin		: -12,
-		eqBandMax		: 12,
-		eqBandStep 		: 1,
-		eqBands			: [
-
-			{ description: '60 Hz', type: 'lowshelf', frequency: 60, detune: 0, Q: 1, gain: 0 },
-			{ description: '170 Hz', type: 'lowshelf', frequency: 170, detune: 0, Q: 1, gain: 0 },
-			{ description: '310 Hz', type: 'lowshelf', frequency: 310, detune: 0, Q: 1, gain: 0 },
-			{ description: '600 Hz', type: 'peaking', frequency: 600, detune: 0, Q: 1, gain: 0 },
-			{ description: '1 KHz', type: 'peaking', frequency: 1000, detune: 0, Q: 1, gain: 0 },
-			{ description: '3 KHz', type: 'peaking', frequency: 3000, detune: 0, Q: 1, gain: 0 },
-			{ description: '6 KHz', type: 'peaking', frequency: 6000, detune: 0, Q: 1, gain: 0 },
-			{ description: '12 KHz', type: 'highshelf', frequency: 12000, detune: 0, Q: 1, gain: 0 },
-			{ description: '14 KHz', type: 'highshelf', frequency: 14000, detune: 0, Q: 1, gain: 0 },
-			{ description: '16 KHz', type: 'highshelf', frequency: 16000, detune: 0, Q: 1, gain: 0 }
-
-		],
-
-		delayTime		: 0.2,
-
-		kingTubbyPreAmpInGain	: 1,
-		kingTubbyPreAmpOutGain	: 1,
-		kingTubbyDelayTime	: 0.5,
-		kingTubbyGain		: 0.8,
-		kingTubbyCutOffFreq	: 1000,
-
-		compressorThreshold 	: -25,
-		compressorKnee		: 30,
-		compressorRatio 	: 12,
-		compressorReduction	: -20,
-		compressorAttack	: 0.003,
-		compressorRelease	: 0.25,
-
-		gainGain		: 0.7,
-
-		stereoPannerPan		: 0,
-
-		waveShapperCurveAmount	: 400,
-
-		/* none, 2x, 4x */
-		waveShapperOversample	: '4x',
-
-		periodicWaveRealArray	: new Float32Array( [ 0, 1 ] ),
-		periodicWaveImagArray	: new Float32Array( [ 0, 0 ] ),
-		periodicWaveDisableNorm	: false,
-
-		analyserFftSize		: 2048,
-		analyserMainBgColor	: 200,
-		analyserBarBgColor 	: 50,
-		analyserSineBgColor	: 0,
-
-		recorderChunks		: [ ],
-		recorderStopCallback	: undefined,
-		recorderMediaRecorder	: undefined,
-		recorderMediaRecordings	: [ ]
-
+		gainGain		: 0.7
 	};
 
 	$.NoiseModule.prototype	= {
@@ -296,7 +227,11 @@
 				return;
 			};
 
-			module.options 		= $.extend( true, {}, this.options, module.options );
+            let moduleDefaultOptions =
+                $.extend( true, {}, this.options, moduleImpl.defaultOptions() );
+
+			module.options =
+                $.extend( true, {}, moduleDefaultOptions, module.options );
 
 			var audioNode 		= moduleImpl.createModuleAudioNode( module );
 

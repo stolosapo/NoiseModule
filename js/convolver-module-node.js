@@ -9,7 +9,14 @@
 
 	};
 
+    $.ConvolverModuleNode.defaults     = {
+    };
+
 	$.ConvolverModuleNode.prototype    = {
+
+        defaultOptions        : function ( ) {
+            return $.ConvolverModuleNode.defaults;
+        },
 
 		createModuleAudioNode : function ( module ) {
 

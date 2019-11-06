@@ -9,7 +9,20 @@
 
 	};
 
+    $.KingTubbyModuleNode.defaults     = {
+
+        kingTubbyPreAmpInGain     : 1,
+		kingTubbyPreAmpOutGain    : 1,
+		kingTubbyDelayTime        : 0.5,
+		kingTubbyGain             : 0.8,
+		kingTubbyCutOffFreq       : 1000
+    };
+
 	$.KingTubbyModuleNode.prototype    = {
+
+        defaultOptions        : function ( ) {
+            return $.KingTubbyModuleNode.defaults;
+        },
 
 		createModuleAudioNode : function ( module ) {
 

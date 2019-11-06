@@ -8,7 +8,19 @@
 		this.nm = noiseModule;
 	};
 
+    $.BiquadFilterModuleNode.defaults  = {
+
+        biquadFilterFrequency   : 440,
+		biquadFilterDetune      : 0,
+		biquadFilterQ           : 1,
+		biquadFilterGain        : 0
+    };
+
 	$.BiquadFilterModuleNode.prototype = {
+
+        defaultOptions        : function ( ) {
+            return $.BiquadFilterModuleNode.defaults;
+        },
 
 		createModuleAudioNode : function ( module ) {
 

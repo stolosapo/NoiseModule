@@ -9,7 +9,19 @@
 
 	};
 
+    $.RecorderModuleNode.defaults     = {
+
+        recorderChunks		    : [ ],
+		recorderStopCallback	: undefined,
+		recorderMediaRecorder	: undefined,
+		recorderMediaRecordings	: [ ]
+    };
+
 	$.RecorderModuleNode.prototype = {
+
+        defaultOptions                : function ( ) {
+            return $.RecorderModuleNode.defaults;
+        },
 
 		createModuleAudioNode         : function ( module ) {
 

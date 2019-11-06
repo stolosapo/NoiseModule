@@ -9,7 +9,16 @@
 
 	};
 
+    $.DelayModuleNode.defaults     = {
+
+        delayTime   : 0.2
+    };
+
 	$.DelayModuleNode.prototype    = {
+
+        defaultOptions        : function ( ) {
+            return $.DelayModuleNode.defaults;
+        },
 
 		createModuleAudioNode : function ( module ) {
 

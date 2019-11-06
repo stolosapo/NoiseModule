@@ -8,7 +8,14 @@
         this.nm = noiseModule;
     };
 
+    $.NoiseModuleNode.defaults  = {
+    };
+
     $.NoiseModuleNode.prototype = {
+
+        defaultOptions            : function ( ) {
+            return $.NoiseModuleNode.defaults;
+        },
 
         createModuleAudioNode   : function ( module ) {
 

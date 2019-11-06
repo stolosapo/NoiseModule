@@ -9,7 +9,34 @@
 
 	};
 
+    $.EqualizerModuleNode.defaults     = {
+
+        eqPreAmpInGain		: 1,
+		eqPreAmpOutGain		: 1,
+		eqBandControl		: 'gain',
+		eqBandMin		: -12,
+		eqBandMax		: 12,
+		eqBandStep 		: 1,
+		eqBands			: [
+
+			{ description: '60 Hz', type: 'lowshelf', frequency: 60, detune: 0, Q: 1, gain: 0 },
+			{ description: '170 Hz', type: 'lowshelf', frequency: 170, detune: 0, Q: 1, gain: 0 },
+			{ description: '310 Hz', type: 'lowshelf', frequency: 310, detune: 0, Q: 1, gain: 0 },
+			{ description: '600 Hz', type: 'peaking', frequency: 600, detune: 0, Q: 1, gain: 0 },
+			{ description: '1 KHz', type: 'peaking', frequency: 1000, detune: 0, Q: 1, gain: 0 },
+			{ description: '3 KHz', type: 'peaking', frequency: 3000, detune: 0, Q: 1, gain: 0 },
+			{ description: '6 KHz', type: 'peaking', frequency: 6000, detune: 0, Q: 1, gain: 0 },
+			{ description: '12 KHz', type: 'highshelf', frequency: 12000, detune: 0, Q: 1, gain: 0 },
+			{ description: '14 KHz', type: 'highshelf', frequency: 14000, detune: 0, Q: 1, gain: 0 },
+			{ description: '16 KHz', type: 'highshelf', frequency: 16000, detune: 0, Q: 1, gain: 0 }
+		]
+    };
+
 	$.EqualizerModuleNode.prototype    = {
+
+        defaultOptions          : function ( ) {
+            return $.EqualizerModuleNode.defaults;
+        },
 
 		createModuleAudioNode	: function ( module ) {
 

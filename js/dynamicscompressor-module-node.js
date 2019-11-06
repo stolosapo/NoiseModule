@@ -9,7 +9,21 @@
 
 	};
 
+    $.DynamicsCompressorModuleNode.defaults     = {
+
+        compressorThreshold : -25,
+		compressorKnee		: 30,
+		compressorRatio 	: 12,
+		compressorReduction	: -20,
+		compressorAttack	: 0.003,
+		compressorRelease	: 0.25
+    };
+
 	$.DynamicsCompressorModuleNode.prototype    = {
+
+        defaultOptions        : function ( ) {
+            return $.DynamicsCompressorModuleNode.defaults;
+        },
 
 		createModuleAudioNode : function ( module ) {
 

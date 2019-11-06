@@ -9,7 +9,19 @@
 
 	};
 
+    $.WaveShaperModuleNode.defaults   = {
+
+        waveShapperCurveAmount  : 400,
+
+        /* none, 2x, 4x */
+		waveShapperOversample	: '4x'
+    };
+
 	$.WaveShaperModuleNode.prototype   = {
+
+        defaultOptions            : function ( ) {
+            return $.WaveShaperModuleNode.defaults;
+        },
 
 		createModuleAudioNode     : function ( module ) {
 

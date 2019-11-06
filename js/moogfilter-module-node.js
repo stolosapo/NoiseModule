@@ -9,7 +9,14 @@
 
 	};
 
+    $.MoogFilterModuleNode.defaults    = {
+    };
+
 	$.MoogFilterModuleNode.prototype   = {
+
+        defaultOptions        : function ( ) {
+            return $.MoogFilterModuleNode.defaults;
+        },
 
 		createModuleAudioNode : function ( module ) {
 

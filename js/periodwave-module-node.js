@@ -9,7 +9,18 @@
 
 	};
 
+    $.PeriodWaveModuleNode.defaults    = {
+
+        periodicWaveRealArray	: new Float32Array( [ 0, 1 ] ),
+		periodicWaveImagArray	: new Float32Array( [ 0, 0 ] ),
+		periodicWaveDisableNorm	: false
+    };
+
 	$.PeriodWaveModuleNode.prototype   = {
+
+        defaultOptions        : function ( ) {
+            return $.PeriodWaveModuleNode.defaults;
+        },
 
 		createModuleAudioNode : function ( module ) {
 

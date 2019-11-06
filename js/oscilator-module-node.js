@@ -8,7 +8,17 @@
         this.nm = noiseModule;
 	};
 
+    $.OscilatorModuleNode.defaults     = {
+
+        oscillatorFrequency	: 440,
+		oscillatorDetune	: 0
+    };
+
 	$.OscilatorModuleNode.prototype    = {
+
+        defaultOptions        : function ( ) {
+            return $.OscilatorModuleNode.defaults;
+        },
 
 		createModuleAudioNode : function ( module ) {
 

@@ -8,7 +8,14 @@
 		this.nm = noiseModule;
 	};
 
+    $.LiveInputModuleNode.defaults     = {
+    };
+
 	$.LiveInputModuleNode.prototype    = {
+
+        defaultOptions          : function ( ) {
+            return $.LiveInputModuleNode.defaults;
+        },
 
 		createModuleAudioNode	: function ( module ) {
 

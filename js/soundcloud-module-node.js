@@ -9,7 +9,18 @@
 
 	};
 
+    $.SoundCloudModuleNode.defaults    = {
+
+        soundCloudClientId	: '8n0A1crHP5gI2tR3j3uSHGDWOMMM9xyo',
+		soundCloudTrackUrl	: '',
+		soundCloudAudio		: undefined
+    };
+
 	$.SoundCloudModuleNode.prototype   = {
+
+        defaultOptions            : function ( ) {
+            return $.SoundCloudModuleNode.defaults;
+        },
 
 		createModuleAudioNode     : function ( module ) {
 

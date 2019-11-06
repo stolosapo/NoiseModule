@@ -9,7 +9,16 @@
 
 	};
 
+    $.GainModuleNode.defaults  = {
+
+        gainGain    : 0.7
+    };
+
 	$.GainModuleNode.prototype = {
+
+        defaultOptions        : function ( ) {
+            return $.GainModuleNode.defaults;
+        },
 
 		createModuleAudioNode : function ( module ) {
 

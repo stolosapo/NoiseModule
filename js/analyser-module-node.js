@@ -9,7 +9,19 @@
 
 	};
 
+    $.AnalyserModuleNode.defaults  = {
+
+        analyserFftSize		: 2048,
+		analyserMainBgColor	: 200,
+		analyserBarBgColor 	: 50,
+		analyserSineBgColor	: 0
+    };
+
 	$.AnalyserModuleNode.prototype = {
+
+        defaultOptions                : function ( ) {
+            return $.AnalyserModuleNode.defaults;
+        },
 
 		createModuleAudioNode         : function ( module ) {
 

@@ -9,7 +9,16 @@
 
 	};
 
+    $.StereoPannerModuleNode.defaults  = {
+
+        stereoPannerPan : 0
+    };
+
 	$.StereoPannerModuleNode.prototype = {
+
+        defaultOptions        : function ( ) {
+            return $.StereoPannerModuleNode.defaults;
+        },
 
 		createModuleAudioNode : function ( module ) {
 

@@ -8,7 +8,18 @@
 		this.nm = noiseModule;
 	};
 
+    $.RadioModuleNode.defaults     = {
+
+        radioAudioElement         : undefined,
+		radioAudioIdSelector      : undefined,
+		radioAudioClassSelector   : undefined
+    };
+
 	$.RadioModuleNode.prototype    = {
+
+        defaultOptions            : function ( ) {
+            return $.RadioModuleNode.defaults;
+        },
 
 		createModuleAudioNode     : function ( module ) {
 
