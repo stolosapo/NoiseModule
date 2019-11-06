@@ -1,49 +1,49 @@
 ( function( window, navigator, $, undefined ) {
 
     /**
-	 * DelayModuleNode: Class for 'delay' node
-	 */
-	$.DelayModuleNode              = function ( noiseModule ) {
+     * DelayModuleNode: Class for 'delay' node
+     */
+    $.DelayModuleNode              = function ( noiseModule ) {
 
-		this.nm = noiseModule;
+        this.nm = noiseModule;
 
-	};
+    };
 
     $.DelayModuleNode.defaults     = {
 
         delayTime   : 0.2
     };
 
-	$.DelayModuleNode.prototype    = {
+    $.DelayModuleNode.prototype    = {
 
         defaultOptions        : function ( ) {
             return $.DelayModuleNode.defaults;
         },
 
-		createModuleAudioNode : function ( module ) {
+        createModuleAudioNode : function ( module ) {
 
-			var node = this.nm.audioContext.createDelay ();
+            var node = this.nm.audioContext.createDelay ();
 
-			node.delayTime.value = module.options.delayTime;
+            node.delayTime.value = module.options.delayTime;
 
-			return node;
+            return node;
 
-		},
+        },
 
-		createModuleDiv       : function ( $moduleEl, module, audioNode ) {
+        createModuleDiv       : function ( $moduleEl, module, audioNode ) {
 
-			var $timeDiv	= this.nm._createSimpleSliderControl( audioNode, 'delayTime', 0, 10, 0.01, "Sec" );
+            var $timeDiv    = this.nm._createSimpleSliderControl( audioNode, 'delayTime', 0, 10, 0.01, "Sec" );
 
-			$timeDiv.appendTo( $moduleEl );
+            $timeDiv.appendTo( $moduleEl );
 
-		},
+        },
 
-		resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
+        resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
 
-			this.nm._resetSliderSetting( $moduleEl, audioNode, 'delayTime', module.options.delayTime );
+            this.nm._resetSliderSetting( $moduleEl, audioNode, 'delayTime', module.options.delayTime );
 
-		},
+        },
 
-	};
+    };
 
 } )( window, navigator, jQuery );

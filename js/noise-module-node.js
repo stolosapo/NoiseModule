@@ -19,7 +19,7 @@
 
         createModuleAudioNode   : function ( module ) {
 
-            var type 	= module.type;
+            var type    = module.type;
 
             if ( type === "white" ) {
                 return this._createWhiteNoise();

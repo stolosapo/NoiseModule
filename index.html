@@ -1,91 +1,97 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
-	<head>
-		<title>The First Kube :: NoiseModule</title>
+    <head>
+        <title>The First Kube :: NoiseModule</title>
 
-		<link rel="stylesheet" type="text/css" href="css/noise-module.css" />
+        <link rel="stylesheet" type="text/css" href="css/noise-module.css" />
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 
         <script src="js/noise-module-node.js"></script>
-		<script src="js/oscilator-module-node.js"></script>
-		<script src="js/liveinput-module-node.js"></script>
-		<script src="js/radio-module-node.js"></script>
-		<script src="js/soundcloud-module-node.js"></script>
-		<script src="js/biquadfilter-module-node.js"></script>
-		<script src="js/equalizer-module-node.js"></script>
-		<script src="js/delay-module-node.js"></script>
-		<script src="js/kingtubby-module-node.js"></script>
-		<script src="js/convolver-module-node.js"></script>
-		<script src="js/moogfilter-module-node.js"></script>
-		<script src="js/dynamicscompressor-module-node.js"></script>
-		<script src="js/gain-module-node.js"></script>
-		<script src="js/stereopanner-module-node.js"></script>
-		<script src="js/waveshaper-module-node.js"></script>
-		<script src="js/periodwave-module-node.js"></script>
-		<script src="js/analyser-module-node.js"></script>
-		<script src="js/recorder-module-node.js"></script>
+        <script src="js/oscilator-module-node.js"></script>
+        <script src="js/liveinput-module-node.js"></script>
+        <script src="js/radio-module-node.js"></script>
+        <script src="js/soundcloud-module-node.js"></script>
+        <script src="js/biquadfilter-module-node.js"></script>
+        <script src="js/equalizer-module-node.js"></script>
+        <script src="js/delay-module-node.js"></script>
+        <script src="js/kingtubby-module-node.js"></script>
+        <script src="js/convolver-module-node.js"></script>
+        <script src="js/moogfilter-module-node.js"></script>
+        <script src="js/dynamicscompressor-module-node.js"></script>
+        <script src="js/gain-module-node.js"></script>
+        <script src="js/stereopanner-module-node.js"></script>
+        <script src="js/waveshaper-module-node.js"></script>
+        <script src="js/periodwave-module-node.js"></script>
+        <script src="js/analyser-module-node.js"></script>
+        <script src="js/recorder-module-node.js"></script>
 
-		<script src="js/noise-module.js"></script>
-		<script src="js/noise-module-builder.js"></script>
+        <script src="js/noise-module.js"></script>
+        <script src="js/noise-module-builder.js"></script>
 
-		<script type="text/javascript">
+        <script type="text/javascript">
 
-			$(document).ready(function() {
+            $(document).ready(function() {
 
-				var urlParams 	= new URLSearchParams( window.location.search );
-				var fileMode 	= false;
+                var urlParams   = new URLSearchParams( window.location.search );
+                var fileMode    = false;
 
-				if (urlParams.has( 'fileMode' )) {
-					fileMode 	= urlParams.get( 'fileMode' );
-				}
+                if (urlParams.has( 'fileMode' )) {
+                    fileMode    = urlParams.get( 'fileMode' );
+                }
 
-				/* Create a new Singleton Noise Module */
-				$( 'body' ).noiseModule( {
+                /* Create a new Singleton Noise Module */
+                $( 'body' ).noiseModule( {
 
-					fileMode: fileMode,
+                    fileMode: fileMode,
 
-					modules 				: [
+                    modules                 : [
 
-						{ name: "WhiteNoise", nodeType: "noise", type: "white", options: { started: false } },
-						{ name: "Gain", nodeType: "gain", type: "", options: { gainGain: 0.5 } },
+                        { name: "WhiteNoise", nodeType: "noise", type: "white", options: { started: false } },
+                        { name: "Gain", nodeType: "gain", type: "", options: { gainGain: 0.5 } },
 
-						{ name: "SineWave", nodeType: "oscillator", type: "sine", options: { started: false } },
+                        // { name: "KingTubby", nodeType: "kingtubbynode", options: { started: true } },
 
-						{ name: "LiveInput", nodeType: "liveinput", type: "", options: { started: false } },
-						{ name: "Eq", nodeType: "equalizer" },
+                        { name: "SineWave", nodeType: "oscillator", type: "sine", options: { started: false } },
+
+                        { name: "LiveInput", nodeType: "liveinput", type: "", options: { started: false } },
+                        { name: "Eq", nodeType: "equalizer" },
 
 
-						{ name: "Master", nodeType: "gain", type: "" },
-						{ name: "MasterAnalyser", nodeType: "analyser", type: "frequencybars" }
+                        { name: "Master", nodeType: "gain", type: "" },
+                        { name: "MasterAnalyser", nodeType: "analyser", type: "frequencybars" }
 
-					],
+                    ],
 
-					connections				: [
+                    connections             : [
 
-						{ srcNode: "WhiteNoise", destNode: "Gain" },
-						{ srcNode: "Gain", destNode: "Master" },
+                        { srcNode: "WhiteNoise", destNode: "Gain" },
+                        { srcNode: "Gain", destNode: "Master" },
 
-						{ srcNode: "SineWave", destNode: "Eq" },
+                        // { srcNode: "Gain", destNode: "KingTubby" },
+                        // { srcNode: "KingTubby", destNode: "Master" },
 
-						{ srcNode: "LiveInput", destNode: "Eq" },
-						{ srcNode: "Eq", destNode: "Master" },
+                        { srcNode: "SineWave", destNode: "Eq" },
 
-						{ srcNode: "Master", destNode: "MasterAnalyser" },
+                        { srcNode: "LiveInput", destNode: "Eq" },
+                        { srcNode: "Eq", destNode: "Master" },
 
-						{ srcNode: "MasterAnalyser", destNode: "output" }
 
-					],
+                        { srcNode: "Master", destNode: "MasterAnalyser" },
 
-				} );
+                        { srcNode: "MasterAnalyser", destNode: "output" }
 
-			});
+                    ],
 
-		</script>
+                } );
 
-	</head>
+            });
 
-	<body>
+        </script>
 
-	</body>
+    </head>
+
+    <body>
+
+    </body>
 </html>

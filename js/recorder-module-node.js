@@ -1,152 +1,152 @@
 ( function( window, navigator, $, undefined ) {
 
     /**
-	 * RecorderModuleNode: Class for 'recorder' node
-	 */
-	$.RecorderModuleNode           = function ( noiseModule ) {
+     * RecorderModuleNode: Class for 'recorder' node
+     */
+    $.RecorderModuleNode           = function ( noiseModule ) {
 
-		this.nm = noiseModule;
+        this.nm = noiseModule;
 
-	};
+    };
 
     $.RecorderModuleNode.defaults     = {
 
-        recorderChunks		    : [ ],
-		recorderStopCallback	: undefined,
-		recorderMediaRecorder	: undefined,
-		recorderMediaRecordings	: [ ]
+        recorderChunks          : [ ],
+        recorderStopCallback    : undefined,
+        recorderMediaRecorder   : undefined,
+        recorderMediaRecordings : [ ]
     };
 
-	$.RecorderModuleNode.prototype = {
+    $.RecorderModuleNode.prototype = {
 
         defaultOptions                : function ( ) {
             return $.RecorderModuleNode.defaults;
         },
 
-		createModuleAudioNode         : function ( module ) {
+        createModuleAudioNode         : function ( module ) {
 
-			var recorder 		= this.nm.audioContext.createMediaStreamDestination( );
+            var recorder        = this.nm.audioContext.createMediaStreamDestination( );
 
-			var mediaRecorder	= new MediaRecorder( recorder.stream );
-			mediaRecorder.ignoreMutedMedia = true;
+            var mediaRecorder   = new MediaRecorder( recorder.stream );
+            mediaRecorder.ignoreMutedMedia = true;
 
-			module.options.recorderMediaRecorder = mediaRecorder;
-
-
-			// push each chunk (blobs) in an array
-			mediaRecorder.ondataavailable	= function( e ) {
-
-				module.options.recorderChunks.push( e.data );
-			};
+            module.options.recorderMediaRecorder = mediaRecorder;
 
 
-			// Make blob out of our blobs, and open it.
-			mediaRecorder.onstop		= function( e ) {
+            // push each chunk (blobs) in an array
+            mediaRecorder.ondataavailable   = function( e ) {
 
-				var blob = new Blob(module.options.recorderChunks, { 'type' : 'audio/ogg; codecs=opus' });
-
-				var audioURL = window.URL.createObjectURL(blob);
-
-				module.options.recorderMediaRecordings.push( audioURL );
-
-				if (module.options.recorderStopCallback != undefined) {
-
-					module.options.recorderStopCallback( module );
-				};
-			};
-
-			return recorder;
-
-		},
-
-		createModuleDiv               : function ( $moduleEl, module, audioNode ) {
-
-			var stopImgClass	= [ 'stop' ];
-
-			var spanTemp 		= '<span class="nm-label info"></span>';
-			var $span 		= $( spanTemp );
-
-			var listTemp		= '<ul class="nm-label nm-list"></ul>';
-			var $list		= $( listTemp );
-
-			$span.text( 'Status:' );
-
-			this.nm._createPlayPauseButton( $moduleEl, module, audioNode, this._recorderPlayPauseClickEvent );
-			this.nm._createCustomButton( $moduleEl, module, audioNode, stopImgClass, this._recorderStopClickEvent );
-
-			module.options.recorderStopCallback = function( module ) {
-
-				$list.empty( );
-
-				$.each( module.options.recorderMediaRecordings, function( index, rec ) {
-
-					var $a = $( '<a>' );
-					$a.attr( 'href', rec );
-					$a.attr( 'target', '_blank' );
-					$a.text( 'track ' + (index + 1) );
-
-					$list.append( $('<li>').append( $a ) );
-				} );
-			};
-
-			$span.appendTo( $moduleEl );
-			$list.appendTo( $moduleEl );
-
-		},
-
-		resetModuleSettings           : function ( $moduleEl, module, audioNode ) {
-
-		},
-
-		_recorderPlayPauseClickEvent  : function ( self, $moduleEl, module, audioNode, playPause ) {
-
-			var mediaRecorder	= module.options.recorderMediaRecorder;
-			var $span 		= $( $moduleEl ).find( '.nm-label.info' );
+                module.options.recorderChunks.push( e.data );
+            };
 
 
-			if (mediaRecorder.state === 'inactive') {
+            // Make blob out of our blobs, and open it.
+            mediaRecorder.onstop        = function( e ) {
 
-				module.options.recorderChunks = [ ];
+                var blob = new Blob(module.options.recorderChunks, { 'type' : 'audio/ogg; codecs=opus' });
 
-				mediaRecorder.start( );
-			}
-			else if (mediaRecorder.state === 'paused') {
+                var audioURL = window.URL.createObjectURL(blob);
 
-				mediaRecorder.resume( );
-			}
-			else if (mediaRecorder.state === 'recording') {
+                module.options.recorderMediaRecordings.push( audioURL );
 
-				mediaRecorder.pause( );
-			};
+                if (module.options.recorderStopCallback != undefined) {
 
-			$span.text( "Status: " + mediaRecorder.state + "..." );
+                    module.options.recorderStopCallback( module );
+                };
+            };
 
-		},
+            return recorder;
 
-		_recorderStopClickEvent       : function ( self, $moduleEl, module, audioNode ) {
+        },
 
-			var pauseClass		= 'pause';
-			var playClass		= 'play';
+        createModuleDiv               : function ( $moduleEl, module, audioNode ) {
 
-			var mediaRecorder	= module.options.recorderMediaRecorder;
-			var $span 		= $moduleEl.find( '.nm-label.info' );
-			var $img		= $moduleEl.find( '.nm-play-button.pause' );
+            var stopImgClass    = [ 'stop' ];
 
-			if (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused') {
+            var spanTemp        = '<span class="nm-label info"></span>';
+            var $span       = $( spanTemp );
 
-				mediaRecorder.stop( );
+            var listTemp        = '<ul class="nm-label nm-list"></ul>';
+            var $list       = $( listTemp );
 
-				if ( $img.length > 0 ) {
+            $span.text( 'Status:' );
 
-					$img.removeClass( pauseClass );
-					$img.addClass( playClass );
-				}
+            this.nm._createPlayPauseButton( $moduleEl, module, audioNode, this._recorderPlayPauseClickEvent );
+            this.nm._createCustomButton( $moduleEl, module, audioNode, stopImgClass, this._recorderStopClickEvent );
 
-				$span.text( "Status: stopped" );
-			};
+            module.options.recorderStopCallback = function( module ) {
 
-		},
+                $list.empty( );
 
-	};
+                $.each( module.options.recorderMediaRecordings, function( index, rec ) {
+
+                    var $a = $( '<a>' );
+                    $a.attr( 'href', rec );
+                    $a.attr( 'target', '_blank' );
+                    $a.text( 'track ' + (index + 1) );
+
+                    $list.append( $('<li>').append( $a ) );
+                } );
+            };
+
+            $span.appendTo( $moduleEl );
+            $list.appendTo( $moduleEl );
+
+        },
+
+        resetModuleSettings           : function ( $moduleEl, module, audioNode ) {
+
+        },
+
+        _recorderPlayPauseClickEvent  : function ( self, $moduleEl, module, audioNode, playPause ) {
+
+            var mediaRecorder   = module.options.recorderMediaRecorder;
+            var $span       = $( $moduleEl ).find( '.nm-label.info' );
+
+
+            if (mediaRecorder.state === 'inactive') {
+
+                module.options.recorderChunks = [ ];
+
+                mediaRecorder.start( );
+            }
+            else if (mediaRecorder.state === 'paused') {
+
+                mediaRecorder.resume( );
+            }
+            else if (mediaRecorder.state === 'recording') {
+
+                mediaRecorder.pause( );
+            };
+
+            $span.text( "Status: " + mediaRecorder.state + "..." );
+
+        },
+
+        _recorderStopClickEvent       : function ( self, $moduleEl, module, audioNode ) {
+
+            var pauseClass      = 'pause';
+            var playClass       = 'play';
+
+            var mediaRecorder   = module.options.recorderMediaRecorder;
+            var $span       = $moduleEl.find( '.nm-label.info' );
+            var $img        = $moduleEl.find( '.nm-play-button.pause' );
+
+            if (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused') {
+
+                mediaRecorder.stop( );
+
+                if ( $img.length > 0 ) {
+
+                    $img.removeClass( pauseClass );
+                    $img.addClass( playClass );
+                }
+
+                $span.text( "Status: stopped" );
+            };
+
+        },
+
+    };
 
 } )( window, navigator, jQuery );

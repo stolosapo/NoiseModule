@@ -1,56 +1,56 @@
 ( function( window, navigator, $, undefined ) {
 
     /**
-	 * ConvolverModuleNode: Class for 'convolver' node
-	 */
-	$.ConvolverModuleNode              = function ( noiseModule ) {
+     * ConvolverModuleNode: Class for 'convolver' node
+     */
+    $.ConvolverModuleNode              = function ( noiseModule ) {
 
-		this.nm = noiseModule;
+        this.nm = noiseModule;
 
-	};
+    };
 
     $.ConvolverModuleNode.defaults     = {
     };
 
-	$.ConvolverModuleNode.prototype    = {
+    $.ConvolverModuleNode.prototype    = {
 
         defaultOptions        : function ( ) {
             return $.ConvolverModuleNode.defaults;
         },
 
-		createModuleAudioNode : function ( module ) {
+        createModuleAudioNode : function ( module ) {
 
-			var node = this.nm.audioContext.createConvolver( );
+            var node = this.nm.audioContext.createConvolver( );
 
-			console.log(node);
+            console.log(node);
 
-			return node;
+            return node;
 
-		},
+        },
 
-		createModuleDiv       : function ( $moduleEl, module, audioNode ) {
+        createModuleDiv       : function ( $moduleEl, module, audioNode ) {
 
-			var spanTemplate 	= '<span class="nm-label info link"></span>'
-			var $normSpan 		= $( spanTemplate );
+            var spanTemplate    = '<span class="nm-label info link"></span>'
+            var $normSpan       = $( spanTemplate );
 
-			$normSpan.text( 'normalize: ' + audioNode.normalize );
+            $normSpan.text( 'normalize: ' + audioNode.normalize );
 
-			$normSpan[0].addEventListener( 'click', function( e ) {
+            $normSpan[0].addEventListener( 'click', function( e ) {
 
-				audioNode.normalize = !audioNode.normalize;
+                audioNode.normalize = !audioNode.normalize;
 
-				$normSpan.text( 'normalize: ' + audioNode.normalize );
+                $normSpan.text( 'normalize: ' + audioNode.normalize );
 
-			} );
+            } );
 
-			$normSpan.appendTo( $moduleEl );
+            $normSpan.appendTo( $moduleEl );
 
-		},
+        },
 
-		resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
+        resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
 
-		}
+        }
 
-	};
+    };
 
 } )( window, navigator, jQuery );

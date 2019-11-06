@@ -1,52 +1,52 @@
 ( function( window, navigator, $, undefined ) {
 
     /**
-	 * GainModuleNode: Class for 'gain' node
-	 */
-	$.GainModuleNode           = function ( noiseModule ) {
+     * GainModuleNode: Class for 'gain' node
+     */
+    $.GainModuleNode           = function ( noiseModule ) {
 
-		this.nm = noiseModule;
+        this.nm = noiseModule;
 
-	};
+    };
 
     $.GainModuleNode.defaults  = {
 
         gainGain    : 0.7
     };
 
-	$.GainModuleNode.prototype = {
+    $.GainModuleNode.prototype = {
 
         defaultOptions        : function ( ) {
             return $.GainModuleNode.defaults;
         },
 
-		createModuleAudioNode : function ( module ) {
+        createModuleAudioNode : function ( module ) {
 
-			return this.createGain( module );
-		},
+            return this.createGain( module );
+        },
 
-		createModuleDiv       : function ( $moduleEl, module, audioNode ) {
+        createModuleDiv       : function ( $moduleEl, module, audioNode ) {
 
-			var $gainDiv	= this.nm._createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
+            var $gainDiv    = this.nm._createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
 
-			$gainDiv.appendTo( $moduleEl );
+            $gainDiv.appendTo( $moduleEl );
 
-		},
+        },
 
-		resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
+        resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
 
-			this.nm._resetSliderSetting( $moduleEl, audioNode, 'gain', module.options.gainGain );
+            this.nm._resetSliderSetting( $moduleEl, audioNode, 'gain', module.options.gainGain );
 
-		},
+        },
 
-        createGain			  : function ( module, value ) {
+        createGain            : function ( module, value ) {
 
-			var gain = this.nm.audioContext.createGain ();
+            var gain = this.nm.audioContext.createGain ();
 
-			gain.gain.value = value || module.options.gainGain;
+            gain.gain.value = value || module.options.gainGain;
 
-			return gain;
-		}
-	};
+            return gain;
+        }
+    };
 
 } )( window, navigator, jQuery );
