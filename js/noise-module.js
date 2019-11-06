@@ -128,20 +128,20 @@
 
         },
 
-        _registerModuleNode     : function ( nodeType, moduleImpl ) {
+        _registerModuleNode     : function ( nodeModuleImpl ) {
 
             var item = {
-                nodeType    : nodeType,
-                moduleImpl  : moduleImpl
+                nodeType    : nodeModuleImpl.nodeTypeName,
+                moduleImpl  : nodeModuleImpl
             };
 
             this.registeredNode.push( item );
-
         },
 
         _registerModuleNodes        : function ( ) {
 
             if (!this.options._nodeRegistrationConfig) {
+                console.error("Could not find Node Registration Configuration for the NoiseModule");
                 return;
             }
 
@@ -151,7 +151,7 @@
 
             $.each( nodeRegistrationConfig, function( index, item ) {
 
-                _self._registerModuleNode(item.nodeType, item.nodeImpl);
+                _self._registerModuleNode(item);
             } );
         },
 

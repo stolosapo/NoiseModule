@@ -9,24 +9,24 @@
             let kingTubbyModuleNode = new $.KingTubbyModuleNode( noiseModuleObject, gainModuleNode )
 
             return [
-                { nodeType: "noise", nodeImpl: new $.NoiseModuleNode( noiseModuleObject ) },
-                { nodeType: "moogfilter", nodeImpl: new $.MoogFilterModuleNode( noiseModuleObject ) },
-                { nodeType: "oscillator", nodeImpl: new $.OscilatorModuleNode( noiseModuleObject ) },
-                { nodeType: "liveinput", nodeImpl: new $.LiveInputModuleNode( noiseModuleObject ) },
-                { nodeType: "radionode", nodeImpl: new $.RadioModuleNode( noiseModuleObject ) },
-                { nodeType: "soundcloudnode", nodeImpl: new $.SoundCloudModuleNode( noiseModuleObject ) },
-                { nodeType: "biquadfilter", nodeImpl: biquadfilterModuleNode },
-                { nodeType: "equalizer", nodeImpl: equalizerModuleNode },
-                { nodeType: "delay", nodeImpl: new $.DelayModuleNode( noiseModuleObject ) },
-                { nodeType: "kingtubbynode", nodeImpl: kingTubbyModuleNode },
-                { nodeType: "convolver", nodeImpl: new $.ConvolverModuleNode( noiseModuleObject ) },
-                { nodeType: "dynamicscompressor", nodeImpl: new $.DynamicsCompressorModuleNode( noiseModuleObject ) },
-                { nodeType: "gain", nodeImpl: gainModuleNode },
-                { nodeType: "stereopannernode", nodeImpl: new $.StereoPannerModuleNode( noiseModuleObject ) },
-                { nodeType: "waveshapernode", nodeImpl: new $.WaveShaperModuleNode( noiseModuleObject ) },
-                { nodeType: "periodicwave", nodeImpl: new $.PeriodWaveModuleNode( noiseModuleObject ) },
-                { nodeType: "analyser", nodeImpl: new $.AnalyserModuleNode( noiseModuleObject ) },
-                { nodeType: "recorder", nodeImpl: new $.RecorderModuleNode( noiseModuleObject ) }
+                new $.NoiseModuleNode( noiseModuleObject ),
+                new $.MoogFilterModuleNode( noiseModuleObject ),
+                new $.OscilatorModuleNode( noiseModuleObject ),
+                new $.LiveInputModuleNode( noiseModuleObject ),
+                new $.RadioModuleNode( noiseModuleObject ),
+                new $.SoundCloudModuleNode( noiseModuleObject ),
+                biquadfilterModuleNode,
+                equalizerModuleNode,
+                new $.DelayModuleNode( noiseModuleObject ),
+                kingTubbyModuleNode,
+                new $.ConvolverModuleNode( noiseModuleObject ),
+                new $.DynamicsCompressorModuleNode( noiseModuleObject ),
+                gainModuleNode,
+                new $.StereoPannerModuleNode( noiseModuleObject ),
+                new $.WaveShaperModuleNode( noiseModuleObject ),
+                new $.PeriodWaveModuleNode( noiseModuleObject ),
+                new $.AnalyserModuleNode( noiseModuleObject ),
+                new $.RecorderModuleNode( noiseModuleObject )
             ];
         };
     };

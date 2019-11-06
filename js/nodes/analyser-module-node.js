@@ -19,6 +19,8 @@
 
     $.AnalyserModuleNode.prototype = {
 
+        nodeTypeName                  : "analyser",
+
         defaultOptions                : function ( ) {
             return $.AnalyserModuleNode.defaults;
         },

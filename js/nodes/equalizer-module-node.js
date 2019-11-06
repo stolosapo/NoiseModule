@@ -35,6 +35,8 @@
 
     $.EqualizerModuleNode.prototype    = {
 
+        nodeTypeName            : "equalizer",
+
         defaultOptions          : function ( ) {
             return $.EqualizerModuleNode.defaults;
         },

@@ -16,6 +16,8 @@
 
     $.GainModuleNode.prototype = {
 
+        nodeTypeName          : "gain",
+
         defaultOptions        : function ( ) {
             return $.GainModuleNode.defaults;
         },

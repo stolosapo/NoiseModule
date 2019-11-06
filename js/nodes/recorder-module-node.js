@@ -19,6 +19,8 @@
 
     $.RecorderModuleNode.prototype = {
 
+        nodeTypeName                  : "recorder",
+
         defaultOptions                : function ( ) {
             return $.RecorderModuleNode.defaults;
         },

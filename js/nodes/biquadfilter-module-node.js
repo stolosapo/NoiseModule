@@ -18,6 +18,8 @@
 
     $.BiquadFilterModuleNode.prototype = {
 
+        nodeTypeName          : "biquadfilter",
+
         defaultOptions        : function ( ) {
             return $.BiquadFilterModuleNode.defaults;
         },

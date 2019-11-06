@@ -14,6 +14,8 @@
 
     $.ConvolverModuleNode.prototype    = {
 
+        nodeTypeName          : "convolver",
+
         defaultOptions        : function ( ) {
             return $.ConvolverModuleNode.defaults;
         },

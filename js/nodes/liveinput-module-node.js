@@ -13,6 +13,8 @@
 
     $.LiveInputModuleNode.prototype    = {
 
+        nodeTypeName            : "liveinput",
+
         defaultOptions          : function ( ) {
             return $.LiveInputModuleNode.defaults;
         },

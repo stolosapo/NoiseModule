@@ -18,6 +18,8 @@
 
     $.PeriodWaveModuleNode.prototype   = {
 
+        nodeTypeName          : "periodicwave",
+
         defaultOptions        : function ( ) {
             return $.PeriodWaveModuleNode.defaults;
         },

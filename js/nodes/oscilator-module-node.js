@@ -16,6 +16,8 @@
 
     $.OscilatorModuleNode.prototype    = {
 
+        nodeTypeName          : "oscillator",
+
         defaultOptions        : function ( ) {
             return $.OscilatorModuleNode.defaults;
         },

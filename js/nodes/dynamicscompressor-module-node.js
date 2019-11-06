@@ -21,6 +21,8 @@
 
     $.DynamicsCompressorModuleNode.prototype    = {
 
+        nodeTypeName          : "dynamicscompressor",
+
         defaultOptions        : function ( ) {
             return $.DynamicsCompressorModuleNode.defaults;
         },
