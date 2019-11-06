@@ -22,8 +22,7 @@
 
 		createModuleAudioNode : function ( module ) {
 
-			return this.nm._createGain( module );
-
+			return this.createGain( module );
 		},
 
 		createModuleDiv       : function ( $moduleEl, module, audioNode ) {
@@ -40,6 +39,14 @@
 
 		},
 
+        createGain			  : function ( module, value ) {
+
+			var gain = this.nm.audioContext.createGain ();
+
+			gain.gain.value = value || module.options.gainGain;
+
+			return gain;
+		}
 	};
 
 } )( window, navigator, jQuery );

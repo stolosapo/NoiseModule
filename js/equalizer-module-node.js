@@ -3,10 +3,11 @@
     /**
 	 * EqualizerModuleNode: Class for 'equalizer' node
 	 */
-	$.EqualizerModuleNode              = function ( noiseModule ) {
+	$.EqualizerModuleNode              = function ( noiseModule, gainModuleNode, biquadfilterModuleNode ) {
 
 		this.nm = noiseModule;
-
+        this.gainNode = gainModuleNode;
+        this.biquadfilterNode = biquadfilterModuleNode;
 	};
 
     $.EqualizerModuleNode.defaults     = {
@@ -42,8 +43,8 @@
 
 			var _self 	= this;
 
-			var preAmp 	= _self.nm._createGain( module, module.options.eqPreAmpInGain );
-			var outputGain	= _self.nm._createGain( module, module.options.eqPreAmpOutGain );
+			var preAmp 	= _self.gainNode.createGain( module, module.options.eqPreAmpInGain );
+			var outputGain	= _self.gainNode.createGain( module, module.options.eqPreAmpOutGain );
 
 			var nodes 	= [ ];
 			var prevNode 	= preAmp;
@@ -53,7 +54,7 @@
 			// Create all bands
 			$.each( module.options.eqBands, function( index, band ) {
 
-				var bandNode 	= _self.nm._createBiquadFilter(
+				var bandNode 	= _self.biquadfilterNode.createBiquadFilter(
 					module,
 					band.type,
 					band.frequency,
@@ -61,7 +62,7 @@
 					band.Q,
 					band.gain );
 
-				_self.nm._connectNodes( prevNode, bandNode );
+				_self.nm.connectNodes( prevNode, bandNode );
 
 				prevNode 		= bandNode;
 
@@ -69,7 +70,7 @@
 
 			} );
 
-			_self.nm._connectNodes( prevNode, outputGain );
+			_self.nm.connectNodes( prevNode, outputGain );
 
 			nodes.push( outputGain );
 

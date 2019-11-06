@@ -2,6 +2,12 @@
 
     let nodeRegistrationConfig = function () {
         return function ( noiseModuleObject ) {
+
+            let gainModuleNode = new $.GainModuleNode( noiseModuleObject );
+            let biquadfilterModuleNode = new $.BiquadFilterModuleNode( noiseModuleObject );
+            let equalizerModuleNode = new $.EqualizerModuleNode( noiseModuleObject, gainModuleNode, biquadfilterModuleNode );
+            let kingTubbyModuleNode = new $.KingTubbyModuleNode( noiseModuleObject, gainModuleNode )
+
             return [
                 { nodeType: "noise", nodeImpl: new $.NoiseModuleNode( noiseModuleObject ) },
     			{ nodeType: "moogfilter", nodeImpl: new $.MoogFilterModuleNode( noiseModuleObject ) },
@@ -9,13 +15,13 @@
     			{ nodeType: "liveinput", nodeImpl: new $.LiveInputModuleNode( noiseModuleObject ) },
     			{ nodeType: "radionode", nodeImpl: new $.RadioModuleNode( noiseModuleObject ) },
     			{ nodeType: "soundcloudnode", nodeImpl: new $.SoundCloudModuleNode( noiseModuleObject ) },
-    			{ nodeType: "biquadfilter", nodeImpl: new $.BiquadFilterModuleNode( noiseModuleObject ) },
-    			{ nodeType: "equalizer", nodeImpl: new $.EqualizerModuleNode( noiseModuleObject ) },
+    			{ nodeType: "biquadfilter", nodeImpl: biquadfilterModuleNode },
+    			{ nodeType: "equalizer", nodeImpl: equalizerModuleNode },
     			{ nodeType: "delay", nodeImpl: new $.DelayModuleNode( noiseModuleObject ) },
-    			{ nodeType: "kingtubbynode", nodeImpl: new $.KingTubbyModuleNode( noiseModuleObject ) },
+    			{ nodeType: "kingtubbynode", nodeImpl: kingTubbyModuleNode },
     			{ nodeType: "convolver", nodeImpl: new $.ConvolverModuleNode( noiseModuleObject ) },
     			{ nodeType: "dynamicscompressor", nodeImpl: new $.DynamicsCompressorModuleNode( noiseModuleObject ) },
-    			{ nodeType: "gain", nodeImpl: new $.GainModuleNode( noiseModuleObject ) },
+    			{ nodeType: "gain", nodeImpl: gainModuleNode },
     			{ nodeType: "stereopannernode", nodeImpl: new $.StereoPannerModuleNode( noiseModuleObject ) },
     			{ nodeType: "waveshapernode", nodeImpl: new $.WaveShaperModuleNode( noiseModuleObject ) },
     			{ nodeType: "periodicwave", nodeImpl: new $.PeriodWaveModuleNode( noiseModuleObject ) },

@@ -24,8 +24,7 @@
 
 		createModuleAudioNode : function ( module ) {
 
-			return this.nm._createBiquadFilter( module );
-
+			return this.createBiquadFilter( module );
 		},
 
 		createModuleDiv       : function ( $moduleEl, module, audioNode ) {
@@ -51,6 +50,18 @@
 
 		},
 
+        createBiquadFilter    : function ( module, type, frequency, detune, Q, gain ) {
+
+			var node = this.nm.audioContext.createBiquadFilter();
+
+			node.type = type || module.type;
+			node.frequency.value = frequency || module.options.biquadFilterFrequency;
+			node.detune.value = detune || module.options.biquadFilterDetune;
+			node.Q.value = Q || module.options.biquadFilterQ;
+			node.gain.value = gain === undefined ? module.options.biquadFilterGain : gain;
+
+			return node;
+		}
 	};
 
 } )( window, navigator, jQuery );

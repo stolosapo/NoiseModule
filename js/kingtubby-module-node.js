@@ -3,10 +3,10 @@
     /**
 	 * KingTubbyModuleNode: Class for 'kingtubbynode' node
 	 */
-	$.KingTubbyModuleNode              = function ( noiseModule ) {
+	$.KingTubbyModuleNode              = function ( noiseModule, gainModuleNode ) {
 
 		this.nm = noiseModule;
-
+        this.gainNode = gainModuleNode;
 	};
 
     $.KingTubbyModuleNode.defaults     = {
@@ -26,35 +26,33 @@
 
 		createModuleAudioNode : function ( module ) {
 
-			var nodes		= [ ];
 
-			var preAmp 		= this.nm._createGain( module, module.options.kingTubbyPreAmpInGain );
-			var outputGain		= this.nm._createGain( module, module.options.kingTubbyPreAmpOutGain );
+			var preAmp       = this.gainNode.createGain( module, module.options.kingTubbyPreAmpInGain );
+			var outputGain   = this.gainNode.createGain( module, module.options.kingTubbyPreAmpOutGain );
 
-			nodes.push( preAmp );
+            var delay        = this.nm.audioContext.createDelay( );
+			delay.delayTime.value    = module.options.kingTubbyDelayTime;
 
-			var delay		= this.nm.audioContext.createDelay( );
-			delay.delayTime.value	= module.options.kingTubbyDelayTime;
-			nodes.push( delay );
-
-			var feedback		= this.nm.audioContext.createGain( );
-			feedback.gain.value	= module.options.kingTubbyGain;
-			nodes.push( feedback );
-
-			var filter		= this.nm.audioContext.createBiquadFilter( );
+			var feedback     = this.gainNode.createGain( module, module.options.kingTubbyGain );
+			var filter       = this.nm.audioContext.createBiquadFilter( );
 			filter.frequency.value	= module.options.kingTubbyCutOffFreq;
-			nodes.push( filter );
 
+
+            var nodes = [ ];
+            nodes.push( preAmp );
+            nodes.push( delay );
+            nodes.push( feedback );
+            nodes.push( filter );
 			nodes.push( outputGain );
 
 
-			this.nm._connectNodes( delay, feedback );
-			this.nm._connectNodes( feedback, filter );
-			this.nm._connectNodes( filter, delay );
+			this.nm.connectNodes( delay, feedback );
+			this.nm.connectNodes( feedback, filter );
+			this.nm.connectNodes( filter, delay );
 
-			this.nm._connectNodes( preAmp, delay );
-			this.nm._connectNodes( preAmp, outputGain );
-			this.nm._connectNodes( delay, outputGain );
+			this.nm.connectNodes( preAmp, delay );
+			this.nm.connectNodes( preAmp, outputGain );
+			this.nm.connectNodes( delay, outputGain );
 
 			return { inNode: preAmp, outNode: outputGain, allNodes: nodes };
 

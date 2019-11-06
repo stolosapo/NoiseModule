@@ -519,7 +519,7 @@
 				var destAudio	= this._findAudioNode( connection.destNode );
 				destNode = destAudio.inNode;
 
-				this._connectNodes( srcNode, destNode );
+				this.connectNodes( srcNode, destNode );
 			};
 
 		},
@@ -814,37 +814,13 @@
 
 		},
 
-		_createGain			: function ( module, value ) {
-
-			var gain = this.audioContext.createGain ();
-
-			gain.gain.value = value || module.options.gainGain;
-
-			return gain;
-
-		},
-
-		_createBiquadFilter		: function ( module, type, frequency, detune, Q, gain ) {
-
-			var node = this.audioContext.createBiquadFilter();
-
-			node.type = type || module.type;
-			node.frequency.value = frequency || module.options.biquadFilterFrequency;
-			node.detune.value = detune || module.options.biquadFilterDetune;
-			node.Q.value = Q || module.options.biquadFilterQ;
-			node.gain.value = gain === undefined ? module.options.biquadFilterGain : gain;
-
-			return node;
-
-		},
-
 		_connectNodeToDestination	: function ( node ) {
 
-			this._connectNodes ( node, this.audioContext.destination );
+			this.connectNodes ( node, this.audioContext.destination );
 
 		},
 
-		_connectNodes			: function ( srcNode, destNode ) {
+		connectNodes			: function ( srcNode, destNode ) {
 
 			if (srcNode === null || srcNode === undefined ||
 				destNode === null || destNode === undefined) {
@@ -877,7 +853,7 @@
 					var srcNode 	= _self._findAudioNode( conn.srcNode ).outNode;
 					var destNode 	= _self._findAudioNode( conn.destNode ).inNode;
 
-					_self._connectNodes( srcNode, destNode );
+					_self.connectNodes( srcNode, destNode );
 				};
 			} );
 
@@ -979,7 +955,7 @@
 
 
 				// do the connection
-				_self._connectNodes( outNode, inNode );
+				_self.connectNodes( outNode, inNode );
 
 
 				// store connection
