@@ -38,24 +38,24 @@
 
         _initFromFile                   : function ( ) {
 
-            var _self           = this;
-            var template        = '<input type="file" id="nm-file-input" />';
-            var $fileInput      = $( template );
+            let _self           = this;
+            let template        = '<input type="file" id="nm-file-input" />';
+            let $fileInput      = $( template );
 
             $fileInput[0].addEventListener( 'change', function ( e ) {
 
-                var file    = e.target.files[0];
+                let file    = e.target.files[0];
 
                 if (!file) {
                     return;
                 }
 
-                var reader  = new FileReader();
+                let reader  = new FileReader();
 
                 reader.onload = function( e ) {
 
-                    var content         = e.target.result;
-                    var moduleOptions   = JSON.parse( content );
+                    let content         = e.target.result;
+                    let moduleOptions   = JSON.parse( content );
 
                     _self._init( moduleOptions );
 
@@ -66,66 +66,107 @@
             }, false );
 
             $fileInput.appendTo( this.$el );
+        },
 
+        _appendElementToTarget          : function ( $elem, $target ) {
+
+            if ( !$elem || !$target ) {
+                return;
+            }
+
+            $elem.appendTo( $target );
         },
 
         _createModulesUI                : function ( ) {
 
             // create container for all modules
-            var template        = `
-            <section id="noise-module-container" class="noise-module-container">
-            </section>`;
+            const template      = `
+                <section id="noise-module-container" class="noise-module-container">
+                </section>`;
 
             this.$containerEl   = $( template );
-            this.$el.prepend( this.$containerEl );
+            this._appendElementToTarget( this.$containerEl, this.$el );
 
             let _self = this;
 
             // create UI for all modules
             this.nm.moduleMap
-                .forEach( m => _self._createModuleUI( m ) );
+                .forEach( m => {
+
+                    let $div = _self._createModuleUI( m );
+                    _self._appendElementToTarget( $div, this.$containerEl );
+                    $div.show( );
+                } );
         },
 
         _createModuleUI                 : function ( moduleItem ) {
 
-            let module          = moduleItem.module;
-            let audioNode       = moduleItem.audioNode;
-            let moduleImpl      = moduleItem.moduleImpl;
-            let name            = module.name;
-            let moduleNumber    = moduleItem.id;
-            const moduleId      = "module" + moduleNumber;
+            let module            = moduleItem.module;
+            let audioNode         = moduleItem.audioNode;
+            let moduleImpl        = moduleItem.moduleImpl;
+            let name              = module.name;
+            let moduleNumber      = moduleItem.id;
+            const moduleId        = "module" + moduleNumber;
 
-            const template      = `
-            <div id="${moduleId}" class="noise-module ${module.nodeType}">
+            const template        = `
+                <div id="${moduleId}" name="${name}" class="noise-module ${module.nodeType}">
+                </div>`;
+
+            const contentTemplate = `
                 <div class="nm-content">
                     <h6 class="nm-content-title">${name}</h6>
-                </div>
-            </div>`;
+                </div>`;
 
-            var $divEl          = $( template );
-            $divEl.attr( 'name', name );
+            let $divEl          = $( template );
+            let $content        = $( contentTemplate );
 
             // append content
-            var $content        = $( $divEl ).find( '.nm-content' );
             moduleImpl.createModuleDiv( $content, module, audioNode );
 
-            // add bypass and reset modes
-            this._appendBypassButton( $divEl, $content, module, audioNode );
-            this._appendResetButton( $divEl, $content, module, audioNode );
+            let $bypass = this._createBypassButton( $content, module, audioNode );
+            let $reset  = this._createResetButton( $content, module, audioNode );
+            let $header = this._createModuleHeader( name, module, audioNode );
+            let $footer = this._createModuleFooter( module, audioNode );
 
-            // add footer
-            this._appendModuleFooter( $divEl, $content, module, audioNode );
+            // this._appendElementToTarget( $header, $divEl );
+            this._appendElementToTarget( $content, $divEl );
+            this._appendElementToTarget( $bypass, $divEl );
+            this._appendElementToTarget( $reset, $divEl );
+            this._appendElementToTarget( $footer, $divEl );
 
-            $divEl.appendTo( this.$containerEl );
-            $divEl.show();
+            return $divEl;
         },
 
-        _appendBypassButton             : function ( $divEl, $content, module, audioNode ) {
+        _createModuleHeader             : function ( name, module, audioNode ) {
+
+            const template        = `
+                <header class="nm-header">
+                </header>`;
+
+            const titleTemplate   = `
+                <h6 class="nm-header-title">
+                    ${name}
+                </h6>`;
+
+            let $header     = $( template );
+            let $title      = $( titleTemplate );
+            let $bypass = this._createBypassButton( $header, module, audioNode );
+            let $reset  = this._createResetButton( $header, module, audioNode );
+
+            this._appendElementToTarget( $bypass, $header );
+            this._appendElementToTarget( $title, $header );
+            this._appendElementToTarget( $reset, $header );
+
+            return $header;
+        },
+
+        /* TODO: Make it simpler */
+        _createBypassButton             : function ( $element, module, audioNode ) {
 
             if ( !audioNode ) {
 
                 console.error( "Could not append Bypass button. No audioNode found for module:", module );
-                return;
+                return void(0);
             }
 
             if ( audioNode.numberOfInputs > 0 ||
@@ -134,13 +175,15 @@
                 let template    = '<img class="nm-bypass" />';
                 let $img        = $( template );
 
-                $img.appendTo( $divEl );
+                this._createBypassEvent( $img, $element, module, audioNode );
 
-                this._createBypassEvent( $divEl, $content, module, audioNode );
+                return $img;
             }
+
+            return void(0);
         },
 
-        _appendResetButton              : function ( $divEl, $content, module, audioNode ) {
+        _createResetButton              : function ( $element, module, audioNode ) {
 
             if (module.nodeType != 'noise' &&
                 module.nodeType != 'liveinput' &&
@@ -149,13 +192,15 @@
                 var template    = '<img class="nm-reset" />';
                 var $img        = $( template );
 
-                $img.appendTo( $divEl );
+                this._createResetEvent( $img, $element, module, audioNode );
 
-                this._createResetEvent( $divEl, $content, module, audioNode );
+                return $img;
             }
+
+            return void(0);
         },
 
-        _appendModuleFooter             : function ( $divEl, $content, module, audioNode ) {
+        _createModuleFooter             : function ( module, audioNode ) {
 
             if ( !audioNode ) {
 
@@ -163,66 +208,49 @@
                 return;
             }
 
-            var inNode      = audioNode.inNode || audioNode;
-            var outNode     = audioNode.outNode || audioNode;
+            let inNode      = audioNode.inNode || audioNode;
+            let outNode     = audioNode.outNode || audioNode;
 
-            var template    = '<footer class="nm-footer"></footer>';
-            var $footer     = $( template );
+            let template    = '<footer class="nm-footer"></footer>';
+            let $footer     = $( template );
 
             if (inNode.numberOfInputs > 0) {
 
-                var conns   = this.nm._findModuleConnections( module, 'in' );
-
-                var fromTem = `
-                <div class="nm-direction direction-from">
-                    <ul class="nm-list list-from">
-                    </ul>
-                </div>`;
-
-                var $from   = $( fromTem );
-                var $imgFrom    = this._createFooterImage( true, 'icon-from');
-
-                $from.prepend( $imgFrom );
-
-                var $list   = ( $from ).find( '.nm-list' );
-
-                $.each( conns, function( index, conn ) {
-
-                    $list.append( $('<li>').text( conn ) );
-
-                } );
-
-
-                $from.appendTo( $footer );
+                let $in = this._createFooterDirectionInfo( module, 'in' );
+                this._appendElementToTarget( $in, $footer );
             }
 
             if (outNode.numberOfOutputs > 0) {
 
-                var conns   = this.nm._findModuleConnections( module, 'out' );
-
-                var toTem   = `
-                <div class="nm-direction direction-to">
-                    <ul class="nm-list list-to">
-                    </ul>
-                </div>`;
-
-                var $to     = $( toTem );
-                var $imgTo  = this._createFooterImage( false, 'icon-to');
-
-                $to.prepend( $imgTo );
-
-                var $list   = ( $to ).find( '.nm-list' );
-
-                $.each( conns, function( index, conn ) {
-
-                    $list.append( $('<li>').text( conn ) );
-
-                } );
-
-                $to.appendTo( $footer );
+                let $out = this._createFooterDirectionInfo( module, 'out' );
+                this._appendElementToTarget( $out, $footer );
             }
 
-            $footer.appendTo( $divEl );
+            return $footer;
+        },
+
+        _createFooterDirectionInfo      : function ( module, direction ) {
+
+            let conns   = this.nm._findModuleConnections( module, direction );
+
+            const template      = `
+                <div class="nm-direction direction-${direction}">
+                </div>`;
+
+            const listTemplate  = `
+                <ul class="nm-list list-${direction}">
+                </ul>`;
+
+            let $info = $( template );
+            let $list = $( listTemplate );
+            let $img  = this._createFooterImage( true, `icon-${direction}`);
+
+            this._appendElementToTarget( $img, $info );
+            this._appendElementToTarget( $list, $info );
+
+            conns.forEach( c => $list.append( $('<li>').text( c ) ));
+
+            return $info;
         },
 
         _createFooterImage              : function ( inOut, cssClass ) {
@@ -236,7 +264,8 @@
 
             $img[0].addEventListener( 'click', function( e ) {
 
-                _self._footerImageClicked( this, e, inOut );
+                // TODO: Fix this. Is not working well.
+                // _self._footerImageClicked( this, e, inOut );
             } );
 
             return $img;
@@ -260,44 +289,42 @@
             };
         },
 
-        _createBypassEvent              : function ( $divEl, $content, module, audioNode ) {
+        _createBypassEvent              : function ( $img, $element, module, audioNode ) {
 
             let _self   = this;
-            let $bypass = $( $divEl ).find( '.nm-bypass' );
 
-            $bypass[0].addEventListener( 'click', function( ) {
+            $img[0].addEventListener( 'click', function( ) {
 
-                _self._bypassModule( $content, module, audioNode );
+                _self._bypassModule( $element, module, audioNode );
             } );
         },
 
-        _createResetEvent               : function ( $divEl, $content, module, audioNode ) {
+        _createResetEvent               : function ( $img, $element, module, audioNode ) {
 
             var _self   = this;
-            var $reset  = $( $divEl ).find( '.nm-reset' );
 
-            $reset[0].addEventListener( 'click', function( ) {
+            $img[0].addEventListener( 'click', function( ) {
 
-                _self._resetModuleSettings( $content, module, audioNode );
+                _self._resetModuleSettings( $element, module, audioNode );
             } );
         },
 
-        _bypassModule                   : function ( $content, module, audioNode ) {
+        _bypassModule                   : function ( $element, module, audioNode ) {
 
             var bypassedClass   = 'bypassed';
-            var bypassed        = $content.hasClass( bypassedClass );
+            var bypassed        = $element.hasClass( bypassedClass );
 
             if (bypassed) {
 
-                $content.removeClass( bypassedClass );
+                $element.removeClass( bypassedClass );
             }
             else {
 
-                $content.addClass( bypassedClass );
+                $element.addClass( bypassedClass );
             }
         },
 
-        _resetModuleSettings            : function ( $content, module, audioNode ) {
+        _resetModuleSettings            : function ( $element, module, audioNode ) {
 
             var nodeType = module.nodeType;
 
@@ -308,7 +335,7 @@
                 return;
             }
 
-            item.resetModuleSettings( $content, module, audioNode );
+            item.resetModuleSettings( $element, module, audioNode );
         },
 
         _openConnectionsExists          : function ( inOut ) {
