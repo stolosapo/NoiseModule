@@ -6,19 +6,14 @@
 
         this.$el    = $( element );
 
-        var fileMode    = options.fileMode;
-
-        if (fileMode === null || fileMode === undefined || fileMode === false) {
+        if ( !options.fileMode ) {
 
             this._init ( options );
-
         }
         else {
 
             this._initFromFile( );
-
         }
-
     };
 
     $.NoiseModule.defaults  = {
@@ -57,6 +52,8 @@
         ],
 
         started         : true,
+
+        /* TODO: Move to UI */
         fileMode        : false,
 
         biquadFilterFrequency     : 440,
@@ -95,6 +92,7 @@
 
         },
 
+        /* TODO: Move to UI */
         _initFromFile                   : function ( ) {
 
             var _self           = this;
@@ -174,6 +172,11 @@
                 throw new Error('AudioContext not supported. :(');
             }
 
+            /* TODO: Error in Chrome: https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio */
+            // audioContext.resume().then(() => {
+            //     console.log('Playback resumed successfully');
+            // });
+
             this.audioContext = audioContext;
 
         },
@@ -186,24 +189,18 @@
             </section>';
 
             this.$containerEl   = $( template );
-
             this.$el.prepend( this.$containerEl );
 
-            var _self = this;
-
+            let _self = this;
 
             // create all modules
-            $.each( this.options.modules, function( index, module ) {
-
-                _self._createModule( module );
-            } );
+            this.options.modules
+                .forEach( m => _self._createModule( m ) );
 
 
             // create module connections
-            $.each( this.options.connections, function( index, connection ) {
-
-                _self._createConnection( connection );
-            } );
+            this.options.connections
+                .forEach( c => _self._createConnection( c ) );
         },
 
         _createModule                   : function ( module ) {
@@ -243,254 +240,258 @@
             }
 
             // create div for module
-            this._createModuleDiv( module, audioNode, moduleImpl );
-
-            // register audio node
-            var moduleItem = {
-                name        : module.name,
-                inNode      : inNode,
-                outNode     : outNode,
-                allNodes    : allNodes
-            };
-
-            this.moduleMap.push( moduleItem );
+            //this._createModuleDiv( module, audioNode, moduleImpl );
 
             // increase module counter
             this.moduleCounter++;
+
+            // register audio node
+            var moduleItem = {
+                id          : this.moduleCounter,
+                name        : module.name,
+                inNode      : inNode,
+                outNode     : outNode,
+                allNodes    : allNodes,
+                module      : module,
+                audioNode   : audioNode,
+                moduleImpl  : moduleImpl
+            };
+
+            this.moduleMap.push( moduleItem );
         },
 
         /* TODO: Move to UI */
-        _createModuleDiv                : function ( module, audioNode, moduleImpl ) {
-
-            var name            = module.name;
-            var moduleNumber    = this._getNextModuleNumber ( );
-            var moduleId        = "module" + moduleNumber;
-
-            var template        = '\
-            <div id="' + moduleId + '" class="noise-module ' + module.nodeType + '">\
-                <div class="nm-content">\
-                    <h6 class="nm-content-title">' + name + '</h6>\
-                </div>\
-            </div>';
-
-            var $divEl          = $( template );
-            $divEl.attr( 'name', module.name );
-
-            // append content
-            var $content        = $( $divEl ).find( '.nm-content' );
-            moduleImpl.createModuleDiv( $content, module, audioNode );
-
-            // add bypass and reset modes
-            this._appendBypassButton( $divEl, $content, module, audioNode );
-            this._appendResetButton( $divEl, $content, module, audioNode );
-
-            // add footer
-            this._appendModuleFooter( $divEl, $content, module, audioNode );
-
-            $divEl.appendTo( this.$containerEl );
-            $divEl.show();
-
-        },
+        // _createModuleDiv                : function ( module, audioNode, moduleImpl ) {
+        //
+        //     var name            = module.name;
+        //     var moduleNumber    = this._getNextModuleNumber ( );
+        //     var moduleId        = "module" + moduleNumber;
+        //
+        //     var template        = `
+        //     <div id="${moduleId}" class="noise-module ${module.nodeType}">
+        //         <div class="nm-content">
+        //             <h6 class="nm-content-title">${name}</h6>
+        //         </div>
+        //     </div>`;
+        //
+        //     var $divEl          = $( template );
+        //     $divEl.attr( 'name', module.name );
+        //
+        //     // append content
+        //     var $content        = $( $divEl ).find( '.nm-content' );
+        //     moduleImpl.createModuleDiv( $content, module, audioNode );
+        //
+        //     // add bypass and reset modes
+        //     // this._appendBypassButton( $divEl, $content, module, audioNode );
+        //     // this._appendResetButton( $divEl, $content, module, audioNode );
+        //
+        //     // add footer
+        //     // this._appendModuleFooter( $divEl, $content, module, audioNode );
+        //
+        //     $divEl.appendTo( this.$containerEl );
+        //     $divEl.show();
+        //
+        // },
 
         /* TODO: Move to UI */
-        _appendBypassButton             : function ( $divEl, $content, module, audioNode ) {
-
-            if ( !audioNode ) {
-
-                console.error( "Could not append Bypass button. No audioNode found for module:", module );
-                return;
-            }
-
-            if ( audioNode.numberOfInputs > 0 ||
-                ( audioNode.inNode && audioNode.inNode.numberOfInputs > 0 ) ) {
-
-                var template    = '<img class="nm-bypass" />';
-                var $img        = $( template );
-
-                $img.appendTo( $divEl );
-
-                this._createBypassEvent( $divEl, $content, module, audioNode );
-            }
-        },
+        // _appendBypassButton             : function ( $divEl, $content, module, audioNode ) {
+        //
+        //     if ( !audioNode ) {
+        //
+        //         console.error( "Could not append Bypass button. No audioNode found for module:", module );
+        //         return;
+        //     }
+        //
+        //     if ( audioNode.numberOfInputs > 0 ||
+        //         ( audioNode.inNode && audioNode.inNode.numberOfInputs > 0 ) ) {
+        //
+        //         var template    = '<img class="nm-bypass" />';
+        //         var $img        = $( template );
+        //
+        //         $img.appendTo( $divEl );
+        //
+        //         this._createBypassEvent( $divEl, $content, module, audioNode );
+        //     }
+        // },
 
         /* TODO: Move to UI, make it more generic remove custom type checks */
-        _appendResetButton              : function ( $divEl, $content, module, audioNode ) {
-
-            if (module.nodeType != 'noise' &&
-                module.nodeType != 'liveinput' &&
-                module.nodeType != 'analyser') {
-
-                var template    = '<img class="nm-reset" />';
-                var $img        = $( template );
-
-                $img.appendTo( $divEl );
-
-                this._createResetEvent( $divEl, $content, module, audioNode );
-            }
-
-        },
-
-        /* TODO: Move to UI */
-        _createResetEvent               : function ( $divEl, $content, module, audioNode ) {
-
-            var _self   = this;
-            var $reset  = $( $divEl ).find( '.nm-reset' );
-
-            $reset[0].addEventListener( 'click', function( ) {
-
-                _self._resetModuleSettings( $content, module, audioNode );
-            } );
-        },
+        // _appendResetButton              : function ( $divEl, $content, module, audioNode ) {
+        //
+        //     if (module.nodeType != 'noise' &&
+        //         module.nodeType != 'liveinput' &&
+        //         module.nodeType != 'analyser') {
+        //
+        //         var template    = '<img class="nm-reset" />';
+        //         var $img        = $( template );
+        //
+        //         $img.appendTo( $divEl );
+        //
+        //         this._createResetEvent( $divEl, $content, module, audioNode );
+        //     }
+        //
+        // },
 
         /* TODO: Move to UI */
-        _createBypassEvent              : function ( $divEl, $content, module, audioNode ) {
+        // _createResetEvent               : function ( $divEl, $content, module, audioNode ) {
+        //
+        //     var _self   = this;
+        //     var $reset  = $( $divEl ).find( '.nm-reset' );
+        //
+        //     $reset[0].addEventListener( 'click', function( ) {
+        //
+        //         _self._resetModuleSettings( $content, module, audioNode );
+        //     } );
+        // },
 
-            var _self   = this;
-            var $bypass = $( $divEl ).find( '.nm-bypass' );
-
-            $bypass[0].addEventListener( 'click', function( ) {
-
-                _self._bypassModule( $content, module, audioNode );
-            } );
-        },
+        /* TODO: Move to UI */
+        // _createBypassEvent              : function ( $divEl, $content, module, audioNode ) {
+        //
+        //     var _self   = this;
+        //     var $bypass = $( $divEl ).find( '.nm-bypass' );
+        //
+        //     $bypass[0].addEventListener( 'click', function( ) {
+        //
+        //         _self._bypassModule( $content, module, audioNode );
+        //     } );
+        // },
 
         /* TODO: Move to UI, create generic method for create input and output info */
-        _appendModuleFooter             : function ( $divEl, $content, module, audioNode ) {
-
-            if ( !audioNode ) {
-
-                console.error( "Could not append Footer. No audioNode found for module:", module );
-                return;
-            }
-
-            var inNode      = audioNode.inNode || audioNode;
-            var outNode     = audioNode.outNode || audioNode;
-
-            var template    = '<footer class="nm-footer"></footer>';
-            var $footer     = $( template );
-
-            if (inNode.numberOfInputs > 0) {
-
-                var conns   = this._findModuleConnections( module, 'in' );
-
-                var fromTem = '\
-                <div class="nm-direction direction-from">\
-                    <ul class="nm-list list-from">\
-                    </ul>\
-                </div>';
-
-                var $from   = $( fromTem );
-                var $imgFrom    = this._createFooterImage( true, 'icon-from');
-
-                $from.prepend( $imgFrom );
-
-                var $list   = ( $from ).find( '.nm-list' );
-
-                $.each( conns, function( index, conn ) {
-
-                    $list.append( $('<li>').text( conn ) );
-
-                } );
-
-
-                $from.appendTo( $footer );
-            }
-
-            if (outNode.numberOfOutputs > 0) {
-
-                var conns   = this._findModuleConnections( module, 'out' );
-
-                var toTem   = '\
-                <div class="nm-direction direction-to">\
-                    <ul class="nm-list list-to">\
-                    </ul>\
-                </div>';
-
-                var $to     = $( toTem );
-                var $imgTo  = this._createFooterImage( false, 'icon-to');
-
-                $to.prepend( $imgTo );
-
-                var $list   = ( $to ).find( '.nm-list' );
-
-                $.each( conns, function( index, conn ) {
-
-                    $list.append( $('<li>').text( conn ) );
-
-                } );
-
-                $to.appendTo( $footer );
-            }
-
-            $footer.appendTo( $divEl );
-        },
-
-        /* TODO: Move to UI */
-        _createFooterImage              : function ( inOut, cssClass ) {
-
-            var _self       = this;
-
-            var template    = '<img class="nm-icon" />';
-
-            $img            = $( template );
-            $img.addClass( cssClass );
-
-            $img[0].addEventListener( 'click', function( e ) {
-
-                _self._footerImageClicked( this, e, inOut );
-            } );
-
-            return $img;
-        },
+        // _appendModuleFooter             : function ( $divEl, $content, module, audioNode ) {
+        //
+        //     if ( !audioNode ) {
+        //
+        //         console.error( "Could not append Footer. No audioNode found for module:", module );
+        //         return;
+        //     }
+        //
+        //     var inNode      = audioNode.inNode || audioNode;
+        //     var outNode     = audioNode.outNode || audioNode;
+        //
+        //     var template    = '<footer class="nm-footer"></footer>';
+        //     var $footer     = $( template );
+        //
+        //     if (inNode.numberOfInputs > 0) {
+        //
+        //         var conns   = this._findModuleConnections( module, 'in' );
+        //
+        //         var fromTem = '\
+        //         <div class="nm-direction direction-from">\
+        //             <ul class="nm-list list-from">\
+        //             </ul>\
+        //         </div>';
+        //
+        //         var $from   = $( fromTem );
+        //         var $imgFrom    = this._createFooterImage( true, 'icon-from');
+        //
+        //         $from.prepend( $imgFrom );
+        //
+        //         var $list   = ( $from ).find( '.nm-list' );
+        //
+        //         $.each( conns, function( index, conn ) {
+        //
+        //             $list.append( $('<li>').text( conn ) );
+        //
+        //         } );
+        //
+        //
+        //         $from.appendTo( $footer );
+        //     }
+        //
+        //     if (outNode.numberOfOutputs > 0) {
+        //
+        //         var conns   = this._findModuleConnections( module, 'out' );
+        //
+        //         var toTem   = '\
+        //         <div class="nm-direction direction-to">\
+        //             <ul class="nm-list list-to">\
+        //             </ul>\
+        //         </div>';
+        //
+        //         var $to     = $( toTem );
+        //         var $imgTo  = this._createFooterImage( false, 'icon-to');
+        //
+        //         $to.prepend( $imgTo );
+        //
+        //         var $list   = ( $to ).find( '.nm-list' );
+        //
+        //         $.each( conns, function( index, conn ) {
+        //
+        //             $list.append( $('<li>').text( conn ) );
+        //
+        //         } );
+        //
+        //         $to.appendTo( $footer );
+        //     }
+        //
+        //     $footer.appendTo( $divEl );
+        // },
 
         /* TODO: Move to UI */
-        _footerImageClicked             : function ( sender, e, inOut ) {
+        // _createFooterImage              : function ( inOut, cssClass ) {
+        //
+        //     var _self       = this;
+        //
+        //     var template    = '<img class="nm-icon" />';
+        //
+        //     $img            = $( template );
+        //     $img.addClass( cssClass );
+        //
+        //     $img[0].addEventListener( 'click', function( e ) {
+        //
+        //         _self._footerImageClicked( this, e, inOut );
+        //     } );
+        //
+        //     return $img;
+        // },
 
-            var $moduleEl = $( sender.parentNode.parentNode.parentNode );
+        /* TODO: Move to UI */
+        // _footerImageClicked             : function ( sender, e, inOut ) {
+        //
+        //     var $moduleEl = $( sender.parentNode.parentNode.parentNode );
+        //
+        //     // Check to see if exist open connections for the oposite direction
+        //
+        //     var openExists = this._openConnectionsExists( !inOut );
+        //
+        //     if (openExists) {
+        //
+        //         this._endConnection( !inOut, $moduleEl );
+        //     }
+        //     else {
+        //
+        //         this._beginConnection( inOut, $moduleEl );
+        //     };
+        // },
 
-            // Check to see if exist open connections for the oposite direction
-
-            var openExists = this._openConnectionsExists( !inOut );
-
-            if (openExists) {
-
-                this._endConnection( !inOut, $moduleEl );
-            }
-            else {
-
-                this._beginConnection( inOut, $moduleEl );
-            };
-        },
-
-        _resetModuleSettings            : function ( $content, module, audioNode ) {
-
-            var nodeType = module.nodeType;
-
-            var item = this._findRegisteredModuleImpl( nodeType );
-
-            if ( !item ) {
-                console.error( "Could not reset settings. No implementation found for module:", module );
-                return;
-            }
-
-            item.resetModuleSettings( $content, module, audioNode );
-        },
+        // _resetModuleSettings            : function ( $content, module, audioNode ) {
+        //
+        //     var nodeType = module.nodeType;
+        //
+        //     var item = this._findRegisteredModuleImpl( nodeType );
+        //
+        //     if ( !item ) {
+        //         console.error( "Could not reset settings. No implementation found for module:", module );
+        //         return;
+        //     }
+        //
+        //     item.resetModuleSettings( $content, module, audioNode );
+        // },
 
         /* TODO: Move to UI, or find other implementation that does not depend on css */
-        _bypassModule                   : function ( $content, module, audioNode ) {
-
-            var bypassedClass   = 'bypassed';
-            var bypassed        = $content.hasClass( bypassedClass );
-
-            if (bypassed) {
-
-                $content.removeClass( bypassedClass );
-            }
-            else {
-
-                $content.addClass( bypassedClass );
-            }
-        },
+        // _bypassModule                   : function ( $content, module, audioNode ) {
+        //
+        //     var bypassedClass   = 'bypassed';
+        //     var bypassed        = $content.hasClass( bypassedClass );
+        //
+        //     if (bypassed) {
+        //
+        //         $content.removeClass( bypassedClass );
+        //     }
+        //     else {
+        //
+        //         $content.addClass( bypassedClass );
+        //     }
+        // },
 
         _createConnection               : function ( connection ) {
 
@@ -582,10 +583,10 @@
                 });
         },
 
-        _getNextModuleNumber            : function ( ) {
-
-            return this.moduleCounter + 1;
-        },
+        // _getNextModuleNumber            : function ( ) {
+        //
+        //     return this.moduleCounter + 1;
+        // },
 
         /* TODO: Move to UI */
         _createSimpleSliderControl      : function ( audioNode, property, min, max, step, units, changeEvent ) {
@@ -840,97 +841,97 @@
         },
 
         /* TODO: Move to UI */
-        _getBeginConnectionClass        : function ( inOut ) {
-
-            if (inOut) {
-                return 'begin-in-connection';
-            };
-
-            return 'begin-out-connection';
-        },
-
-        /* TODO: Move to UI */
-        _openConnectionsExists          : function ( inOut ) {
-
-            return this._getOpenConnections( inOut ).length > 0;
-        },
+        // _getBeginConnectionClass        : function ( inOut ) {
+        //
+        //     if (inOut) {
+        //         return 'begin-in-connection';
+        //     };
+        //
+        //     return 'begin-out-connection';
+        // },
 
         /* TODO: Move to UI */
-        _getOpenConnections             : function ( inOut ) {
-
-            var beginClass = this._getBeginConnectionClass( inOut );
-
-            var $openConnModules = this.$el.find( '.' + beginClass );
-
-            return $openConnModules;
-        },
+        // _openConnectionsExists          : function ( inOut ) {
+        //
+        //     return this._getOpenConnections( inOut ).length > 0;
+        // },
 
         /* TODO: Move to UI */
-        _beginConnection                : function ( inOut, $moduleEl ) {
-
-            var beginClass = this._getBeginConnectionClass( inOut );
-
-            if (!$moduleEl.hasClass( beginClass )) {
-
-                $moduleEl.addClass( beginClass );
-
-            };
-
-        },
+        // _getOpenConnections             : function ( inOut ) {
+        //
+        //     var beginClass = this._getBeginConnectionClass( inOut );
+        //
+        //     var $openConnModules = this.$el.find( '.' + beginClass );
+        //
+        //     return $openConnModules;
+        // },
 
         /* TODO: Move to UI */
-        _endConnection                  : function ( inOut, $sourceModuleEl ) {
+        // _beginConnection                : function ( inOut, $moduleEl ) {
+        //
+        //     var beginClass = this._getBeginConnectionClass( inOut );
+        //
+        //     if (!$moduleEl.hasClass( beginClass )) {
+        //
+        //         $moduleEl.addClass( beginClass );
+        //
+        //     };
+        //
+        // },
 
-            var _self = this;
-
-            var beginClass = this._getBeginConnectionClass( inOut );
-            var $openConnModules = this._getOpenConnections( inOut );
-            var sourceName = $sourceModuleEl.attr( 'name' );
-            var sourceAudioNode = this._findAudioNode( sourceName );
-            var sourceNode = inOut ? sourceAudioNode.outNode : sourceAudioNode.inNode;
-
-            var $destEl;
-            var destName;
-            var destAudioNode;
-            var destNode;
-
-            var inNode;
-            var outNode;
-
-            $.each( $openConnModules, function( index, el ) {
-
-                $destEl = $( el );
-
-                destName = $destEl.attr( 'name' );
-                destAudioNode = _self._findAudioNode( destName );
-                destNode = inOut ? destAudioNode.inNode : destAudioNode.outNode;
-
-                console.log( 'Connect', sourceName, 'with', destName );
-
-                $destEl.removeClass( beginClass );
-
-                if (inOut) {
-                    inNode = destNode;
-                    outNode = sourceNode;
-                }
-                else {
-                    inNode = sourceNode;
-                    outNode = destNode;
-                };
-
-
-                // do the connection
-                _self.connectNodes( outNode, inNode );
-
-
-                // store connection
-
-
-                // change footer of the module
-
-            } );
-
-        },
+        /* TODO: Move to UI */
+        // _endConnection                  : function ( inOut, $sourceModuleEl ) {
+        //
+        //     var _self = this;
+        //
+        //     var beginClass = this._getBeginConnectionClass( inOut );
+        //     var $openConnModules = this._getOpenConnections( inOut );
+        //     var sourceName = $sourceModuleEl.attr( 'name' );
+        //     var sourceAudioNode = this._findAudioNode( sourceName );
+        //     var sourceNode = inOut ? sourceAudioNode.outNode : sourceAudioNode.inNode;
+        //
+        //     var $destEl;
+        //     var destName;
+        //     var destAudioNode;
+        //     var destNode;
+        //
+        //     var inNode;
+        //     var outNode;
+        //
+        //     $.each( $openConnModules, function( index, el ) {
+        //
+        //         $destEl = $( el );
+        //
+        //         destName = $destEl.attr( 'name' );
+        //         destAudioNode = _self._findAudioNode( destName );
+        //         destNode = inOut ? destAudioNode.inNode : destAudioNode.outNode;
+        //
+        //         console.log( 'Connect', sourceName, 'with', destName );
+        //
+        //         $destEl.removeClass( beginClass );
+        //
+        //         if (inOut) {
+        //             inNode = destNode;
+        //             outNode = sourceNode;
+        //         }
+        //         else {
+        //             inNode = sourceNode;
+        //             outNode = destNode;
+        //         };
+        //
+        //
+        //         // do the connection
+        //         _self.connectNodes( outNode, inNode );
+        //
+        //
+        //         // store connection
+        //
+        //
+        //         // change footer of the module
+        //
+        //     } );
+        //
+        // },
 
         _requestGET                     : function ( url, callback ) {
 

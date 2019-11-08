@@ -32,7 +32,7 @@
     };
 
     /* Noise Module Factory */
-    $.fn.noiseModule    = function ( options ) {
+    $.fn.noiseModule    = function ( options, useUI ) {
 
         if ( typeof options === 'string' ) {
 
@@ -77,6 +77,10 @@
                     options._nodeRegistrationConfig = nodeRegistrationConfig();
 
                     instance = new $.NoiseModule( options, this );
+
+                    if ( useUI ) {
+                        let instanceUI = new $.NoiseModuleUI( instance, options, this );
+                    }
 
                     $.data( this, 'noiseModule', instance );
                 }
