@@ -128,16 +128,6 @@
 
         },
 
-        _registerModuleNode             : function ( nodeModuleImpl ) {
-
-            var item = {
-                nodeType    : nodeModuleImpl.nodeTypeName,
-                moduleImpl  : nodeModuleImpl
-            };
-
-            this.registeredNode.push( item );
-        },
-
         _registerModuleNodes            : function ( ) {
 
             if (!this.options._nodeRegistrationConfig) {
@@ -149,26 +139,25 @@
 
             let nodeRegistrationConfig = this.options._nodeRegistrationConfig(_self);
 
-            $.each( nodeRegistrationConfig, function( index, item ) {
+            nodeRegistrationConfig.forEach(i => {
 
-                _self._registerModuleNode(item);
-            } );
+                let item = {
+                    nodeType    : i.nodeTypeName,
+                    moduleImpl  : i
+                };
+
+                _self.registeredNode.push( item );
+            });
         },
 
         _findRegisteredModuleImpl       : function ( nodeType ) {
 
-            var itemImp;
+            const itemImplArr =
+                this.registeredNode
+                    .filter(i => i.nodeType === nodeType)
+                    .map(i => i.moduleImpl);
 
-            $.each( this.registeredNode, function( index, item ) {
-
-                if (item.nodeType === nodeType) {
-
-                    itemImp = item.moduleImpl;
-                };
-            } );
-
-            return itemImp;
-
+            return itemImplArr.length === 1 ? itemImplArr[ 0 ] : void(0);
         },
 
         _createAudioContext             : function ( ) {
@@ -223,6 +212,8 @@
             var moduleImpl  = this._findRegisteredModuleImpl( module.nodeType );
 
             if (moduleImpl === undefined) {
+
+                console.error("Could not find implementation for module:", module);
                 return;
             };
 
@@ -268,6 +259,7 @@
             this.moduleCounter++;
         },
 
+        /* TODO: Move to UI */
         _createModuleDiv                : function ( module, audioNode, moduleImpl ) {
 
             var name            = module.name;
@@ -300,9 +292,12 @@
 
         },
 
+        /* TODO: Move to UI */
         _appendBypassButton             : function ( $divEl, $content, module, audioNode ) {
 
-            if (audioNode === null || audioNode === undefined) {
+            if ( !audioNode ) {
+
+                console.error( "Could not append Bypass button. No audioNode found for module:", module );
                 return;
             }
 
@@ -310,15 +305,15 @@
                 ( audioNode.inNode && audioNode.inNode.numberOfInputs > 0 ) ) {
 
                 var template    = '<img class="nm-bypass" />';
-                var $img    = $( template );
+                var $img        = $( template );
 
                 $img.appendTo( $divEl );
 
                 this._createBypassEvent( $divEl, $content, module, audioNode );
             }
-
         },
 
+        /* TODO: Move to UI, make it more generic remove custom type checks */
         _appendResetButton              : function ( $divEl, $content, module, audioNode ) {
 
             if (module.nodeType != 'noise' &&
@@ -326,7 +321,7 @@
                 module.nodeType != 'analyser') {
 
                 var template    = '<img class="nm-reset" />';
-                var $img    = $( template );
+                var $img        = $( template );
 
                 $img.appendTo( $divEl );
 
@@ -335,6 +330,7 @@
 
         },
 
+        /* TODO: Move to UI */
         _createResetEvent               : function ( $divEl, $content, module, audioNode ) {
 
             var _self   = this;
@@ -344,9 +340,9 @@
 
                 _self._resetModuleSettings( $content, module, audioNode );
             } );
-
         },
 
+        /* TODO: Move to UI */
         _createBypassEvent              : function ( $divEl, $content, module, audioNode ) {
 
             var _self   = this;
@@ -356,20 +352,22 @@
 
                 _self._bypassModule( $content, module, audioNode );
             } );
-
         },
 
+        /* TODO: Move to UI, create generic method for create input and output info */
         _appendModuleFooter             : function ( $divEl, $content, module, audioNode ) {
 
-            if (audioNode === null || audioNode === undefined) {
+            if ( !audioNode ) {
+
+                console.error( "Could not append Footer. No audioNode found for module:", module );
                 return;
             }
 
-            var inNode  = audioNode.inNode || audioNode;
+            var inNode      = audioNode.inNode || audioNode;
             var outNode     = audioNode.outNode || audioNode;
 
             var template    = '<footer class="nm-footer"></footer>';
-            var $footer = $( template );
+            var $footer     = $( template );
 
             if (inNode.numberOfInputs > 0) {
 
@@ -425,30 +423,28 @@
             }
 
             $footer.appendTo( $divEl );
-
         },
 
+        /* TODO: Move to UI */
         _createFooterImage              : function ( inOut, cssClass ) {
 
-            var _self   = this;
+            var _self       = this;
 
             var template    = '<img class="nm-icon" />';
 
-            $img        = $( template );
+            $img            = $( template );
             $img.addClass( cssClass );
 
             $img[0].addEventListener( 'click', function( e ) {
 
                 _self._footerImageClicked( this, e, inOut );
-
             } );
 
             return $img;
-
         },
 
+        /* TODO: Move to UI */
         _footerImageClicked             : function ( sender, e, inOut ) {
-
 
             var $moduleEl = $( sender.parentNode.parentNode.parentNode );
 
@@ -464,7 +460,6 @@
 
                 this._beginConnection( inOut, $moduleEl );
             };
-
         },
 
         _resetModuleSettings            : function ( $content, module, audioNode ) {
@@ -473,13 +468,15 @@
 
             var item = this._findRegisteredModuleImpl( nodeType );
 
-            if (item != undefined) {
+            if ( !item ) {
+                console.error( "Could not reset settings. No implementation found for module:", module );
+                return;
+            }
 
-                return item.resetModuleSettings( $content, module, audioNode );
-            };
-
+            item.resetModuleSettings( $content, module, audioNode );
         },
 
+        /* TODO: Move to UI, or find other implementation that does not depend on css */
         _bypassModule                   : function ( $content, module, audioNode ) {
 
             var bypassedClass   = 'bypassed';
@@ -493,14 +490,14 @@
 
                 $content.addClass( bypassedClass );
             }
-
         },
 
         _createConnection               : function ( connection ) {
 
-            var srcModule = this._findModule( connection.srcNode );
+            var srcModule   = this._findModule( connection.srcNode );
 
-            if ( connection.connected === false || srcModule.options.started === false ) {
+            if ( connection.connected === false ||
+                 srcModule.options.started === false ) {
                 return;
             }
 
@@ -524,21 +521,14 @@
 
         _findModule                     : function ( moduleName ) {
 
-            var module;
+            const moduleArr =
+                this.options.modules
+                    .filter( m => m.name === moduleName );
 
-            $.each( this.options.modules, function( index, mod ) {
-
-                if ( mod.name === moduleName ) {
-
-                    module = mod;
-                    return;
-                };
-            } );
-
-            return module;
-
+            return moduleArr.length === 1 ? moduleArr[ 0 ] : void(0);
         },
 
+        /* TODO: Move to UI */
         _findModuleDivByName            : function ( module ) {
 
             var $allDivs    = this.$containerEl.find( '.noise-module.' + module.nodeType );
@@ -557,71 +547,47 @@
             } );
 
             return $divEl;
-
         },
 
         _findModuleConnections          : function ( module, direction ) {
 
-            var _self       = this;
+            const askedNodeDir    = direction == 'in' ? 'destNode' : 'srcNode';
+            const givenNodeDir    = direction == 'in' ? 'srcNode' : 'destNode';
 
-            var name        = module.name;
-
-            var askedNodeDir    = direction == 'in' ? 'destNode' : 'srcNode';
-            var givenNodeDir    = direction == 'in' ? 'srcNode' : 'destNode';
-
-            var conns       = [];
-
-            $.each( this.options.connections, function( index, conn ) {
-
-                if ( name === conn[ askedNodeDir ] ) {
-
-                    conns.push( conn[ givenNodeDir ] );
-                };
-            } );
+            const conns =
+                this.options.connections
+                    .filter( c => c[ askedNodeDir ] === module.name )
+                    .map( c => c[ givenNodeDir ] );
 
             return conns;
-
         },
 
         _findAudioNode                  : function ( moduleName ) {
 
-            var node;
+            const nodeArr =
+                this.moduleMap
+                    .filter( m => m.name === moduleName )
+                    .map( m => { return { inNode: m.inNode, outNode: m.outNode } } )
 
-            $.each( this.moduleMap, function( index, map ) {
-
-                if ( map.name === moduleName ) {
-
-                    node = { inNode: map.inNode, outNode: map.outNode };
-
-                    return;
-                };
-            } );
-
-            return node;
-
+            return nodeArr.length === 1 ? nodeArr[ 0 ] : void(0);
         },
 
         _updateAudioNode                : function ( moduleName, audioInNode, audioOutNode ) {
 
-            $.each( this.moduleMap, function( index, map ) {
-
-                if ( map.name === moduleName ) {
-
-                    map.inNode  = audioInNode;
-                    map.outNode = audioOutNode || audioInNode;
-
-                    return;
-                };
-            } );
-
+            this.moduleMap
+                .filter(m => m.name === moduleName )
+                .forEach(m => {
+                    m.inNode  = audioInNode;
+                    m.outNode = audioOutNode || audioInNode;
+                });
         },
 
         _getNextModuleNumber            : function ( ) {
 
             return this.moduleCounter + 1;
-
         },
 
+        /* TODO: Move to UI */
         _createSimpleSliderControl      : function ( audioNode, property, min, max, step, units, changeEvent ) {
 
             return this._createSliderControl(
@@ -633,9 +599,9 @@
                 step,
                 units,
                 changeEvent );
-
         },
 
+        /* TODO: Move to UI */
         _createSliderControl            : function ( audioNode, property, description, min, max, step, units, changeEvent ) {
 
             var template    = '\
@@ -673,9 +639,9 @@
             } );
 
             return $div;
-
         },
 
+        /* TODO: Move to UI */
         _resetSliderSetting             : function ( $moduleEl, audioNode, property, value ) {
 
             var $div        = $( $moduleEl ).find( '.' + property );
@@ -689,6 +655,7 @@
 
         },
 
+        /* TODO: Move to UI */
         _resetSliderSettingByClasses    : function ( $moduleEl, audioNode, property, classes, value ) {
 
             var propertyClass   = classes.join( '.' );
@@ -704,6 +671,7 @@
 
         },
 
+        /* TODO: Move to UI */
         _createPlayStopButton           : function ( $moduleEl, module, audioNode ) {
 
             var _self   = this;
@@ -746,6 +714,7 @@
 
         },
 
+        /* TODO: Move to UI */
         _createPlayPauseButton          : function ( $moduleEl, module, audioNode, playPauseClickEvent ) {
 
             var _self   = this;
@@ -788,6 +757,7 @@
 
         },
 
+        /* TODO: Move to UI */
         _createCustomButton             : function ( $moduleEl, module, audioNode, cssClasses, clickEvent ) {
 
             var _self   = this;
@@ -815,65 +785,61 @@
         _connectNodeToDestination       : function ( node ) {
 
             this.connectNodes ( node, this.audioContext.destination );
-
         },
 
         connectNodes                    : function ( srcNode, destNode ) {
 
-            if (srcNode === null || srcNode === undefined ||
-                destNode === null || destNode === undefined) {
+            if ( !srcNode || !destNode ) {
+
+                console.error( "Could not create connection. Source and Destination should exist.", srcNode, destNode );
                 return;
             }
 
             srcNode.connect ( destNode );
-
         },
 
         _disconnectNodes                : function ( srcNode, destNode ) {
 
-            if (srcNode === null || srcNode === undefined ||
-                destNode === null || destNode === undefined) {
+            if ( !srcNode || !destNode ) {
+
+                console.error( "Could not disconnect connection. Source and Destination should exist.", srcNode, destNode );
                 return;
             }
 
             srcNode.disconnect ( destNode );
-
         },
 
         _connectAllDestinations         : function ( module ) {
 
-            var _self = this;
+            let _self = this;
 
-            $.each( this.options.connections, function( index, conn ) {
+            this.options.connections
+                .filter( c => c.srcNode === module.name )
+                .forEach( c => {
 
-                if ( conn.srcNode === module.name ) {
-
-                    var srcNode     = _self._findAudioNode( conn.srcNode ).outNode;
-                    var destNode    = _self._findAudioNode( conn.destNode ).inNode;
+                    let srcNode     = _self._findAudioNode( c.srcNode ).outNode;
+                    let destNode    = _self._findAudioNode( c.destNode ).inNode;
 
                     _self.connectNodes( srcNode, destNode );
-                };
-            } );
-
+                });
         },
 
         _disconnectAllDestinations      : function ( module ) {
 
-            var _self = this;
+            let _self = this;
 
-            $.each( this.options.connections, function( index, conn ) {
+            this.options.connections
+                .filter( c => c.srcNode === module.name )
+                .forEach( c => {
 
-                if ( conn.srcNode === module.name ) {
-
-                    var srcNode     = _self._findAudioNode( conn.srcNode ).outNode;
-                    var destNode    = _self._findAudioNode( conn.destNode ).inNode;
+                    let srcNode     = _self._findAudioNode( c.srcNode ).outNode;
+                    let destNode    = _self._findAudioNode( c.destNode ).inNode;
 
                     _self._disconnectNodes( srcNode, destNode );
-                };
-            } );
-
+                });
         },
 
+        /* TODO: Move to UI */
         _getBeginConnectionClass        : function ( inOut ) {
 
             if (inOut) {
@@ -881,15 +847,15 @@
             };
 
             return 'begin-out-connection';
-
         },
 
+        /* TODO: Move to UI */
         _openConnectionsExists          : function ( inOut ) {
 
             return this._getOpenConnections( inOut ).length > 0;
-
         },
 
+        /* TODO: Move to UI */
         _getOpenConnections             : function ( inOut ) {
 
             var beginClass = this._getBeginConnectionClass( inOut );
@@ -897,9 +863,9 @@
             var $openConnModules = this.$el.find( '.' + beginClass );
 
             return $openConnModules;
-
         },
 
+        /* TODO: Move to UI */
         _beginConnection                : function ( inOut, $moduleEl ) {
 
             var beginClass = this._getBeginConnectionClass( inOut );
@@ -912,6 +878,7 @@
 
         },
 
+        /* TODO: Move to UI */
         _endConnection                  : function ( inOut, $sourceModuleEl ) {
 
             var _self = this;
