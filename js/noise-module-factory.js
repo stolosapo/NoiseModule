@@ -1,6 +1,6 @@
 ( function( window, navigator, $, undefined ) {
 
-    let nodeRegistrationConfig = function () {
+    let nodeRegistrationConfig_old = function () {
         return function ( noiseModuleObject ) {
 
             let gainModuleNode = new $.GainModuleNode( noiseModuleObject );
@@ -31,8 +31,8 @@
         };
     };
 
-    let nodeRegistrationConfig_new = function () {
-        return function ( noiseModuleObject ) {
+    let nodeRegistrationConfig = function () {
+        return function ( ) {
 
             let gainFactory = new $.GainModuleNodeFactory( );
             let filterFactory = new $.BiquadFilterModuleNodeFactory( );
@@ -55,24 +55,24 @@
 
             let config = {};
 
-            config[ gainFactory.typeName ] = gainFactory.create( noiseModuleObject );
-            config[ filterFactory.typeName ] = filterFactory.create( noiseModuleObject );
-            config[ eqFactory.typeName ] = eqFactory.create( noiseModuleObject );
-            config[ kingFactory.typeName ] = kingFactory.create( noiseModuleObject );
-            config[ noiseFactory.typeName ] = noiseFactory.create( noiseModuleObject );
-            config[ moogFactory.typeName ] = moogFactory.create( noiseModuleObject );
-            config[ oscFactory.typeName ] = oscFactory.create( noiseModuleObject );
-            config[ liveFactory.typeName ] = liveFactory.create( noiseModuleObject );
-            config[ radioFactory.typeName ] = radioFactory.create( noiseModuleObject );
-            config[ soundCloudFactory.typeName ] = soundCloudFactory.create( noiseModuleObject );
-            config[ delayFactory.typeName ] = delayFactory.create( noiseModuleObject );
-            config[ convolverFactory.typeName ] = convolverFactory.create( noiseModuleObject );
-            config[ compressorFactory.typeName ] = compressorFactory.create( noiseModuleObject );
-            config[ pannerFactory.typeName ] = pannerFactory.create( noiseModuleObject );
-            config[ shapperFactory.typeName ] = shapperFactory.create( noiseModuleObject );
-            config[ waveFactory.typeName ] = waveFactory.create( noiseModuleObject );
-            config[ analyserFactory.typeName ] = analyserFactory.create( noiseModuleObject );
-            config[ recorderFactory.typeName ] = recorderFactory.create( noiseModuleObject );
+            config[ gainFactory.typeName ] = gainFactory;
+            config[ filterFactory.typeName ] = filterFactory;
+            config[ eqFactory.typeName ] = eqFactory;
+            config[ kingFactory.typeName ] = kingFactory;
+            config[ noiseFactory.typeName ] = noiseFactory;
+            config[ moogFactory.typeName ] = moogFactory;
+            config[ oscFactory.typeName ] = oscFactory;
+            config[ liveFactory.typeName ] = liveFactory;
+            config[ radioFactory.typeName ] = radioFactory;
+            config[ soundCloudFactory.typeName ] = soundCloudFactory;
+            config[ delayFactory.typeName ] = delayFactory;
+            config[ convolverFactory.typeName ] = convolverFactory;
+            config[ compressorFactory.typeName ] = compressorFactory;
+            config[ pannerFactory.typeName ] = pannerFactory;
+            config[ shapperFactory.typeName ] = shapperFactory;
+            config[ waveFactory.typeName ] = waveFactory;
+            config[ analyserFactory.typeName ] = analyserFactory;
+            config[ recorderFactory.typeName ] = recorderFactory;
 
             return config;
         };
@@ -120,8 +120,6 @@
                 instance = $.data( this, 'noiseModule' );
 
                 if ( !instance ) {
-
-                    let cccc = nodeRegistrationConfig_new();
 
                     options._nodeRegistrationConfig = nodeRegistrationConfig();
 

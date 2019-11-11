@@ -90,7 +90,7 @@
             let _self = this;
 
             // create UI for all modules
-            this.nm.moduleMap
+            this.nm.moduleInstaces
                 .forEach( m => {
 
                     let $div = _self._createModuleUI( m );
@@ -329,16 +329,14 @@
 
         _resetModuleSettings            : function ( $element, module, audioNode ) {
 
-            var nodeType = module.nodeType;
+            var instance = this.nm._findModuleInstanseByName( module.name );
 
-            var item = this.nm._findRegisteredModuleImpl( nodeType );
-
-            if ( !item ) {
+            if ( !instance ) {
                 console.error( "Could not reset settings. No implementation found for module:", module );
                 return;
             }
 
-            item.resetModuleSettings( $element, module, audioNode );
+            instance.moduleImpl.resetModuleSettings( $element, module, audioNode );
         },
 
         _openConnectionsExists          : function ( inOut ) {
