@@ -134,12 +134,19 @@
 
         },
 
+        resumeAudioContext              : function ( ) {
+            /* TODO: Error in Chrome: https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio */
+            this.audioContext.resume().then(() => {
+                console.log('Playback resumed successfully');
+            });
+        },
+
         _createModules                  : function ( ) {
 
             // create container for all modules
-            var template        = '\
-            <section id="noise-module-container" class="noise-module-container">\
-            </section>';
+            var template        = `
+              <section id="noise-module-container" class="noise-module-container">
+              </section>`;
 
             this.$containerEl   = $( template );
             this.$el.prepend( this.$containerEl );

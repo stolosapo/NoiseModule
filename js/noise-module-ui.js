@@ -90,6 +90,10 @@
             this.$containerEl   = $( template );
             this.appendElementToTarget( this.$containerEl, this.$el );
 
+            // create resume button
+            let $resume = this._createResumeAudioContextUI( );
+            this.appendElementToTarget( $resume, this.$containerEl );
+
             let _self = this;
 
             // create UI for all modules
@@ -100,6 +104,25 @@
                     _self.appendElementToTarget( $div, this.$containerEl );
                     $div.show( );
                 } );
+        },
+
+        _createResumeAudioContextUI     : function ( ) {
+
+            const template  = `
+                <div class="noise-module resume">
+                </div>`;
+
+            let _self       = this;
+            let $resume     = $( template );
+
+            let clickFn     = function ( sender, module, audioNode ) {
+                sender.nm.resumeAudioContext( );
+            };
+
+            let $button = this.createCustomButton( void(0), void(0), void(0), clickFn );
+            this.appendElementToTarget( $button, $resume );
+
+            return $resume;
         },
 
         createContentContainer          : function ( ) {
@@ -153,7 +176,7 @@
             let $header     = $( template );
             let $title      = $( titleTemplate );
             let $bypass = this._createBypassButton( $header, module, audioNode );
-            let $reset  = this._createResetButton( $header, module, audioNode );
+            let $reset  = this._createResetButton( module, audioNode );
 
             this.appendElementToTarget( $bypass, $header );
             this.appendElementToTarget( $title, $header );
@@ -183,7 +206,7 @@
             return void(0);
         },
 
-        _createResetButton              : function ( $element, module, audioNode ) {
+        _createResetButton              : function ( module, audioNode ) {
 
             if (module.nodeType != 'noise' &&
                 module.nodeType != 'liveinput' &&
@@ -192,7 +215,7 @@
                 var template    = '<img class="nm-reset" />';
                 var $img        = $( template );
 
-                this._createResetEvent( $img, $element, module, audioNode );
+                this._createResetEvent( $img, module, audioNode );
 
                 return $img;
             }
@@ -297,7 +320,7 @@
             } );
         },
 
-        _createResetEvent               : function ( $img, $element, module, audioNode ) {
+        _createResetEvent               : function ( $img, module, audioNode ) {
 
             var _self   = this;
 
@@ -395,12 +418,10 @@
             var $button     = $( template );
 
             if ( cssClasses ) {
-
                 cssClass.forEach(c => $button.addClass( c ));
             };
 
             $button[0].addEventListener( 'click', function( ) {
-
                 clickEvent( _self, module, audioNode );
             } );
 
