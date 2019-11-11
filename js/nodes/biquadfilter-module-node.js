@@ -39,7 +39,7 @@
             return this.createBiquadFilter( module );
         },
 
-        createModuleDiv       : function ( $moduleEl, module, audioNode ) {
+        createModuleDiv       : function ( module, audioNode ) {
 
             let $container  = this.nm.ui.createContentContainer( );
 
@@ -56,12 +56,12 @@
             return $container;
         },
 
-        resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
+        resetModuleSettings   : function ( module, audioNode ) {
 
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'frequency', module.options.biquadFilterFrequency );
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.biquadFilterDetune );
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'Q', module.options.biquadFilterQ );
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'gain', module.options.biquadFilterGain );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'frequency', module.options.biquadFilterFrequency );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'detune', module.options.biquadFilterDetune );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'Q', module.options.biquadFilterQ );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'gain', module.options.biquadFilterGain );
 
         },
 

@@ -52,9 +52,9 @@
 
         },
 
-        createModuleDiv       : function ( $moduleEl, module, audioNode ) {
+        createModuleDiv       : function ( module, audioNode ) {
 
-            let $container  = this.nm.ui.createContentContainer( );
+            let $container      = this.nm.ui.createContentContainer( );
             let $thresholdDiv   = this.nm._createSimpleSliderControl( audioNode, 'threshold', -36, 0, 0.01, "DB" );
             let $kneeDiv        = this.nm._createSimpleSliderControl( audioNode, 'knee', 0, 40, 0.01, "DB" );
             let $ratioDiv       = this.nm._createSimpleSliderControl( audioNode, 'ratio', 1, 50, 0.1, "Sec" );
@@ -72,14 +72,14 @@
             return $container;
         },
 
-        resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
+        resetModuleSettings   : function ( module, audioNode ) {
 
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'threshold', module.options.compressorThreshold );
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'knee', module.options.compressorKnee );
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'ratio', module.options.compressorRatio );
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'reduction', module.options.compressorReduction );
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'attack', module.options.compressorAttack );
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'release', module.options.compressorRelease );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'threshold', module.options.compressorThreshold );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'knee', module.options.compressorKnee );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'ratio', module.options.compressorRatio );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'reduction', module.options.compressorReduction );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'attack', module.options.compressorAttack );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'release', module.options.compressorRelease );
 
         },
 

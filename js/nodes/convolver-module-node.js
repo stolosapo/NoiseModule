@@ -40,7 +40,7 @@
 
         },
 
-        createModuleDiv       : function ( $moduleEl, module, audioNode ) {
+        createModuleDiv       : function ( module, audioNode ) {
 
             let $container  = this.nm.ui.createContentContainer( );
 
@@ -62,7 +62,7 @@
             return $container;
         },
 
-        resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
+        resetModuleSettings   : function ( module, audioNode ) {
 
         }
 

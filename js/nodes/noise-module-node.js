@@ -46,17 +46,17 @@
             };
         },
 
-        createModuleDiv         : function ( $moduleEl, module, audioNode ) {
+        createModuleDiv         : function ( module, audioNode ) {
 
             let $container  = this.nm.ui.createContentContainer( );
-            let $button = this.nm.ui.createPlayStopButton( $moduleEl, module, audioNode );
+            let $button = this.nm.ui.createPlayStopButton( module, audioNode );
 
             this.nm.ui.appendElementToTarget( $button, $container );
 
             return $container;
         },
 
-        resetModuleSettings     : function ( $moduleEl, module, audioNode ) {
+        resetModuleSettings     : function ( module, audioNode ) {
         },
 
         /* Private Methods */

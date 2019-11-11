@@ -93,7 +93,7 @@
             return { inNode: preAmp, outNode: outputGain, allNodes: nodes };
         },
 
-        createModuleDiv         : function ( $moduleEl, module, audioNode ) {
+        createModuleDiv         : function ( module, audioNode ) {
 
             let _self       = this;
             let inGain      = audioNode.inNode;
@@ -126,7 +126,7 @@
             return $container;
         },
 
-        resetModuleSettings     : function ( $moduleEl, module, audioNode ) {
+        resetModuleSettings     : function ( module, audioNode ) {
 
             let _self       = this;
 

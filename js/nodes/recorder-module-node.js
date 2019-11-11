@@ -70,7 +70,7 @@
 
         },
 
-        createModuleDiv               : function ( $moduleEl, module, audioNode ) {
+        createModuleDiv               : function ( module, audioNode ) {
 
             let $container      = this.nm.ui.createContentContainer( );
 
@@ -83,8 +83,8 @@
 
             $span.text( 'Status:' );
 
-            let $play = this.nm.ui.createPlayPauseButton( $moduleEl, module, audioNode, this._recorderPlayPauseClickEvent );
-            let $stop = this.nm.ui.createCustomButton( $moduleEl, module, audioNode, stopImgClass, this._recorderStopClickEvent );
+            let $play = this.nm.ui.createPlayPauseButton( module, audioNode, this._recorderPlayPauseClickEvent );
+            let $stop = this.nm.ui.createCustomButton( module, audioNode, stopImgClass, this._recorderStopClickEvent );
 
             module.options.recorderStopCallback = function( module ) {
 
@@ -109,7 +109,7 @@
             return $container;
         },
 
-        resetModuleSettings           : function ( $moduleEl, module, audioNode ) {
+        resetModuleSettings           : function ( module, audioNode ) {
 
         },
 

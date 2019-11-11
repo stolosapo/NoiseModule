@@ -42,7 +42,7 @@
 
         },
 
-        createModuleDiv       : function ( $moduleEl, module, audioNode ) {
+        createModuleDiv       : function ( module, audioNode ) {
 
             let $container  = this.nm.ui.createContentContainer( );
             let $timeDiv    = this.nm._createSimpleSliderControl( audioNode, 'delayTime', 0, 10, 0.01, "Sec" );
@@ -52,9 +52,9 @@
             return $container;
         },
 
-        resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
+        resetModuleSettings   : function ( module, audioNode ) {
 
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'delayTime', module.options.delayTime );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'delayTime', module.options.delayTime );
 
         },
 

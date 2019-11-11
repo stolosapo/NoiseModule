@@ -74,7 +74,7 @@
 
         },
 
-        createModuleDiv           : function ( $moduleEl, module, audioNode ) {
+        createModuleDiv           : function ( module, audioNode ) {
 
             let $container  = this.nm.ui.createContentContainer( );
 
@@ -98,7 +98,7 @@
             $audioEl.on( 'seeking', function( e ) { $span.text( 'Seeking' ); } );
             $audioEl.on( 'waiting', function( e ) { $span.text( 'Waiting' ); } );
 
-            let $play = this.nm.ui.createPlayPauseButton( $moduleEl, module, audioNode, this._soundCloudPlayPauseEvent );
+            let $play = this.nm.ui.createPlayPauseButton( module, audioNode, this._soundCloudPlayPauseEvent );
 
             this.nm.ui.appendElementToTarget( $span, $container );
             this.nm.ui.appendElementToTarget( $play, $container );
@@ -106,10 +106,10 @@
             return $container;
         },
 
-        resetModuleSettings       : function ( $moduleEl, module, audioNode ) {
+        resetModuleSettings       : function ( module, audioNode ) {
 
             let audio   = module.options.soundCloudAudio;
-            let $img    = $moduleEl.find( '.nm-play-button' );
+            let $img    = this.$div.find( '.nm-play-button' );
 
             audio.pause( );
 

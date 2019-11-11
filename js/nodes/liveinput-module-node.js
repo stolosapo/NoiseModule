@@ -59,10 +59,8 @@
                     /* Update source node map with this new instance */
                     _self.nm._updateAudioNode( module.name, source );
 
-                    var $divEl  = _self.nm._findModuleDivByName( module );
-                    var $content    = $( $divEl ).find( '.nm-content' );
-
-                    _self.nm._appendModuleFooter( $( $divEl ), $content, module, source );
+                    let $footer = _self.nm.ui.createModuleFooter( module, source );
+                    _self.nm.ui.appendElementToTarget( $footer, _self.$div[0].parentNode );
 
                     /* If module option is started then do the connection */
                     if (module.options.started) {
@@ -77,17 +75,17 @@
 
         },
 
-        createModuleDiv         : function ( $moduleEl, module, audioNode ) {
+        createModuleDiv         : function ( module, audioNode ) {
 
             let $container  = this.nm.ui.createContentContainer( );
-            let $button = this.nm.ui.createPlayStopButton( $moduleEl, module, audioNode );
+            let $button = this.nm.ui.createPlayStopButton( module, audioNode );
 
             this.nm.ui.appendElementToTarget( $button, $container );
 
             return $container;
         },
 
-        resetModuleSettings     : function ( $moduleEl, module, audioNode ) {
+        resetModuleSettings     : function ( module, audioNode ) {
         }
     };
 

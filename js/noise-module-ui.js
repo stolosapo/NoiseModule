@@ -124,27 +124,19 @@
                 <div id="${moduleId}" name="${name}" class="noise-module ${module.nodeType}">
                 </div>`;
 
-            let $divEl              = $( template );
-            let $contentContainer   = this.createContentContainer( );
+            let $div              = $( template );
 
-            // append content
-            let $content = moduleImpl.createModuleDiv( $contentContainer, module, audioNode );
+            let $content  = moduleImpl.createModuleDiv( module, audioNode );
+            let $header   = this._createModuleHeader( name, module, audioNode );
+            let $footer   = this.createModuleFooter( module, audioNode );
 
-            let $bypass = this._createBypassButton( $contentContainer, module, audioNode );
-            let $reset  = this._createResetButton( $contentContainer, module, audioNode );
-            let $header = this._createModuleHeader( name, module, audioNode );
-            let $footer = this._createModuleFooter( module, audioNode );
-
-            this.appendElementToTarget( $header, $divEl );
-            // this.appendElementToTarget( $contentContainer, $divEl );
-            this.appendElementToTarget( $content, $divEl );
-            // this.appendElementToTarget( $bypass, $divEl );
-            // this.appendElementToTarget( $reset, $divEl );
-            this.appendElementToTarget( $footer, $divEl );
+            this.appendElementToTarget( $header, $div );
+            this.appendElementToTarget( $content, $div );
+            this.appendElementToTarget( $footer, $div );
 
             moduleImpl.$div = $content;
 
-            return $divEl;
+            return $div;
         },
 
         _createModuleHeader             : function ( name, module, audioNode ) {
@@ -174,8 +166,6 @@
         _createBypassButton             : function ( $element, module, audioNode ) {
 
             if ( !audioNode ) {
-
-                console.error( "Could not append Bypass button. No audioNode found for module:", module );
                 return void(0);
             }
 
@@ -210,11 +200,9 @@
             return void(0);
         },
 
-        _createModuleFooter             : function ( module, audioNode ) {
+        createModuleFooter              : function ( module, audioNode ) {
 
             if ( !audioNode ) {
-
-                console.error( "Could not append Footer. No audioNode found for module:", module );
                 return;
             }
 
@@ -315,11 +303,11 @@
 
             $img[0].addEventListener( 'click', function( ) {
 
-                _self._resetModuleSettings( $element, module, audioNode );
+                _self._resetModuleSettings( module, audioNode );
             } );
         },
 
-        createPlayStopButton            : function ( $moduleEl, module, audioNode ) {
+        createPlayStopButton            : function ( module, audioNode ) {
 
             var _self       = this;
 
@@ -330,11 +318,9 @@
             var $button        = $( template );
 
             if ( module.options.started ) {
-
                 $button.addClass( stopClass );
             }
             else {
-
                 $button.addClass( playClass );
             }
 
@@ -360,7 +346,7 @@
             return $button;
         },
 
-        createPlayPauseButton           : function ( $moduleEl, module, audioNode, playPauseClickEvent ) {
+        createPlayPauseButton           : function ( module, audioNode, playPauseClickEvent ) {
 
             var _self       = this;
 
@@ -383,14 +369,14 @@
 
                 if ( $(this).hasClass( playClass ) ) {
 
-                    playPauseClickEvent( _self, $moduleEl, module, audioNode, true );
+                    playPauseClickEvent( _self, module, audioNode, true );
 
                     $(this).removeClass( playClass );
                     $(this).addClass( pauseClass );
                 }
                 else {
 
-                    playPauseClickEvent( _self, $moduleEl, module, audioNode, false );
+                    playPauseClickEvent( _self, module, audioNode, false );
 
                     $(this).removeClass( pauseClass );
                     $(this).addClass( playClass );
@@ -401,7 +387,7 @@
             return $button;
         },
 
-        createCustomButton              : function ( $moduleEl, module, audioNode, cssClasses, clickEvent ) {
+        createCustomButton              : function ( module, audioNode, cssClasses, clickEvent ) {
 
             var _self   = this;
 
@@ -415,7 +401,7 @@
 
             $button[0].addEventListener( 'click', function( ) {
 
-                clickEvent( _self, $moduleEl, module, audioNode );
+                clickEvent( _self, module, audioNode );
             } );
 
             return $button;
@@ -436,7 +422,7 @@
             }
         },
 
-        _resetModuleSettings            : function ( $element, module, audioNode ) {
+        _resetModuleSettings            : function ( module, audioNode ) {
 
             var instance = this.nm._findModuleInstanseByName( module.name );
 
@@ -445,7 +431,7 @@
                 return;
             }
 
-            instance.moduleImpl.resetModuleSettings( $element, module, audioNode );
+            instance.moduleImpl.resetModuleSettings( module, audioNode );
         },
 
         _openConnectionsExists          : function ( inOut ) {

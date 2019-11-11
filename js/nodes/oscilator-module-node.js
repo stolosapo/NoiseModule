@@ -45,13 +45,13 @@
             return wave;
         },
 
-        createModuleDiv       : function ( $moduleEl, module, audioNode ) {
+        createModuleDiv       : function ( module, audioNode ) {
 
             let $container  = this.nm.ui.createContentContainer( );
 
             let $freqDiv    = this.nm._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
             let $detuDiv    = this.nm._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
-            let $button     = this.nm.ui.createPlayStopButton( $moduleEl, module, audioNode );
+            let $button     = this.nm.ui.createPlayStopButton( module, audioNode );
 
             this.nm.ui.appendElementToTarget( $freqDiv, $container );
             this.nm.ui.appendElementToTarget( $detuDiv, $container );
@@ -60,7 +60,7 @@
             return $container;
         },
 
-        resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
+        resetModuleSettings   : function ( module, audioNode ) {
 
             this.nm._resetSliderSetting( this.$div, audioNode, 'frequency', module.options.oscillatorFrequency );
             this.nm._resetSliderSetting( this.$div, audioNode, 'detune', module.options.oscillatorDetune );
