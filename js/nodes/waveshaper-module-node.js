@@ -30,8 +30,6 @@
 
     $.WaveShaperModuleNode.prototype   = {
 
-        nodeTypeName              : "waveshapernode",
-
         defaultOptions            : function ( ) {
             return $.WaveShaperModuleNode.defaults;
         },

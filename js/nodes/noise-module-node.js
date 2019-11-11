@@ -25,8 +25,6 @@
 
     $.NoiseModuleNode.prototype = {
 
-        nodeTypeName              : "noise",
-
         defaultOptions            : function ( ) {
             return $.NoiseModuleNode.defaults;
         },

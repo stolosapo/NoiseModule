@@ -28,8 +28,6 @@
 
     $.DelayModuleNode.prototype    = {
 
-        nodeTypeName          : "delay",
-
         defaultOptions        : function ( ) {
             return $.DelayModuleNode.defaults;
         },

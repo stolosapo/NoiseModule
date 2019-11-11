@@ -29,8 +29,6 @@
 
     $.RadioModuleNode.prototype    = {
 
-        nodeTypeName              : "radionode",
-
         defaultOptions            : function ( ) {
             return $.RadioModuleNode.defaults;
         },

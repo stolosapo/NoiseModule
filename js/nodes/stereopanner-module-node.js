@@ -27,8 +27,6 @@
 
     $.StereoPannerModuleNode.prototype = {
 
-        nodeTypeName          : "stereopannernode",
-
         defaultOptions        : function ( ) {
             return $.StereoPannerModuleNode.defaults;
         },

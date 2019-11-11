@@ -36,8 +36,6 @@
 
     $.KingTubbyModuleNode.prototype    = {
 
-        nodeTypeName          : "kingtubbynode",
-
         defaultOptions        : function ( ) {
             return $.KingTubbyModuleNode.defaults;
         },

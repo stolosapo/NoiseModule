@@ -31,8 +31,6 @@
 
     $.AnalyserModuleNode.prototype = {
 
-        nodeTypeName                  : "analyser",
-
         defaultOptions                : function ( ) {
             return $.AnalyserModuleNode.defaults;
         },
@@ -74,6 +72,7 @@
                 this._createSinewaveAnalyser( $moduleEl, module, $canvas, canvasCtx, audioNode );
             }
 
+            return $canvas;
         },
 
         resetModuleSettings           : function ( $moduleEl, module, audioNode ) {

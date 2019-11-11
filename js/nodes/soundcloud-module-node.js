@@ -29,8 +29,6 @@
 
     $.SoundCloudModuleNode.prototype   = {
 
-        nodeTypeName              : "soundcloudnode",
-
         defaultOptions            : function ( ) {
             return $.SoundCloudModuleNode.defaults;
         },

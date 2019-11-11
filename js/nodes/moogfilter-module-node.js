@@ -25,8 +25,6 @@
 
     $.MoogFilterModuleNode.prototype   = {
 
-        nodeTypeName          : "moogfilter",
-
         defaultOptions        : function ( ) {
             return $.MoogFilterModuleNode.defaults;
         },

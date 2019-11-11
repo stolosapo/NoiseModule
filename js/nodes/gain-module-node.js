@@ -28,8 +28,6 @@
 
     $.GainModuleNode.prototype = {
 
-        nodeTypeName          : "gain",
-
         defaultOptions        : function ( ) {
             return $.GainModuleNode.defaults;
         },
@@ -41,7 +39,7 @@
 
         createModuleDiv       : function ( $moduleEl, module, audioNode ) {
 
-            var $gainDiv    = this.nm._createSimpleSliderControl( audioNode, this.nodeTypeName, 0, 1, 0.01, "" );
+            var $gainDiv    = this.nm._createSimpleSliderControl( audioNode, "gain", 0, 1, 0.01, "" );
 
             $gainDiv.appendTo( $moduleEl );
 
@@ -51,7 +49,7 @@
         resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
 
             // this.nm._resetSliderSetting( $moduleEl, audioNode, 'gain', module.options.gainGain );
-            this.nm._resetSliderSetting( this.$div, audioNode, this.nodeTypeName, module.options.gainGain );
+            this.nm._resetSliderSetting( this.$div, audioNode, "gain", module.options.gainGain );
 
         },
 
