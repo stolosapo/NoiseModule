@@ -39,7 +39,7 @@
 
         createModuleAudioNode : function ( module ) {
 
-            var node = this.nm.audioContext.createDynamicsCompressor ();
+            let node = this.nm.audioContext.createDynamicsCompressor ();
 
             node.threshold.value = module.options.compressorThreshold;
             node.knee.value = module.options.compressorKnee;
@@ -54,20 +54,22 @@
 
         createModuleDiv       : function ( $moduleEl, module, audioNode ) {
 
-            var $thresholdDiv   = this.nm._createSimpleSliderControl( audioNode, 'threshold', -36, 0, 0.01, "DB" );
-            var $kneeDiv        = this.nm._createSimpleSliderControl( audioNode, 'knee', 0, 40, 0.01, "DB" );
-            var $ratioDiv       = this.nm._createSimpleSliderControl( audioNode, 'ratio', 1, 50, 0.1, "Sec" );
-            var $reductionDiv   = this.nm._createSimpleSliderControl( audioNode, 'reduction', -20, 0, 0.01, "DB" );
-            var $attackDiv      = this.nm._createSimpleSliderControl( audioNode, 'attack', 0, 1, 0.001, "Sec" );
-            var $releaseDiv     = this.nm._createSimpleSliderControl( audioNode, 'release', 0, 2, 0.01, "Sec" );
+            let $container  = this.nm.ui.createContentContainer( );
+            let $thresholdDiv   = this.nm._createSimpleSliderControl( audioNode, 'threshold', -36, 0, 0.01, "DB" );
+            let $kneeDiv        = this.nm._createSimpleSliderControl( audioNode, 'knee', 0, 40, 0.01, "DB" );
+            let $ratioDiv       = this.nm._createSimpleSliderControl( audioNode, 'ratio', 1, 50, 0.1, "Sec" );
+            let $reductionDiv   = this.nm._createSimpleSliderControl( audioNode, 'reduction', -20, 0, 0.01, "DB" );
+            let $attackDiv      = this.nm._createSimpleSliderControl( audioNode, 'attack', 0, 1, 0.001, "Sec" );
+            let $releaseDiv     = this.nm._createSimpleSliderControl( audioNode, 'release', 0, 2, 0.01, "Sec" );
 
-            $thresholdDiv.appendTo( $moduleEl );
-            $kneeDiv.appendTo( $moduleEl );
-            $ratioDiv.appendTo( $moduleEl );
-            $reductionDiv.appendTo( $moduleEl );
-            $attackDiv.appendTo( $moduleEl );
-            $releaseDiv.appendTo( $moduleEl );
+            this.nm.ui.appendElementToTarget( $thresholdDiv, $container );
+            this.nm.ui.appendElementToTarget( $kneeDiv, $container );
+            this.nm.ui.appendElementToTarget( $ratioDiv, $container );
+            this.nm.ui.appendElementToTarget( $reductionDiv, $container );
+            this.nm.ui.appendElementToTarget( $attackDiv, $container );
+            this.nm.ui.appendElementToTarget( $releaseDiv, $container );
 
+            return $container;
         },
 
         resetModuleSettings   : function ( $moduleEl, module, audioNode ) {

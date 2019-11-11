@@ -36,9 +36,9 @@
 
         createModuleAudioNode         : function ( module ) {
 
-            var recorder        = this.nm.audioContext.createMediaStreamDestination( );
+            let recorder        = this.nm.audioContext.createMediaStreamDestination( );
 
-            var mediaRecorder   = new MediaRecorder( recorder.stream );
+            let mediaRecorder   = new MediaRecorder( recorder.stream );
             mediaRecorder.ignoreMutedMedia = true;
 
             module.options.recorderMediaRecorder = mediaRecorder;
@@ -54,9 +54,9 @@
             // Make blob out of our blobs, and open it.
             mediaRecorder.onstop        = function( e ) {
 
-                var blob = new Blob(module.options.recorderChunks, { 'type' : 'audio/ogg; codecs=opus' });
+                let blob = new Blob(module.options.recorderChunks, { 'type' : 'audio/ogg; codecs=opus' });
 
-                var audioURL = window.URL.createObjectURL(blob);
+                let audioURL = window.URL.createObjectURL(blob);
 
                 module.options.recorderMediaRecordings.push( audioURL );
 
@@ -72,26 +72,27 @@
 
         createModuleDiv               : function ( $moduleEl, module, audioNode ) {
 
-            var stopImgClass    = [ 'stop' ];
+            let $container      = this.nm.ui.createContentContainer( );
 
-            var spanTemp        = '<span class="nm-label info"></span>';
-            var $span       = $( spanTemp );
+            let stopImgClass    = [ 'stop' ];
+            let spanTemp        = '<span class="nm-label info"></span>';
+            let $span           = $( spanTemp );
 
-            var listTemp        = '<ul class="nm-label nm-list"></ul>';
-            var $list       = $( listTemp );
+            let listTemp        = '<ul class="nm-label nm-list"></ul>';
+            let $list           = $( listTemp );
 
             $span.text( 'Status:' );
 
-            this.nm._createPlayPauseButton( $moduleEl, module, audioNode, this._recorderPlayPauseClickEvent );
-            this.nm._createCustomButton( $moduleEl, module, audioNode, stopImgClass, this._recorderStopClickEvent );
+            let $play = this.nm.ui.createPlayPauseButton( $moduleEl, module, audioNode, this._recorderPlayPauseClickEvent );
+            let $stop = this.nm.ui.createCustomButton( $moduleEl, module, audioNode, stopImgClass, this._recorderStopClickEvent );
 
             module.options.recorderStopCallback = function( module ) {
 
                 $list.empty( );
 
-                $.each( module.options.recorderMediaRecordings, function( index, rec ) {
+                module.options.recorderMediaRecordings.forEach( (rec, index) => {
 
-                    var $a = $( '<a>' );
+                    let $a = $( '<a>' );
                     $a.attr( 'href', rec );
                     $a.attr( 'target', '_blank' );
                     $a.text( 'track ' + (index + 1) );
@@ -100,9 +101,12 @@
                 } );
             };
 
-            $span.appendTo( $moduleEl );
-            $list.appendTo( $moduleEl );
+            this.nm.ui.appendElementToTarget( $play, $container );
+            this.nm.ui.appendElementToTarget( $stop, $container );
+            this.nm.ui.appendElementToTarget( $span, $container );
+            this.nm.ui.appendElementToTarget( $list, $container );
 
+            return $container;
         },
 
         resetModuleSettings           : function ( $moduleEl, module, audioNode ) {
@@ -111,8 +115,8 @@
 
         _recorderPlayPauseClickEvent  : function ( self, $moduleEl, module, audioNode, playPause ) {
 
-            var mediaRecorder   = module.options.recorderMediaRecorder;
-            var $span       = $( $moduleEl ).find( '.nm-label.info' );
+            let mediaRecorder   = module.options.recorderMediaRecorder;
+            let $span       = $( $moduleEl ).find( '.nm-label.info' );
 
 
             if (mediaRecorder.state === 'inactive') {
@@ -136,12 +140,12 @@
 
         _recorderStopClickEvent       : function ( self, $moduleEl, module, audioNode ) {
 
-            var pauseClass      = 'pause';
-            var playClass       = 'play';
+            let pauseClass      = 'pause';
+            let playClass       = 'play';
 
-            var mediaRecorder   = module.options.recorderMediaRecorder;
-            var $span       = $moduleEl.find( '.nm-label.info' );
-            var $img        = $moduleEl.find( '.nm-play-button.pause' );
+            let mediaRecorder   = module.options.recorderMediaRecorder;
+            let $span       = $moduleEl.find( '.nm-label.info' );
+            let $img        = $moduleEl.find( '.nm-play-button.pause' );
 
             if (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused') {
 

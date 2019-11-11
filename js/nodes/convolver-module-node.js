@@ -32,7 +32,7 @@
 
         createModuleAudioNode : function ( module ) {
 
-            var node = this.nm.audioContext.createConvolver( );
+            let node = this.nm.audioContext.createConvolver( );
 
             console.log(node);
 
@@ -42,8 +42,10 @@
 
         createModuleDiv       : function ( $moduleEl, module, audioNode ) {
 
-            var spanTemplate    = '<span class="nm-label info link"></span>'
-            var $normSpan       = $( spanTemplate );
+            let $container  = this.nm.ui.createContentContainer( );
+
+            let spanTemplate    = '<span class="nm-label info link"></span>'
+            let $normSpan       = $( spanTemplate );
 
             $normSpan.text( 'normalize: ' + audioNode.normalize );
 
@@ -55,8 +57,9 @@
 
             } );
 
-            $normSpan.appendTo( $moduleEl );
+            this.nm.ui.appendElementToTarget( $normSpan, $container );
 
+            return $container;
         },
 
         resetModuleSettings   : function ( $moduleEl, module, audioNode ) {

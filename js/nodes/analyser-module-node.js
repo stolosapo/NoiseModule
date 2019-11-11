@@ -52,34 +52,37 @@
 
         createModuleDiv               : function ( $moduleEl, module, audioNode ) {
 
-            var template    = '<canvas class="nm-analyser-canvas"></canvas>';
-            var $canvas     = $( template );
+            let $container  = this.nm.ui.createContentContainer( );
 
-            var canvasCtx   = $canvas[0].getContext("2d");
+            let template    = '<canvas class="nm-analyser-canvas"></canvas>';
+            let $canvas     = $( template );
+            let canvasCtx   = $canvas[0].getContext("2d");
 
-            $canvas.appendTo( $moduleEl );
+            // $canvas.appendTo( $moduleEl );
 
             if (module.type === 'sinewave') {
 
-                this._createSinewaveAnalyser( $moduleEl, module, $canvas, canvasCtx, audioNode );
+                this._createSinewaveAnalyser( module, $canvas, canvasCtx, audioNode );
             }
             else if (module.type === 'frequencybars') {
 
-                this._createFequencyBarsAnalyser( $moduleEl, module, $canvas, canvasCtx, audioNode );
+                this._createFequencyBarsAnalyser( module, $canvas, canvasCtx, audioNode );
             }
             else {
 
-                this._createSinewaveAnalyser( $moduleEl, module, $canvas, canvasCtx, audioNode );
+                this._createSinewaveAnalyser( module, $canvas, canvasCtx, audioNode );
             }
 
-            return $canvas;
+            this.nm.ui.appendElementToTarget( $canvas, $container );
+
+            return $container;
         },
 
         resetModuleSettings           : function ( $moduleEl, module, audioNode ) {
 
         },
 
-        _createSinewaveAnalyser       : function ( $moduleEl, module, $canvas, canvasCtx, audioNode ) {
+        _createSinewaveAnalyser       : function ( module, $canvas, canvasCtx, audioNode ) {
 
             var WIDTH       = $canvas[ 0 ].width;
             var HEIGHT      = $canvas[ 0 ].height;
@@ -134,7 +137,7 @@
 
         },
 
-        _createFequencyBarsAnalyser   : function ( $moduleEl, module, $canvas, canvasCtx, audioNode ) {
+        _createFequencyBarsAnalyser   : function ( module, $canvas, canvasCtx, audioNode ) {
 
             var WIDTH       = $canvas[ 0 ].width;
             var HEIGHT      = $canvas[ 0 ].height;

@@ -34,7 +34,7 @@
 
         createModuleAudioNode : function ( module ) {
 
-            var wave = this.nm.audioContext.createOscillator();
+            let wave = this.nm.audioContext.createOscillator();
 
             wave.type = module.type;
             wave.frequency.value = module.options.oscillatorFrequency;
@@ -47,20 +47,23 @@
 
         createModuleDiv       : function ( $moduleEl, module, audioNode ) {
 
-            var $freqDiv    = this.nm._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
-            var $detuDiv    = this.nm._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
+            let $container  = this.nm.ui.createContentContainer( );
 
-            $freqDiv.appendTo( $moduleEl );
-            $detuDiv.appendTo( $moduleEl );
+            let $freqDiv    = this.nm._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
+            let $detuDiv    = this.nm._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
+            let $button     = this.nm.ui.createPlayStopButton( $moduleEl, module, audioNode );
 
-            // Create Play / Stop button
-            this.nm._createPlayStopButton( $moduleEl, module, audioNode );
+            this.nm.ui.appendElementToTarget( $freqDiv, $container );
+            this.nm.ui.appendElementToTarget( $detuDiv, $container );
+            this.nm.ui.appendElementToTarget( $button, $container );
+
+            return $container;
         },
 
         resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
 
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'frequency', module.options.oscillatorFrequency );
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'detune', module.options.oscillatorDetune );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'frequency', module.options.oscillatorFrequency );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'detune', module.options.oscillatorDetune );
         },
     };
 

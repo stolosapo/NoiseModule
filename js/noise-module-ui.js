@@ -136,12 +136,13 @@
             let $footer = this._createModuleFooter( module, audioNode );
 
             this.appendElementToTarget( $header, $divEl );
-            this.appendElementToTarget( $contentContainer, $divEl );
+            // this.appendElementToTarget( $contentContainer, $divEl );
+            this.appendElementToTarget( $content, $divEl );
             // this.appendElementToTarget( $bypass, $divEl );
             // this.appendElementToTarget( $reset, $divEl );
             this.appendElementToTarget( $footer, $divEl );
 
-            moduleImpl.$div = $contentContainer;
+            moduleImpl.$div = $content;
 
             return $divEl;
         },
@@ -316,6 +317,108 @@
 
                 _self._resetModuleSettings( $element, module, audioNode );
             } );
+        },
+
+        createPlayStopButton            : function ( $moduleEl, module, audioNode ) {
+
+            var _self       = this;
+
+            var playClass   = 'play';
+            var stopClass   = 'stop';
+
+            var template    = '<img class="nm-play-button"></img>';
+            var $button        = $( template );
+
+            if ( module.options.started ) {
+
+                $button.addClass( stopClass );
+            }
+            else {
+
+                $button.addClass( playClass );
+            }
+
+            $button[0].addEventListener( 'click', function( ) {
+
+                if ( $(this).hasClass( playClass ) ) {
+
+                    _self.nm._connectAllDestinations( module );
+
+                    $(this).removeClass( playClass );
+                    $(this).addClass( stopClass );
+                }
+                else {
+
+                    _self.nm._disconnectAllDestinations( module );
+
+                    $(this).removeClass( stopClass );
+                    $(this).addClass( playClass );
+                }
+
+            } );
+
+            return $button;
+        },
+
+        createPlayPauseButton           : function ( $moduleEl, module, audioNode, playPauseClickEvent ) {
+
+            var _self       = this;
+
+            var playClass   = 'play';
+            var pauseClass  = 'pause';
+
+            var template    = '<img class="nm-play-button"></img>';
+            var $button     = $( template );
+
+            if ( module.options.started ) {
+
+                $button.addClass( pauseClass );
+            }
+            else {
+
+                $button.addClass( playClass );
+            }
+
+            $button[0].addEventListener( 'click', function( ) {
+
+                if ( $(this).hasClass( playClass ) ) {
+
+                    playPauseClickEvent( _self, $moduleEl, module, audioNode, true );
+
+                    $(this).removeClass( playClass );
+                    $(this).addClass( pauseClass );
+                }
+                else {
+
+                    playPauseClickEvent( _self, $moduleEl, module, audioNode, false );
+
+                    $(this).removeClass( pauseClass );
+                    $(this).addClass( playClass );
+                }
+
+            } );
+
+            return $button;
+        },
+
+        createCustomButton              : function ( $moduleEl, module, audioNode, cssClasses, clickEvent ) {
+
+            var _self   = this;
+
+            var template    = '<img class="nm-play-button"></img>';
+            var $button     = $( template );
+
+            if ( cssClasses ) {
+
+                cssClass.forEach(c => $button.addClass( c ));
+            };
+
+            $button[0].addEventListener( 'click', function( ) {
+
+                clickEvent( _self, $moduleEl, module, audioNode );
+            } );
+
+            return $button;
         },
 
         _bypassModule                   : function ( $element, module, audioNode ) {

@@ -35,13 +35,13 @@
 
         createModuleAudioNode     : function ( module ) {
 
-            var audio = this._getRadioAudioElement( module ).get( 0 );
+            let audio = this._getRadioAudioElement( module ).get( 0 );
 
             if (!audio) {
                 return;
             };
 
-            var source = this.nm.audioContext.createMediaElementSource( audio );
+            let source = this.nm.audioContext.createMediaElementSource( audio );
 
             return source;
 
@@ -49,17 +49,17 @@
 
         createModuleDiv           : function ( $moduleEl, module, audioNode ) {
 
-            var template    = '<span class="nm-label"></span>';
-            var $span   = $( template );
+            let $container  = this.nm.ui.createContentContainer( );
 
-            var audio = module.options.radioAudioElement;
+            let template    = '<span class="nm-label"></span>';
+            let $span       = $( template );
+
+            let audio       = module.options.radioAudioElement;
 
             if (!audio) {
-
                 $span.text( 'Could not connect...' );
-                $span.appendTo( $moduleEl );
-
-                return $span;
+                this.nm.ui.appendElementToTarget( $span, $container );
+                return $container;
             };
 
 
@@ -72,16 +72,14 @@
             audio.on( 'waiting', function( e ) { $span.text( 'Waiting' ); } );
             audio.on( 'emptied', function( e ) { $span.text( 'Cleared' ); } );
 
+            this.nm.ui.appendElementToTarget( $span, $container );
 
-            $span.appendTo( $moduleEl );
-
-            return $span;
-
+            return $container;
         },
 
         resetModuleSettings       : function ( $moduleEl, module, audioNode ) {
 
-            var audio = module.options.radioAudioElement.get( 0 );
+            let audio = module.options.radioAudioElement.get( 0 );
 
             if (!audio) {
                 return;

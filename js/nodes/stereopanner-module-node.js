@@ -43,15 +43,17 @@
 
         createModuleDiv       : function ( $moduleEl, module, audioNode ) {
 
-            var $panDiv = this.nm._createSimpleSliderControl( audioNode, 'pan', -1, 1, 0.01, "" );
+            let $container  = this.nm.ui.createContentContainer( );
+            let $panDiv     = this.nm._createSimpleSliderControl( audioNode, 'pan', -1, 1, 0.01, "" );
 
-            $panDiv.appendTo( $moduleEl );
+            this.nm.ui.appendElementToTarget( $panDiv, $container );
 
+            return $container;
         },
 
         resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
 
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'pan', module.options.stereoPannerPan );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'pan', module.options.stereoPannerPan );
 
         }
 

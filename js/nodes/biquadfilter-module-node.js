@@ -41,16 +41,19 @@
 
         createModuleDiv       : function ( $moduleEl, module, audioNode ) {
 
-            var $freqDiv    = this.nm._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
-            var $detuDiv    = this.nm._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
-            var $qDiv   = this.nm._createSimpleSliderControl( audioNode, 'Q', 1, 100, 0.1, "" );
-            var $gainDiv    = this.nm._createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
+            let $container  = this.nm.ui.createContentContainer( );
 
-            $freqDiv.appendTo( $moduleEl );
-            $detuDiv.appendTo( $moduleEl );
-            $qDiv.appendTo( $moduleEl );
-            $gainDiv.appendTo( $moduleEl );
+            let $freqDiv    = this.nm._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
+            let $detuDiv    = this.nm._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
+            let $qDiv   = this.nm._createSimpleSliderControl( audioNode, 'Q', 1, 100, 0.1, "" );
+            let $gainDiv    = this.nm._createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
 
+            this.nm.ui.appendElementToTarget( $freqDiv, $container );
+            this.nm.ui.appendElementToTarget( $detuDiv, $container );
+            this.nm.ui.appendElementToTarget( $qDiv, $container );
+            this.nm.ui.appendElementToTarget( $gainDiv, $container );
+
+            return $container;
         },
 
         resetModuleSettings   : function ( $moduleEl, module, audioNode ) {

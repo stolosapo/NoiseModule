@@ -79,8 +79,12 @@
 
         createModuleDiv         : function ( $moduleEl, module, audioNode ) {
 
-            this.nm._createPlayStopButton( $moduleEl, module, audioNode );
+            let $container  = this.nm.ui.createContentContainer( );
+            let $button = this.nm.ui.createPlayStopButton( $moduleEl, module, audioNode );
 
+            this.nm.ui.appendElementToTarget( $button, $container );
+
+            return $container;
         },
 
         resetModuleSettings     : function ( $moduleEl, module, audioNode ) {

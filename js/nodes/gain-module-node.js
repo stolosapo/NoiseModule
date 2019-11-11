@@ -42,18 +42,14 @@
             let $container  = this.nm.ui.createContentContainer( );
             let $gain       = this.nm._createSimpleSliderControl( audioNode, "gain", 0, 1, 0.01, "" );
 
-            $gain.appendTo( $moduleEl );
-
-            // this.nm.ui.appendElementToTarget( $gain, $container );
+            this.nm.ui.appendElementToTarget( $gain, $container );
 
             return $container;
         },
 
         resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
 
-            // this.nm._resetSliderSetting( $moduleEl, audioNode, 'gain', module.options.gainGain );
             this.nm._resetSliderSetting( this.$div, audioNode, "gain", module.options.gainGain );
-
         },
 
         createGain            : function ( module, value ) {

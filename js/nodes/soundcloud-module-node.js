@@ -35,23 +35,23 @@
 
         createModuleAudioNode     : function ( module ) {
 
-            var _self       = this;
+            let _self       = this;
 
-            var source;
+            let source;
 
-            var baseUrl     = 'https://api.soundcloud.com/resolve.json?url=';
-            var clientParameter     = 'client_id=' + module.options.soundCloudClientId;
-            var url         = baseUrl + module.options.soundCloudTrackUrl + '&' + clientParameter;
+            let baseUrl     = 'https://api.soundcloud.com/resolve.json?url=';
+            let clientParameter     = 'client_id=' + module.options.soundCloudClientId;
+            let url         = baseUrl + module.options.soundCloudTrackUrl + '&' + clientParameter;
 
-            var audio       = new Audio( );
+            let audio       = new Audio( );
             audio.crossOrigin   = "anonymous";
 
             module.options.soundCloudAudio = audio;
 
             this.nm._requestGET( url, function ( response ) {
 
-                var trackInfo   = JSON.parse( response );
-                var streamUrl   = trackInfo.stream_url + "?" + clientParameter;
+                let trackInfo   = JSON.parse( response );
+                let streamUrl   = trackInfo.stream_url + "?" + clientParameter;
 
                 audio.src   = streamUrl;
 
@@ -60,8 +60,8 @@
                 /* Update source node map with this new instance */
                 _self.nm._updateAudioNode( module.name, source );
 
-                var $divEl  = _self.nm._findModuleDivByName( module );
-                var $content    = $( $divEl ).find( '.nm-content' );
+                let $divEl  = _self.nm._findModuleDivByName( module );
+                let $content    = $( $divEl ).find( '.nm-content' );
 
                 _self.nm._appendModuleFooter( $( $divEl ), $content, module, source );
                 _self.nm._connectAllDestinations( module );
@@ -76,20 +76,20 @@
 
         createModuleDiv           : function ( $moduleEl, module, audioNode ) {
 
-            var template    = '<span class="nm-label"></span>';
-            var $span   = $( template );
+            let $container  = this.nm.ui.createContentContainer( );
 
-            var audio   = module.options.soundCloudAudio;
+            let template    = '<span class="nm-label"></span>';
+            let $span       = $( template );
+
+            let audio       = module.options.soundCloudAudio;
 
             if (!audio) {
-
                 $span.text( 'Could not connect...' );
-                $span.appendTo( $moduleEl );
-
-                return $span;
+                this.nm.ui.appendElementToTarget( $span, $container );
+                return $container;
             };
 
-            var $audioEl    = $( audio );
+            let $audioEl    = $( audio );
 
             $audioEl.on( 'playing', function( e ) { $span.text( 'Playing' ); } );
             $audioEl.on( 'pause', function( e ) { $span.text( 'Paused' ); } );
@@ -98,17 +98,18 @@
             $audioEl.on( 'seeking', function( e ) { $span.text( 'Seeking' ); } );
             $audioEl.on( 'waiting', function( e ) { $span.text( 'Waiting' ); } );
 
+            let $play = this.nm.ui.createPlayPauseButton( $moduleEl, module, audioNode, this._soundCloudPlayPauseEvent );
 
-            $span.appendTo( $moduleEl );
+            this.nm.ui.appendElementToTarget( $span, $container );
+            this.nm.ui.appendElementToTarget( $play, $container );
 
-            this.nm._createPlayPauseButton( $moduleEl, module, audioNode, this._soundCloudPlayPauseEvent );
-
+            return $container;
         },
 
         resetModuleSettings       : function ( $moduleEl, module, audioNode ) {
 
-            var audio   = module.options.soundCloudAudio;
-            var $img    = $moduleEl.find( '.nm-play-button' );
+            let audio   = module.options.soundCloudAudio;
+            let $img    = $moduleEl.find( '.nm-play-button' );
 
             audio.pause( );
 
@@ -116,14 +117,13 @@
             $img.addClass( 'play' );
 
             audio.load( );
-
         },
 
 
         /* Private Methods */
         _soundCloudPlayPauseEvent : function ( self, $moduleEl, module, audioNode, playPause ) {
 
-            var audio       = module.options.soundCloudAudio;
+            let audio       = module.options.soundCloudAudio;
 
             if (audio.paused) {
                 audio.play( );

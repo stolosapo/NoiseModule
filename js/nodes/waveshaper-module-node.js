@@ -36,7 +36,7 @@
 
         createModuleAudioNode     : function ( module ) {
 
-            var node = this.nm.audioContext.createWaveShaper ( );
+            let node = this.nm.audioContext.createWaveShaper ( );
 
             node.curve = this._createDistortionCurve ( module.options.waveShapperCurveAmount );
             node.oversample = module.options.waveShapperOversample;
@@ -47,41 +47,41 @@
 
         createModuleDiv           : function ( $moduleEl, module, audioNode ) {
 
-            var _self   = this;
+            let $container      = this.nm.ui.createContentContainer( );
 
-            var $curveDiv   = this.nm._createSimpleSliderControl( audioNode, 'curve', 0, 1000, 1, "", function() {
+            let _self           = this;
 
+            let $curveDiv       = this.nm._createSimpleSliderControl( audioNode, 'curve', 0, 1000, 1, "", function() {
                 audioNode.curve = _self._createDistortionCurve ( this.value );
             } );
 
-            var $oversampleDiv  = this.nm._createSimpleSliderControl( audioNode, 'oversample', 0, 4, 2, "", function() {
-
-                var value = this.value == 0 ? 'none' : this.value + 'x';
-
+            let $oversampleDiv  = this.nm._createSimpleSliderControl( audioNode, 'oversample', 0, 4, 2, "", function() {
+                let value = this.value == 0 ? 'none' : this.value + 'x';
                 audioNode.oversample = value;
             } );
 
-            $curveDiv.appendTo( $moduleEl );
-            $oversampleDiv.appendTo( $moduleEl );
+            this.nm.ui.appendElementToTarget( $curveDiv, $container );
+            this.nm.ui.appendElementToTarget( $oversampleDiv, $container );
 
+            return $container;
         },
 
         resetModuleSettings       : function ( $moduleEl, module, audioNode ) {
 
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'curve', module.options.waveShapperCurveAmount );
-            this.nm._resetSliderSetting( $moduleEl, audioNode, 'oversample', module.options.waveShapperOversample );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'curve', module.options.waveShapperCurveAmount );
+            this.nm._resetSliderSetting( this.$div, audioNode, 'oversample', module.options.waveShapperOversample );
 
         },
 
         _createDistortionCurve    : function ( amount ) {
 
-            var k = typeof amount === 'number' ? amount : 50;
-            var n_samples = 44100;
+            let k = typeof amount === 'number' ? amount : 50;
+            let n_samples = 44100;
 
-            var curve = new Float32Array(n_samples);
-            var deg = Math.PI / 180;
-            var i = 0
-            var x;
+            let curve = new Float32Array(n_samples);
+            let deg = Math.PI / 180;
+            let i = 0
+            let x;
 
             for ( ; i < n_samples; ++i ) {
 

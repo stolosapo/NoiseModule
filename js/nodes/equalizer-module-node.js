@@ -58,20 +58,20 @@
 
         createModuleAudioNode   : function ( module ) {
 
-            var _self   = this;
+            let _self       = this;
 
-            var preAmp  = _self.gainNode.createGain( module, module.options.eqPreAmpInGain );
-            var outputGain  = _self.gainNode.createGain( module, module.options.eqPreAmpOutGain );
+            let preAmp      = _self.gainNode.createGain( module, module.options.eqPreAmpInGain );
+            let outputGain  = _self.gainNode.createGain( module, module.options.eqPreAmpOutGain );
 
-            var nodes   = [ ];
-            var prevNode    = preAmp;
+            let nodes       = [ ];
+            let prevNode    = preAmp;
 
             nodes.push( preAmp );
 
             // Create all bands
-            $.each( module.options.eqBands, function( index, band ) {
+            module.options.eqBands.forEach( (band, index) => {
 
-                var bandNode    = _self.biquadfilterNode.createBiquadFilter(
+                let bandNode    = _self.biquadfilterNode.createBiquadFilter(
                     module,
                     band.type,
                     band.frequency,
@@ -84,7 +84,6 @@
                 prevNode        = bandNode;
 
                 nodes.push( prevNode );
-
             } );
 
             _self.nm.connectNodes( prevNode, outputGain );
@@ -92,96 +91,104 @@
             nodes.push( outputGain );
 
             return { inNode: preAmp, outNode: outputGain, allNodes: nodes };
-
         },
 
         createModuleDiv         : function ( $moduleEl, module, audioNode ) {
 
-            var _self       = this;
-            var inGain      = audioNode.inNode;
-            var outGain     = audioNode.outNode;
+            let _self       = this;
+            let inGain      = audioNode.inNode;
+            let outGain     = audioNode.outNode;
 
-            var min         = module.options.eqBandMin;
-            var max         = module.options.eqBandMax;
-            var step        = module.options.eqBandStep;
 
-            var $inGainDiv  = this.nm._createSliderControl( inGain, 'gain', 'preAmp In', 0, 2, 0.1, '' );
+            let $container  = this.nm.ui.createContentContainer( );
+
+            let $inGainDiv  = this.nm._createSliderControl( inGain, 'gain', 'preAmp In', 0, 2, 0.1, '' );
             $inGainDiv.addClass( 'pre-amp' );
             $inGainDiv.addClass( 'in' );
 
-            var $outGainDiv = this.nm._createSliderControl( outGain, 'gain', 'preAmp Out', 0, 2, 0.1, '' );
+            let $outGainDiv = this.nm._createSliderControl( outGain, 'gain', 'preAmp Out', 0, 2, 0.1, '' );
             $outGainDiv.addClass( 'pre-amp' );
             $outGainDiv.addClass( 'out' );
 
-            var lastIndex   = audioNode.allNodes.length - 1;
+            let lastIndex   = audioNode.allNodes.length - 1;
 
-            $inGainDiv.appendTo( $moduleEl );
+            this.nm.ui.appendElementToTarget( $inGainDiv, $container );
 
-            $.each( audioNode.allNodes, function( index, node ) {
+            audioNode.allNodes.forEach( (node, index) => {
 
-                if ( index == 0 || index == lastIndex ) {
-                    return;
-                }
+                let $filter  = _self._createFilterUI( _self, index, lastIndex, module, node );
 
-                var bandIndex   = index - 1;
-                var description = module.options.eqBands[ bandIndex ].description;
-
-                var $filterDiv  = _self.nm._createSliderControl(
-                    node,
-                    module.options.eqBandControl,
-                    description,
-                    min,
-                    max,
-                    step,
-                    '' );
-
-                $filterDiv.addClass( 'eq-band' );
-                $filterDiv.addClass( 'band' + bandIndex );
-
-                $filterDiv.appendTo( $moduleEl );
-
+                _self.nm.ui.appendElementToTarget( $filter, $container );
             } );
 
+            this.nm.ui.appendElementToTarget( $outGainDiv, $container );
 
-            $outGainDiv.appendTo( $moduleEl );
-
+            return $container;
         },
 
         resetModuleSettings     : function ( $moduleEl, module, audioNode ) {
 
-            var _self       = this;
+            let _self       = this;
 
-            var inClasses   = [ 'gain', 'pre-amp', 'in' ];
-            var outClasses  = [ 'gain', 'pre-amp', 'out' ];
+            let inClasses   = [ 'gain', 'pre-amp', 'in' ];
+            let outClasses  = [ 'gain', 'pre-amp', 'out' ];
 
-            this.nm._resetSliderSettingByClasses( $moduleEl, audioNode.inNode, 'gain', inClasses, module.options.eqPreAmpInGain );
-            this.nm._resetSliderSettingByClasses( $moduleEl, audioNode.outNode, 'gain', outClasses, module.options.eqPreAmpOutGain );
+            this.nm._resetSliderSettingByClasses( _self.$div, audioNode.inNode, 'gain', inClasses, module.options.eqPreAmpInGain );
+            this.nm._resetSliderSettingByClasses( _self.$div, audioNode.outNode, 'gain', outClasses, module.options.eqPreAmpOutGain );
 
-            var lastIndex   = audioNode.allNodes.length - 1;
+            let lastIndex   = audioNode.allNodes.length - 1;
 
-            $.each( audioNode.allNodes, function( index, node ) {
-
-                if ( index == 0 || index == lastIndex ) {
-                    return;
-                }
-
-                var bandControlType = module.options.eqBandControl;
-                var bandIndex       = index - 1;
-
-                var classes     = [ bandControlType, 'eq-band', 'band' + bandIndex ];
-                var value       = module.options.eqBands[ bandIndex ][ bandControlType ];
-
-                _self.nm._resetSliderSettingByClasses(
-                    $moduleEl,
-                    node,
-                    bandControlType,
-                    classes,
-                    value );
-
+            audioNode.allNodes.forEach( (node, index) => {
+                _self._resetFilter( _self, index, lastIndex, module, node )
             } );
-
         },
 
+        _createFilterUI         : function ( _self, index, lastIndex, module, node ) {
+
+            let min         = module.options.eqBandMin;
+            let max         = module.options.eqBandMax;
+            let step        = module.options.eqBandStep;
+
+            if ( index == 0 || index == lastIndex ) {
+                return;
+            }
+
+            let bandIndex   = index - 1;
+            let description = module.options.eqBands[ bandIndex ].description;
+
+            let $filter  = _self.nm._createSliderControl(
+                node,
+                module.options.eqBandControl,
+                description,
+                min,
+                max,
+                step,
+                '' );
+
+            $filter.addClass( 'eq-band' );
+            $filter.addClass( 'band' + bandIndex );
+
+            return $filter;
+        },
+
+        _resetFilter            : function ( _self, index, lastIndex, module, node ) {
+            if ( index == 0 || index == lastIndex ) {
+                return;
+            }
+
+            let bandControlType = module.options.eqBandControl;
+            let bandIndex       = index - 1;
+
+            let classes     = [ bandControlType, 'eq-band', 'band' + bandIndex ];
+            let value       = module.options.eqBands[ bandIndex ][ bandControlType ];
+
+            _self.nm._resetSliderSettingByClasses(
+                _self.$div,
+                node,
+                bandControlType,
+                classes,
+                value );
+        },
     };
 
 } )( window, navigator, jQuery );
