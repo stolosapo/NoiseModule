@@ -407,6 +407,81 @@
             return $button;
         },
 
+        createSimpleSliderControl       : function ( audioNode, property, min, max, step, units, changeEvent ) {
+
+            return this.createSliderControl(
+                audioNode,
+                property,
+                property,
+                min,
+                max,
+                step,
+                units,
+                changeEvent );
+        },
+
+        createSliderControl             : function ( audioNode, property, description, min, max, step, units, changeEvent ) {
+
+            let template    = `
+                <div class="${property}" name="${description}">
+                    <div class="nm-slider-info" min="${min}" max="${max}">
+                        <span class="nm-label">${description}</span>
+                        <span class="nm-value" units="${units}"></span>
+                    </div>
+                    <input min="${min}" max="${max}" step="${step}" type="range"></input>
+                </div>`;
+
+            let $div    = $( template );
+            let $span   = $( $div ).find( '.nm-value' );
+            let $input  = $( $div ).find( 'input' );
+
+            let value   = audioNode[ property ].value;
+
+            $input[0].value = value;
+
+            $span.text( value + ' ' + units );
+
+            if (changeEvent != null && changeEvent != undefined) {
+
+                $input[0].addEventListener( 'input', changeEvent );
+                return $div;
+            }
+
+            $input[0].addEventListener( 'input', function( ) {
+
+                audioNode[ property ].value = this.value;
+                $span.text( this.value + ' ' + units );
+            } );
+
+            return $div;
+        },
+
+        resetSliderSetting              : function ( $moduleEl, audioNode, property, value ) {
+
+            var $div        = $( $moduleEl ).find( '.' + property );
+            var $span       = $( $div ).find( '.nm-value' );
+            var $input      = $( $div ).find( 'input' );
+            var units       = $span.attr( 'units' );
+
+            $input[0].value = value;
+            $span.text( value + ' ' + units );
+            audioNode[ property ].value = value;
+        },
+
+        resetSliderSettingByClasses     : function ( $moduleEl, audioNode, property, classes, value ) {
+
+            var propertyClass   = classes.join( '.' );
+
+            var $div        = $( $moduleEl ).find( '.' + propertyClass );
+            var $span       = $( $div ).find( '.nm-value' );
+            var $input      = $( $div ).find( 'input' );
+            var units       = $span.attr( 'units' );
+
+            $input[0].value = value;
+            $span.text( value + ' ' + units );
+            audioNode[ property ].value = value;
+        },
+
         _bypassModule                   : function ( $element, module, audioNode ) {
 
             var bypassedClass   = 'bypassed';

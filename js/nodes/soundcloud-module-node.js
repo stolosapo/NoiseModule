@@ -60,10 +60,9 @@
                 /* Update source node map with this new instance */
                 _self.nm._updateAudioNode( module.name, source );
 
-                let $divEl  = _self.nm._findModuleDivByName( module );
-                let $content    = $( $divEl ).find( '.nm-content' );
+                let $footer = _self.nm.ui.createModuleFooter( module, source );
+                _self.nm.ui.appendElementToTarget( $footer, _self.$div[0].parentNode );
 
-                _self.nm._appendModuleFooter( $( $divEl ), $content, module, source );
                 _self.nm._connectAllDestinations( module );
 
                 /* If module option is started then do the connection */

@@ -49,8 +49,8 @@
 
             let $container  = this.nm.ui.createContentContainer( );
 
-            let $freqDiv    = this.nm._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
-            let $detuDiv    = this.nm._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
+            let $freqDiv    = this.nm.ui.createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
+            let $detuDiv    = this.nm.ui.createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
             let $button     = this.nm.ui.createPlayStopButton( module, audioNode );
 
             this.nm.ui.appendElementToTarget( $freqDiv, $container );
@@ -62,8 +62,8 @@
 
         resetModuleSettings   : function ( module, audioNode ) {
 
-            this.nm._resetSliderSetting( this.$div, audioNode, 'frequency', module.options.oscillatorFrequency );
-            this.nm._resetSliderSetting( this.$div, audioNode, 'detune', module.options.oscillatorDetune );
+            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'frequency', module.options.oscillatorFrequency );
+            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'detune', module.options.oscillatorDetune );
         },
     };
 

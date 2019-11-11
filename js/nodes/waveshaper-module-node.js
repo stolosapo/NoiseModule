@@ -51,11 +51,11 @@
 
             let _self           = this;
 
-            let $curveDiv       = this.nm._createSimpleSliderControl( audioNode, 'curve', 0, 1000, 1, "", function() {
+            let $curveDiv       = this.nm.ui.createSimpleSliderControl( audioNode, 'curve', 0, 1000, 1, "", function() {
                 audioNode.curve = _self._createDistortionCurve ( this.value );
             } );
 
-            let $oversampleDiv  = this.nm._createSimpleSliderControl( audioNode, 'oversample', 0, 4, 2, "", function() {
+            let $oversampleDiv  = this.nm.ui.createSimpleSliderControl( audioNode, 'oversample', 0, 4, 2, "", function() {
                 let value = this.value == 0 ? 'none' : this.value + 'x';
                 audioNode.oversample = value;
             } );
@@ -68,9 +68,8 @@
 
         resetModuleSettings       : function ( module, audioNode ) {
 
-            this.nm._resetSliderSetting( this.$div, audioNode, 'curve', module.options.waveShapperCurveAmount );
-            this.nm._resetSliderSetting( this.$div, audioNode, 'oversample', module.options.waveShapperOversample );
-
+            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'curve', module.options.waveShapperCurveAmount );
+            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'oversample', module.options.waveShapperOversample );
         },
 
         _createDistortionCurve    : function ( amount ) {

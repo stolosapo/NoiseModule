@@ -43,10 +43,10 @@
 
             let $container  = this.nm.ui.createContentContainer( );
 
-            let $freqDiv    = this.nm._createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
-            let $detuDiv    = this.nm._createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
-            let $qDiv   = this.nm._createSimpleSliderControl( audioNode, 'Q', 1, 100, 0.1, "" );
-            let $gainDiv    = this.nm._createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
+            let $freqDiv    = this.nm.ui.createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
+            let $detuDiv    = this.nm.ui.createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
+            let $qDiv   = this.nm.ui.createSimpleSliderControl( audioNode, 'Q', 1, 100, 0.1, "" );
+            let $gainDiv    = this.nm.ui.createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
 
             this.nm.ui.appendElementToTarget( $freqDiv, $container );
             this.nm.ui.appendElementToTarget( $detuDiv, $container );
@@ -58,10 +58,10 @@
 
         resetModuleSettings   : function ( module, audioNode ) {
 
-            this.nm._resetSliderSetting( this.$div, audioNode, 'frequency', module.options.biquadFilterFrequency );
-            this.nm._resetSliderSetting( this.$div, audioNode, 'detune', module.options.biquadFilterDetune );
-            this.nm._resetSliderSetting( this.$div, audioNode, 'Q', module.options.biquadFilterQ );
-            this.nm._resetSliderSetting( this.$div, audioNode, 'gain', module.options.biquadFilterGain );
+            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'frequency', module.options.biquadFilterFrequency );
+            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'detune', module.options.biquadFilterDetune );
+            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'Q', module.options.biquadFilterQ );
+            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'gain', module.options.biquadFilterGain );
 
         },
 

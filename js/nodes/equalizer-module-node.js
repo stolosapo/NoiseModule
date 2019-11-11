@@ -102,11 +102,11 @@
 
             let $container  = this.nm.ui.createContentContainer( );
 
-            let $inGainDiv  = this.nm._createSliderControl( inGain, 'gain', 'preAmp In', 0, 2, 0.1, '' );
+            let $inGainDiv  = this.nm.ui.createSliderControl( inGain, 'gain', 'preAmp In', 0, 2, 0.1, '' );
             $inGainDiv.addClass( 'pre-amp' );
             $inGainDiv.addClass( 'in' );
 
-            let $outGainDiv = this.nm._createSliderControl( outGain, 'gain', 'preAmp Out', 0, 2, 0.1, '' );
+            let $outGainDiv = this.nm.ui.createSliderControl( outGain, 'gain', 'preAmp Out', 0, 2, 0.1, '' );
             $outGainDiv.addClass( 'pre-amp' );
             $outGainDiv.addClass( 'out' );
 
@@ -133,8 +133,8 @@
             let inClasses   = [ 'gain', 'pre-amp', 'in' ];
             let outClasses  = [ 'gain', 'pre-amp', 'out' ];
 
-            this.nm._resetSliderSettingByClasses( _self.$div, audioNode.inNode, 'gain', inClasses, module.options.eqPreAmpInGain );
-            this.nm._resetSliderSettingByClasses( _self.$div, audioNode.outNode, 'gain', outClasses, module.options.eqPreAmpOutGain );
+            this.nm.ui.resetSliderSettingByClasses( _self.$div, audioNode.inNode, 'gain', inClasses, module.options.eqPreAmpInGain );
+            this.nm.ui.resetSliderSettingByClasses( _self.$div, audioNode.outNode, 'gain', outClasses, module.options.eqPreAmpOutGain );
 
             let lastIndex   = audioNode.allNodes.length - 1;
 
@@ -156,7 +156,7 @@
             let bandIndex   = index - 1;
             let description = module.options.eqBands[ bandIndex ].description;
 
-            let $filter  = _self.nm._createSliderControl(
+            let $filter  = _self.nm.ui.createSliderControl(
                 node,
                 module.options.eqBandControl,
                 description,
@@ -182,7 +182,7 @@
             let classes     = [ bandControlType, 'eq-band', 'band' + bandIndex ];
             let value       = module.options.eqBands[ bandIndex ][ bandControlType ];
 
-            _self.nm._resetSliderSettingByClasses(
+            _self.nm.ui.resetSliderSettingByClasses(
                 _self.$div,
                 node,
                 bandControlType,

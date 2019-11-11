@@ -44,7 +44,7 @@
         createModuleDiv       : function ( module, audioNode ) {
 
             let $container  = this.nm.ui.createContentContainer( );
-            let $panDiv     = this.nm._createSimpleSliderControl( audioNode, 'pan', -1, 1, 0.01, "" );
+            let $panDiv     = this.nm.ui.createSimpleSliderControl( audioNode, 'pan', -1, 1, 0.01, "" );
 
             this.nm.ui.appendElementToTarget( $panDiv, $container );
 
@@ -53,8 +53,7 @@
 
         resetModuleSettings   : function ( module, audioNode ) {
 
-            this.nm._resetSliderSetting( this.$div, audioNode, 'pan', module.options.stereoPannerPan );
-
+            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'pan', module.options.stereoPannerPan );
         }
 
     };

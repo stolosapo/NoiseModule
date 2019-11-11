@@ -45,7 +45,7 @@
         createModuleDiv       : function ( module, audioNode ) {
 
             let $container  = this.nm.ui.createContentContainer( );
-            let $timeDiv    = this.nm._createSimpleSliderControl( audioNode, 'delayTime', 0, 10, 0.01, "Sec" );
+            let $timeDiv    = this.nm.ui.createSimpleSliderControl( audioNode, 'delayTime', 0, 10, 0.01, "Sec" );
 
             this.nm.ui.appendElementToTarget( $timeDiv, $container );
 
@@ -54,7 +54,7 @@
 
         resetModuleSettings   : function ( module, audioNode ) {
 
-            this.nm._resetSliderSetting( this.$div, audioNode, 'delayTime', module.options.delayTime );
+            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'delayTime', module.options.delayTime );
 
         },
 
