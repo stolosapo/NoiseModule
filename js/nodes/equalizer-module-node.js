@@ -1,8 +1,26 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * EqualizerModuleNode: Class for 'equalizer' node
-     */
+    /* EqualizerModuleNode: Class for 'equalizer' node */
+
+    $.EqualizerModuleNodeFactory             = function ( gainModuleFactory, biquadfilterModuleFactory ) {
+
+        this.gainModuleFactory = gainModuleFactory;
+        this.biquadfilterModuleFactory = biquadfilterModuleFactory;
+    };
+
+    $.EqualizerModuleNodeFactory.prototype   = {
+
+        typeName    : "equalizer",
+
+        create      : function ( noiseModule ) {
+
+            let gainModuleNode = this.gainModuleFactory.create( noiseModule );
+            let biquadfilterModuleNode = this.biquadfilterModuleFactory.create( noiseModule );
+
+            return new $.EqualizerModuleNode( noiseModule, gainModuleNode, biquadfilterModuleNode );
+        }
+    };
+
     $.EqualizerModuleNode              = function ( noiseModule, gainModuleNode, biquadfilterModuleNode ) {
 
         this.nm = noiseModule;
@@ -12,14 +30,13 @@
 
     $.EqualizerModuleNode.defaults     = {
 
-        eqPreAmpInGain      : 1,
-        eqPreAmpOutGain     : 1,
-        eqBandControl       : 'gain',
+        eqPreAmpInGain  : 1,
+        eqPreAmpOutGain : 1,
+        eqBandControl   : 'gain',
         eqBandMin       : -12,
         eqBandMax       : 12,
         eqBandStep      : 1,
         eqBands         : [
-
             { description: '60 Hz', type: 'lowshelf', frequency: 60, detune: 0, Q: 1, gain: 0 },
             { description: '170 Hz', type: 'lowshelf', frequency: 170, detune: 0, Q: 1, gain: 0 },
             { description: '310 Hz', type: 'lowshelf', frequency: 310, detune: 0, Q: 1, gain: 0 },

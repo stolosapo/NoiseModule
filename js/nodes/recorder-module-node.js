@@ -1,12 +1,23 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * RecorderModuleNode: Class for 'recorder' node
-     */
+    /* RecorderModuleNode: Class for 'recorder' node */
+
+    $.RecorderModuleNodeFactory             = function () {
+    };
+
+    $.RecorderModuleNodeFactory.prototype   = {
+
+        typeName    : "recorder",
+
+        create      : function ( noiseModule ) {
+
+            return new $.RecorderModuleNode( noiseModule );
+        }
+    };
+
     $.RecorderModuleNode           = function ( noiseModule ) {
 
         this.nm = noiseModule;
-
     };
 
     $.RecorderModuleNode.defaults     = {

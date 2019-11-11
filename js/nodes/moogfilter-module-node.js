@@ -1,12 +1,23 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * MoogFilterModuleNode: Class for 'moogfilter' node
-     */
+    /* MoogFilterModuleNode: Class for 'moogfilter' node */
+
+    $.MoogFilterModuleNodeFactory             = function () {
+    };
+
+    $.MoogFilterModuleNodeFactory.prototype   = {
+
+        typeName    : "moogfilter",
+
+        create      : function ( noiseModule ) {
+
+            return new $.MoogFilterModuleNode( noiseModule );
+        }
+    };
+
     $.MoogFilterModuleNode             = function ( noiseModule ) {
 
         this.nm = noiseModule;
-
     };
 
     $.MoogFilterModuleNode.defaults    = {

@@ -642,7 +642,7 @@
             return $div;
         },
 
-        /* TODO: Move to UI */
+        /* TODO: Move to UI. Error when reset button is in header div and not in content div. Change this implementation to be more generic of where to button belongs */
         _resetSliderSetting             : function ( $moduleEl, audioNode, property, value ) {
 
             var $div        = $( $moduleEl ).find( '.' + property );

@@ -1,8 +1,20 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * RadioModuleNode: Class for 'radionode' node
-     */
+    /* RadioModuleNode: Class for 'radionode' node */
+
+    $.RadioModuleNodeFactory             = function () {
+    };
+
+    $.RadioModuleNodeFactory.prototype   = {
+
+        typeName    : "radionode",
+
+        create      : function ( noiseModule ) {
+
+            return new $.RadioModuleNode( noiseModule );
+        }
+    };
+
     $.RadioModuleNode              = function ( noiseModule ) {
 
         this.nm = noiseModule;

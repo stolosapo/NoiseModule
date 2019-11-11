@@ -1,12 +1,23 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * PeriodWaveModuleNode: Class for 'periodicwave' node
-     */
+    /* PeriodWaveModuleNode: Class for 'periodicwave' node */
+
+    $.PeriodWaveModuleNodeFactory             = function () {
+    };
+
+    $.PeriodWaveModuleNodeFactory.prototype   = {
+
+        typeName    : "periodicwave",
+
+        create      : function ( noiseModule ) {
+
+            return new $.PeriodWaveModuleNode( noiseModule );
+        }
+    };
+
     $.PeriodWaveModuleNode             = function ( noiseModule ) {
 
         this.nm = noiseModule;
-
     };
 
     $.PeriodWaveModuleNode.defaults    = {

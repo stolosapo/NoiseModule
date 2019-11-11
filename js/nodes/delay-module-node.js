@@ -1,8 +1,20 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * DelayModuleNode: Class for 'delay' node
-     */
+    /* DelayModuleNode: Class for 'delay' node */
+
+    $.DelayModuleNodeFactory             = function () {
+    };
+
+    $.DelayModuleNodeFactory.prototype   = {
+
+        typeName    : "delay",
+
+        create      : function ( noiseModule ) {
+
+            return new $.DelayModuleNode( noiseModule );
+        }
+    };
+
     $.DelayModuleNode              = function ( noiseModule ) {
 
         this.nm = noiseModule;

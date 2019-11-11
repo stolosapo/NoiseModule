@@ -1,8 +1,20 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * DynamicsCompressorModuleNode: Class for 'dynamicscompressor' node
-     */
+    /* DynamicsCompressorModuleNode: Class for 'dynamicscompressor' node */
+
+    $.DynamicsCompressorModuleNodeFactory             = function () {
+    };
+
+    $.DynamicsCompressorModuleNodeFactory.prototype   = {
+
+        typeName    : "dynamicscompressor",
+
+        create      : function ( noiseModule ) {
+
+            return new $.DynamicsCompressorModuleNode( noiseModule );
+        }
+    };
+
     $.DynamicsCompressorModuleNode              = function ( noiseModule ) {
 
         this.nm = noiseModule;

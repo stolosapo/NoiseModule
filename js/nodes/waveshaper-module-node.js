@@ -1,12 +1,23 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * WaveShaperModuleNode: Class for 'waveshapernode' node
-     */
+    /* WaveShaperModuleNode: Class for 'waveshapernode' node */
+
+    $.WaveShaperModuleNodeFactory             = function () {
+    };
+
+    $.WaveShaperModuleNodeFactory.prototype   = {
+
+        typeName    : "waveshapernode",
+
+        create      : function ( noiseModule ) {
+
+            return new $.WaveShaperModuleNode( noiseModule );
+        }
+    };
+
     $.WaveShaperModuleNode             = function ( noiseModule ) {
 
         this.nm = noiseModule;
-
     };
 
     $.WaveShaperModuleNode.defaults   = {

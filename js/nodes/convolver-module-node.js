@@ -1,8 +1,20 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * ConvolverModuleNode: Class for 'convolver' node
-     */
+    /* ConvolverModuleNode: Class for 'convolver' node */
+
+    $.ConvolverModuleNodeFactory             = function () {
+    };
+
+    $.ConvolverModuleNodeFactory.prototype   = {
+
+        typeName    : "convolver",
+
+        create      : function ( noiseModule ) {
+
+            return new $.ConvolverModuleNode( noiseModule );
+        }
+    };
+
     $.ConvolverModuleNode              = function ( noiseModule ) {
 
         this.nm = noiseModule;

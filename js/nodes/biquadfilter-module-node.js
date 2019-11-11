@@ -1,8 +1,20 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * BiquadFilterModuleNode: Class for 'biquadfilter' node
-     */
+    /* BiquadFilterModuleNode: Class for 'biquadfilter' node */
+
+    $.BiquadFilterModuleNodeFactory             = function () {
+    };
+
+    $.BiquadFilterModuleNodeFactory.prototype   = {
+
+        typeName    : "biquadfilter",
+
+        create      : function ( noiseModule ) {
+
+            return new $.BiquadFilterModuleNode( noiseModule );
+        }
+    };
+
     $.BiquadFilterModuleNode           = function ( noiseModule ) {
 
         this.nm = noiseModule;

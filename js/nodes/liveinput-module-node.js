@@ -1,8 +1,20 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * LiveInputModuleNode: Class for 'liveinput' node
-     */
+    /* LiveInputModuleNode: Class for 'liveinput' node */
+
+    $.LiveInputModuleNodeFactory             = function () {
+    };
+
+    $.LiveInputModuleNodeFactory.prototype   = {
+
+        typeName    : "liveinput",
+
+        create      : function ( noiseModule ) {
+
+            return new $.LiveInputModuleNode( noiseModule );
+        }
+    };
+
     $.LiveInputModuleNode              = function ( noiseModule ) {
 
         this.nm = noiseModule;

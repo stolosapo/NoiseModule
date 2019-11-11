@@ -1,8 +1,20 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * OscilatorModuleNode: Class for 'oscilator' node
-     */
+    /* OscilatorModuleNode: Class for 'oscilator' node */
+
+    $.OscilatorModuleNodeFactory             = function () {
+    };
+
+    $.OscilatorModuleNodeFactory.prototype   = {
+
+        typeName    : "oscillator",
+
+        create      : function ( noiseModule ) {
+
+            return new $.OscilatorModuleNode( noiseModule );
+        }
+    }
+
     $.OscilatorModuleNode              = function ( noiseModule ) {
 
         this.nm = noiseModule;

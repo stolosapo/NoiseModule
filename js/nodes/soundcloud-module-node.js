@@ -1,12 +1,23 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * SoundCloudModuleNode: Class for 'soundcloudnode' node
-     */
+    /* SoundCloudModuleNode: Class for 'soundcloudnode' node */
+
+    $.SoundCloudModuleNodeFactory             = function () {
+    };
+
+    $.SoundCloudModuleNodeFactory.prototype   = {
+
+        typeName    : "soundcloudnode",
+
+        create      : function ( noiseModule ) {
+
+            return new $.SoundCloudModuleNode( noiseModule );
+        }
+    };
+
     $.SoundCloudModuleNode             = function ( noiseModule ) {
 
         this.nm = noiseModule;
-
     };
 
     $.SoundCloudModuleNode.defaults    = {

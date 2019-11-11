@@ -1,8 +1,24 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * KingTubbyModuleNode: Class for 'kingtubbynode' node
-     */
+    /* KingTubbyModuleNode: Class for 'kingtubbynode' node */
+
+    $.KingTubbyModuleNodeFactory             = function ( gainModuleFactory ) {
+
+        this.gainModuleFactory = gainModuleFactory;
+    };
+
+    $.KingTubbyModuleNodeFactory.prototype   = {
+
+        typeName    : "kingtubbynode",
+
+        create      : function ( noiseModule ) {
+
+            let gainModuleNode = this.gainModuleFactory.create( noiseModule );
+
+            return new $.KingTubbyModuleNode( noiseModule, gainModuleNode );
+        }
+    };
+
     $.KingTubbyModuleNode              = function ( noiseModule, gainModuleNode ) {
 
         this.nm = noiseModule;

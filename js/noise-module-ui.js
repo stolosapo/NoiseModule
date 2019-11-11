@@ -114,25 +114,28 @@
 
             const contentTemplate = `
                 <div class="nm-content">
-                    <h6 class="nm-content-title">${name}</h6>
                 </div>`;
 
-            let $divEl          = $( template );
-            let $content        = $( contentTemplate );
+            //<h6 class="nm-content-title">${name}</h6>
+
+            let $divEl              = $( template );
+            let $contentContainer   = $( contentTemplate );
 
             // append content
-            moduleImpl.createModuleDiv( $content, module, audioNode );
+            let $content = moduleImpl.createModuleDiv( $contentContainer, module, audioNode );
 
-            let $bypass = this._createBypassButton( $content, module, audioNode );
-            let $reset  = this._createResetButton( $content, module, audioNode );
+            let $bypass = this._createBypassButton( $contentContainer, module, audioNode );
+            let $reset  = this._createResetButton( $contentContainer, module, audioNode );
             let $header = this._createModuleHeader( name, module, audioNode );
             let $footer = this._createModuleFooter( module, audioNode );
 
-            // this._appendElementToTarget( $header, $divEl );
-            this._appendElementToTarget( $content, $divEl );
-            this._appendElementToTarget( $bypass, $divEl );
-            this._appendElementToTarget( $reset, $divEl );
+            this._appendElementToTarget( $header, $divEl );
+            this._appendElementToTarget( $contentContainer, $divEl );
+            // this._appendElementToTarget( $bypass, $divEl );
+            // this._appendElementToTarget( $reset, $divEl );
             this._appendElementToTarget( $footer, $divEl );
+
+            moduleImpl.$div = $contentContainer;
 
             return $divEl;
         },

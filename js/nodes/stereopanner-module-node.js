@@ -1,12 +1,23 @@
 ( function( window, navigator, $, undefined ) {
 
-    /**
-     * StereoPannerModuleNode: Class for 'stereopannernode' node
-     */
+    /* StereoPannerModuleNode: Class for 'stereopannernode' node */
+
+    $.StereoPannerModuleNodeFactory             = function () {
+    };
+
+    $.StereoPannerModuleNodeFactory.prototype   = {
+
+        typeName    : "stereopannernode",
+
+        create      : function ( noiseModule ) {
+
+            return new $.StereoPannerModuleNode( noiseModule );
+        }
+    };
+
     $.StereoPannerModuleNode           = function ( noiseModule ) {
 
         this.nm = noiseModule;
-
     };
 
     $.StereoPannerModuleNode.defaults  = {
