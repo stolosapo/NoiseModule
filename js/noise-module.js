@@ -73,7 +73,7 @@
 
             // initialize counters
             this.moduleCounter          = 0;
-            this.moduleInstaces              = [];
+            this.moduleInstaces         = [];
             this.registeredFactories    = [];
 
             // register all node implementations

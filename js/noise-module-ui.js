@@ -5,6 +5,9 @@
         this.$el    = $( element );
         this.nm     = noiseModule;
 
+        /* Set also into NoiseModule the UI module */
+        this.nm.ui  = this;
+
         if ( !options.fileMode ) {
 
             this._init ( options );
@@ -68,7 +71,7 @@
             $fileInput.appendTo( this.$el );
         },
 
-        _appendElementToTarget          : function ( $elem, $target ) {
+        appendElementToTarget           : function ( $elem, $target ) {
 
             if ( !$elem || !$target ) {
                 return;
@@ -85,7 +88,7 @@
                 </section>`;
 
             this.$containerEl   = $( template );
-            this._appendElementToTarget( this.$containerEl, this.$el );
+            this.appendElementToTarget( this.$containerEl, this.$el );
 
             let _self = this;
 
@@ -94,9 +97,18 @@
                 .forEach( m => {
 
                     let $div = _self._createModuleUI( m );
-                    _self._appendElementToTarget( $div, this.$containerEl );
+                    _self.appendElementToTarget( $div, this.$containerEl );
                     $div.show( );
                 } );
+        },
+
+        createContentContainer          : function ( ) {
+
+            const template  = `
+                <div class="nm-content">
+                </div>`;
+
+            return $( template );
         },
 
         _createModuleUI                 : function ( moduleItem ) {
@@ -112,14 +124,8 @@
                 <div id="${moduleId}" name="${name}" class="noise-module ${module.nodeType}">
                 </div>`;
 
-            const contentTemplate = `
-                <div class="nm-content">
-                </div>`;
-
-            //<h6 class="nm-content-title">${name}</h6>
-
             let $divEl              = $( template );
-            let $contentContainer   = $( contentTemplate );
+            let $contentContainer   = this.createContentContainer( );
 
             // append content
             let $content = moduleImpl.createModuleDiv( $contentContainer, module, audioNode );
@@ -129,11 +135,11 @@
             let $header = this._createModuleHeader( name, module, audioNode );
             let $footer = this._createModuleFooter( module, audioNode );
 
-            this._appendElementToTarget( $header, $divEl );
-            this._appendElementToTarget( $contentContainer, $divEl );
-            // this._appendElementToTarget( $bypass, $divEl );
-            // this._appendElementToTarget( $reset, $divEl );
-            this._appendElementToTarget( $footer, $divEl );
+            this.appendElementToTarget( $header, $divEl );
+            this.appendElementToTarget( $contentContainer, $divEl );
+            // this.appendElementToTarget( $bypass, $divEl );
+            // this.appendElementToTarget( $reset, $divEl );
+            this.appendElementToTarget( $footer, $divEl );
 
             moduleImpl.$div = $contentContainer;
 
@@ -156,9 +162,9 @@
             let $bypass = this._createBypassButton( $header, module, audioNode );
             let $reset  = this._createResetButton( $header, module, audioNode );
 
-            this._appendElementToTarget( $bypass, $header );
-            this._appendElementToTarget( $title, $header );
-            this._appendElementToTarget( $reset, $header );
+            this.appendElementToTarget( $bypass, $header );
+            this.appendElementToTarget( $title, $header );
+            this.appendElementToTarget( $reset, $header );
 
             return $header;
         },
@@ -220,13 +226,13 @@
             if (inNode.numberOfInputs > 0) {
 
                 let $in = this._createFooterDirectionInfo( module, 'in' );
-                this._appendElementToTarget( $in, $footer );
+                this.appendElementToTarget( $in, $footer );
             }
 
             if (outNode.numberOfOutputs > 0) {
 
                 let $out = this._createFooterDirectionInfo( module, 'out' );
-                this._appendElementToTarget( $out, $footer );
+                this.appendElementToTarget( $out, $footer );
             }
 
             return $footer;
@@ -248,8 +254,8 @@
             let $list = $( listTemplate );
             let $img  = this._createFooterImage( true, `icon-${direction}`);
 
-            this._appendElementToTarget( $img, $info );
-            this._appendElementToTarget( $list, $info );
+            this.appendElementToTarget( $img, $info );
+            this.appendElementToTarget( $list, $info );
 
             conns.forEach( c => $list.append( $('<li>').text( c ) ));
 

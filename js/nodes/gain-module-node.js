@@ -39,11 +39,14 @@
 
         createModuleDiv       : function ( $moduleEl, module, audioNode ) {
 
-            var $gainDiv    = this.nm._createSimpleSliderControl( audioNode, "gain", 0, 1, 0.01, "" );
+            let $container  = this.nm.ui.createContentContainer( );
+            let $gain       = this.nm._createSimpleSliderControl( audioNode, "gain", 0, 1, 0.01, "" );
 
-            $gainDiv.appendTo( $moduleEl );
+            $gain.appendTo( $moduleEl );
 
-            return $gainDiv;
+            // this.nm.ui.appendElementToTarget( $gain, $container );
+
+            return $container;
         },
 
         resetModuleSettings   : function ( $moduleEl, module, audioNode ) {
