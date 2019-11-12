@@ -113,7 +113,9 @@
 
         _createAudioContext             : function ( ) {
 
-            var audioContext;
+            let _self = this;
+
+            let audioContext;
 
             if (typeof AudioContext !== "undefined") {
                 audioContext = new AudioContext();
@@ -125,16 +127,29 @@
                 throw new Error('AudioContext not supported. :(');
             }
 
-            /* TODO: Error in Chrome: https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio */
-            // audioContext.resume().then(() => {
-            //     console.log('Playback resumed successfully');
-            // });
-
             this.audioContext = audioContext;
 
+            console.log( 'AudioContext state is', this.audioContextState());
+
+            this.audioContext.addEventListener( 'statechange', function( e ) {
+                console.log( 'AudioContext state changed to', _self.audioContextState() );
+            } );
+        },
+
+        audioContextState               : function ( ) {
+            if ( !this.audioContext ) {
+                return void(0);
+            }
+
+            return this.audioContext.state;
         },
 
         resumeAudioContext              : function ( ) {
+
+            if ( this.audioContextState() === 'running' ) {
+                return;
+            }
+
             /* TODO: Error in Chrome: https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio */
             this.audioContext.resume().then(() => {
                 console.log('Playback resumed successfully');

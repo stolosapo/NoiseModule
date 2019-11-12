@@ -90,10 +90,6 @@
             this.$containerEl   = $( template );
             this.appendElementToTarget( this.$containerEl, this.$el );
 
-            // create resume button
-            let $resume = this._createResumeAudioContextUI( );
-            this.appendElementToTarget( $resume, this.$containerEl );
-
             let _self = this;
 
             // create UI for all modules
@@ -104,25 +100,6 @@
                     _self.appendElementToTarget( $div, this.$containerEl );
                     $div.show( );
                 } );
-        },
-
-        _createResumeAudioContextUI     : function ( ) {
-
-            const template  = `
-                <div class="noise-module resume">
-                </div>`;
-
-            let _self       = this;
-            let $resume     = $( template );
-
-            let clickFn     = function ( sender, module, audioNode ) {
-                sender.nm.resumeAudioContext( );
-            };
-
-            let $button = this.createCustomButton( void(0), void(0), void(0), clickFn );
-            this.appendElementToTarget( $button, $resume );
-
-            return $resume;
         },
 
         createContentContainer          : function ( ) {
@@ -349,6 +326,8 @@
 
             $button[0].addEventListener( 'click', function( ) {
 
+                _self.nm.resumeAudioContext();
+
                 if ( $(this).hasClass( playClass ) ) {
 
                     _self.nm._connectAllDestinations( module );
@@ -390,6 +369,8 @@
 
             $button[0].addEventListener( 'click', function( ) {
 
+                _self.nm.resumeAudioContext();
+
                 if ( $(this).hasClass( playClass ) ) {
 
                     playPauseClickEvent( _self, module, audioNode, true );
@@ -422,6 +403,9 @@
             };
 
             $button[0].addEventListener( 'click', function( ) {
+
+                _self.nm.resumeAudioContext();
+
                 clickEvent( _self, module, audioNode );
             } );
 
