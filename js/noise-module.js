@@ -52,9 +52,11 @@
         ],
 
         started         : true,
+        lockPosition    : false,
 
         /* TODO: Move to UI */
         fileMode        : false,
+        position        : { x: 80, y: 80 },
 
         biquadFilterFrequency     : 440,
         biquadFilterDetune        : 0,

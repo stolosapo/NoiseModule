@@ -99,7 +99,14 @@
                     let $div = _self._createModuleUI( m );
                     _self.appendElementToTarget( $div, this.$containerEl );
                     $div.show( );
+
+                    if ( !m.module.options.lockPosition ) {
+                        _self._makeElementDraggable( $div );
+                    }
                 } );
+
+            // line up modules
+            this._lineUpModules( );
         },
 
         createContentContainer          : function ( ) {
@@ -192,8 +199,9 @@
                 module.nodeType != 'liveinput' &&
                 module.nodeType != 'analyser') {
 
-                var template    = '<img class="nm-reset" />';
-                var $img        = $( template );
+                let _self       = this;
+                let template    = '<img class="nm-reset" />';
+                let $img        = $( template );
 
                 $img[0].addEventListener( 'click', function( ) {
                     _self._resetModuleSettings( module, audioNode );
@@ -582,6 +590,116 @@
             } );
         },
 
+        _lineUpModules                  : function ( ) {
+
+            let _self = this;
+            let cnt = this.nm.moduleInstaces.length;
+
+            if ( cnt <= 0 ) {
+                return;
+            }
+
+            const spaceX = 25;
+            const spaceY = 25;
+
+            let firstModule = this.nm.moduleInstaces[0];
+            let firstElement = firstModule.moduleImpl.$div[0].parentElement;
+
+            let lastX = firstElement.offsetLeft;
+            let lastY = firstElement.offsetTop;
+            let lastW = firstElement.offsetWidth;
+            let lastH = firstElement.offsetHeight;
+
+            _self._setTranslate( lastX, lastY, firstElement );
+
+            this.nm.moduleInstaces
+                .forEach( (m, i) => {
+
+                    if ( i == 0 ) {
+                        return;
+                    }
+
+                    let pos;
+
+                    if ( m.module.options.position ) {
+                        pos = m.module.options.position;
+                    }
+
+                    let $d = m.moduleImpl.$div[0].parentElement;
+
+                    lastX = lastX + spaceX + lastW;
+                    lastY = lastY;
+                    lastW = $d.offsetWidth;
+                    lastH = $d.offsetHeight;
+
+                    _self._setTranslate( lastX, lastY, $d );
+                } );
+        },
+
+        _makeElementDraggable           : function ( $element ) {
+
+            let _self = this;
+
+            let $div    = $( $element );
+            let $header = $div.find( '.nm-header' );
+            let $div0   = $div[ 0 ];
+
+            let currentX = 0;
+            let currentY = 0;
+            let initialX = 0;
+            let initialY = 0;
+            let xOffset = 0;
+            let yOffset = 0;
+
+            if ( $header ) {
+                /* if present, the header is where you move the DIV from:*/
+                $header[0].onmousedown = dragStart;
+            } else {
+                /* otherwise, move the DIV from anywhere inside the DIV:*/
+                $div0.onmousedown = dragStart;
+            }
+
+            function dragStart( e ) {
+
+                e = e || window.event;
+                e.preventDefault();
+
+                // get the mouse cursor position at startup:
+                initialX = e.clientX - xOffset;
+                initialY = e.clientY - yOffset;
+
+                document.onmouseup = dragEnd;
+
+                // call a function whenever the cursor moves:
+                document.onmousemove = drag;
+            };
+
+            function drag( e ) {
+
+                e = e || window.event;
+                e.preventDefault();
+
+                // calculate the new cursor position:
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+
+                xOffset = currentX;
+                yOffset = currentY;
+
+                // set the element's new position:
+                _self._setTranslate(currentX, currentY, $div0);
+            }
+
+            function dragEnd( ) {
+                /* stop moving when mouse button is released:*/
+                document.onmouseup = null;
+                document.onmousemove = null;
+            };
+        },
+
+        _setTranslate                   : function ( xPos, yPos, $el ) {
+            $el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+        },
     };
 
 } )( window, navigator, jQuery );
