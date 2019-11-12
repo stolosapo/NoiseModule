@@ -100,8 +100,9 @@
             this.nm.ui.appendElementToTarget( $delayDiv, $container );
             this.nm.ui.appendElementToTarget( $feedbackDiv, $container );
             this.nm.ui.appendElementToTarget( $freqDiv, $container );
+            this.nm.ui.appendElementToTarget( $outGainDiv, $container );
 
-            return $outGainDiv;
+            return $container;
         },
 
         resetModuleSettings   : function ( module, audioNode ) {

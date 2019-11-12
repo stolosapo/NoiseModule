@@ -52,7 +52,7 @@
                         { name: "WhiteNoise", nodeType: "noise", type: "white", options: { started: false } },
                         { name: "Gain", nodeType: "gain", type: "", options: { gainGain: 0.5 } },
 
-                        // { name: "KingTubby", nodeType: "kingtubbynode", options: { started: true } },
+                        { name: "KingTubby", nodeType: "kingtubbynode", options: { started: true } },
 
                         { name: "SineWave", nodeType: "oscillator", type: "sine", options: { started: false } },
 
@@ -70,10 +70,10 @@
                         { srcNode: "WhiteNoise", destNode: "Gain" },
                         { srcNode: "Gain", destNode: "Master" },
 
-                        // { srcNode: "Gain", destNode: "KingTubby" },
-                        // { srcNode: "KingTubby", destNode: "Master" },
+                        { srcNode: "Gain", destNode: "KingTubby" },
 
-                        { srcNode: "SineWave", destNode: "Eq" },
+                        // { srcNode: "SineWave", destNode: "KingTubby" },
+                        { srcNode: "KingTubby", destNode: "Eq" },
 
                         { srcNode: "LiveInput", destNode: "Eq" },
                         { srcNode: "Eq", destNode: "Master" },

@@ -109,7 +109,8 @@
             this._lineUpModules( );
 
             // draw connections
-            // this._drawConnections( this.$containerEl );
+            let $svg = this._createConnectionsUI( );
+            this.appendElementToTarget( $svg, this.$containerEl );
         },
 
         createContentContainer          : function ( ) {
@@ -640,17 +641,29 @@
                 } );
         },
 
-        _drawConnections                : function ( $container ) {
+        _createConnectionsUI            : function ( ) {
 
             let _self = this;
 
+            const template = `
+                <svg class="noise-module-svg-canvas">
+                </svg>`;
+
+            let $svg = $( template );
+
             this.nm.options.connections
                 .forEach( c => {
-                    _self._drawConnection( $container, c );
+
+                    let $line = _self._createConnectionElement( c );
+                    if ( $line ) {
+                        _self.appendElementToTarget( $line, $svg );
+                    }
                 } );
+
+            return $svg;
         },
 
-        _drawConnection                 : function ( $container, connection ) {
+        _createConnectionElement        : function ( connection ) {
 
             let src = connection.srcNode;
             let dst = connection.destNode;
@@ -664,9 +677,7 @@
 
             let $line = this._createConnectionLine( $srcEl, $dstEl );
 
-            if ( $line ) {
-                this.appendElementToTarget( $line, $container );
-            }
+            return $line;
         },
 
         _createConnectionLine           : function ( $srcEl, $dstEl ) {
@@ -685,9 +696,7 @@
             let y2 = $dstEl.offsetHeight - ( h2 / 2 );
 
             const template = `
-                <svg width="500" height="500">
-                    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="black"/>
-                </svg>`;
+                <line class="nm-connection-line" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="black" />`;
 
             return $( template );
         },
