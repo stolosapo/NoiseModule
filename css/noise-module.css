@@ -73,7 +73,7 @@
 	text-transform: uppercase;
 }
 
-.noise-module .nm-content.bypassed .nm-content-title {
+.noise-module .nm-header.bypassed {
 	text-decoration: line-through;
 }
 

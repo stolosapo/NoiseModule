@@ -172,10 +172,13 @@
             if ( audioNode.numberOfInputs > 0 ||
                 ( audioNode.inNode && audioNode.inNode.numberOfInputs > 0 ) ) {
 
+                let _self       = this;
                 let template    = '<img class="nm-bypass" />';
                 let $img        = $( template );
 
-                this._createBypassEvent( $img, $element, module, audioNode );
+                $img[0].addEventListener( 'click', function( ) {
+                    _self._bypassModule( $element, module, audioNode );
+                } );
 
                 return $img;
             }
@@ -192,7 +195,9 @@
                 var template    = '<img class="nm-reset" />';
                 var $img        = $( template );
 
-                this._createResetEvent( $img, module, audioNode );
+                $img[0].addEventListener( 'click', function( ) {
+                    _self._resetModuleSettings( module, audioNode );
+                } );
 
                 return $img;
             }
@@ -285,26 +290,6 @@
 
                 this._beginConnection( inOut, $moduleEl );
             };
-        },
-
-        _createBypassEvent              : function ( $img, $element, module, audioNode ) {
-
-            let _self   = this;
-
-            $img[0].addEventListener( 'click', function( ) {
-
-                _self._bypassModule( $element, module, audioNode );
-            } );
-        },
-
-        _createResetEvent               : function ( $img, module, audioNode ) {
-
-            var _self   = this;
-
-            $img[0].addEventListener( 'click', function( ) {
-
-                _self._resetModuleSettings( module, audioNode );
-            } );
         },
 
         createPlayStopButton            : function ( module, audioNode ) {
@@ -493,11 +478,9 @@
             var bypassed        = $element.hasClass( bypassedClass );
 
             if (bypassed) {
-
                 $element.removeClass( bypassedClass );
             }
             else {
-
                 $element.addClass( bypassedClass );
             }
         },
