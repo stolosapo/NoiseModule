@@ -107,6 +107,9 @@
 
             // line up modules
             this._lineUpModules( );
+
+            // draw connections
+            // this._drawConnections( this.$containerEl );
         },
 
         createContentContainer          : function ( ) {
@@ -590,6 +593,7 @@
             } );
         },
 
+        /* TODO: Make it simpler, catch option's position */
         _lineUpModules                  : function ( ) {
 
             let _self = this;
@@ -634,6 +638,58 @@
 
                     _self._setTranslate( lastX, lastY, $d );
                 } );
+        },
+
+        _drawConnections                : function ( $container ) {
+
+            let _self = this;
+
+            this.nm.options.connections
+                .forEach( c => {
+                    _self._drawConnection( $container, c );
+                } );
+        },
+
+        _drawConnection                 : function ( $container, connection ) {
+
+            let src = connection.srcNode;
+            let dst = connection.destNode;
+            let conn = connection.connected;
+
+            let srcMod = this.nm._findModuleInstanseByName( src );
+            let dstMod = this.nm._findModuleInstanseByName( dst );
+
+            let $srcEl = srcMod.moduleImpl.$div[0];
+            let $dstEl = dstMod ? dstMod.moduleImpl.$div[0] : void(0);
+
+            let $line = this._createConnectionLine( $srcEl, $dstEl );
+
+            if ( $line ) {
+                this.appendElementToTarget( $line, $container );
+            }
+        },
+
+        _createConnectionLine           : function ( $srcEl, $dstEl ) {
+
+            if ( !$srcEl || !$dstEl ) {
+                return;
+            }
+
+            let w1 = $srcEl.offsetWidth;
+            let h1 = $srcEl.offsetHeight;
+            let x1 = $srcEl.offsetLeft + w1;
+            let y1 = $srcEl.offsetTop - ( h1 / 2 );
+
+            let h2 = $dstEl.offsetHeight;
+            let x2 = $dstEl.offsetWidth;
+            let y2 = $dstEl.offsetHeight - ( h2 / 2 );
+
+            const template = `
+                <svg width="500" height="500">
+                    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="black"/>
+                </svg>`;
+
+            return $( template );
         },
 
         _makeElementDraggable           : function ( $element ) {
