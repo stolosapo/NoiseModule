@@ -30,13 +30,19 @@
 
     $.EqualizerModuleNode.defaults     = {
 
-        eqPreAmpInGain  : 1,
-        eqPreAmpOutGain : 1,
-        eqBandControl   : 'gain',
-        eqBandMin       : -12,
-        eqBandMax       : 12,
-        eqBandStep      : 1,
-        eqBands         : [
+        biquadFilterFrequency   : 440,
+        biquadFilterDetune      : 0,
+        biquadFilterQ           : 1,
+        biquadFilterGain        : 0,
+
+        eqPreAmpInGain          : 1,
+        eqPreAmpOutGain         : 1,
+        eqBandControl           : 'gain',
+        eqBandMin               : -12,
+        eqBandMax               : 12,
+        eqBandStep              : 1,
+
+        eqBands                 : [
             { description: '60 Hz', type: 'lowshelf', frequency: 60, detune: 0, Q: 1, gain: 0 },
             { description: '170 Hz', type: 'lowshelf', frequency: 170, detune: 0, Q: 1, gain: 0 },
             { description: '310 Hz', type: 'lowshelf', frequency: 310, detune: 0, Q: 1, gain: 0 },

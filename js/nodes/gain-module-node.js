@@ -52,6 +52,15 @@
             this.nm.ui.resetSliderSetting( this.$div, audioNode, "gain", module.options.gainGain );
         },
 
+        exportSettings        : function ( ) {
+
+            let settings = this.nm.buildModuleSettings( );
+
+            settings.gainGain = this._self.outNode.gain.value;
+
+            return settings;
+        },
+
         createGain            : function ( module, value ) {
 
             var gain = this.nm.audioContext.createGain ();

@@ -38,32 +38,25 @@
             recorder
         */
         modules         : [
-
             { name: "WhiteNoise", nodeType: "noise", type: "white", options: { started: false } },
             { name: "Gain", nodeType: "gain", type: "", options: { gainGain: 0.7 } }
-
         ],
 
         connections     : [
-
             { srcNode: "WhiteNoise", destNode: "Gain", connected: true },
             { srcNode: "Gain", destNode: "output", connected: true }
-
         ],
-
-        started         : true,
-        lockPosition    : false,
 
         /* TODO: Move to UI */
         fileMode        : false,
-        position        : { x: 80, y: 80 },
 
-        biquadFilterFrequency     : 440,
-        biquadFilterDetune        : 0,
-        biquadFilterQ             : 1,
-        biquadFilterGain          : 0,
+        moduleDefaults  : {
+            started         : true,
+            lockPosition    : false,
 
-        gainGain        : 0.7
+            /* TODO: Move to UI */
+            position        : { x: 80, y: 80 },
+        }
     };
 
     $.NoiseModule.prototype = {
@@ -92,6 +85,7 @@
             // create modules
             this._createModules();
 
+            this.exportSettings();
         },
 
         _registerModuleFactories        : function ( ) {
@@ -171,8 +165,8 @@
             let _self = this;
 
             // create all modules
-            this.options.modules
-                .forEach( m => _self._createModule( m ) );
+            this.moduleInstaces =
+                this.options.modules.map( m => _self._createModule( m ) );
 
 
             // create module connections
@@ -194,7 +188,7 @@
             let moduleImpl  = factory.create( this );
 
             let moduleDefaultOptions =
-                $.extend( true, {}, this.options, moduleImpl.defaultOptions() );
+                $.extend( true, {}, this.options.moduleDefaults, moduleImpl.defaultOptions() );
 
             module.options =
                 $.extend( true, {}, moduleDefaultOptions, module.options );
@@ -233,7 +227,9 @@
                 moduleImpl  : moduleImpl
             };
 
-            this.moduleInstaces.push( moduleItem );
+            moduleItem.moduleImpl._self = moduleItem;
+
+            return moduleItem;
         },
 
         _createConnection               : function ( connection ) {
@@ -363,6 +359,41 @@
 
                     _self._disconnectNodes( srcNode, destNode );
                 });
+        },
+
+        buildModuleSettings             : function ( ) {
+
+            let settings = {};
+
+            return settings;
+        },
+
+        exportSettings                  : function ( ) {
+
+            let settings = {};
+
+            settings.modules =
+                this.moduleInstaces
+                    .map( m => {
+
+                        let impl = m.moduleImpl;
+
+                        let settings;
+                        if ( impl.exportSettings ) {
+                            settings = impl.exportSettings();
+                        }
+                        else {
+                            settings = impl.defaultOptions();
+                        }
+
+                        return settings;
+                    } );
+
+            settings.connections =
+                this.options.connections
+                    .map(c => Object.assign( {}, c ));
+
+            console.log("settings", settings);
         },
 
         _requestGET                     : function ( url, callback ) {
