@@ -21,6 +21,8 @@
     };
 
     $.NoiseModuleNode.defaults  = {
+
+        started: false
     };
 
     $.NoiseModuleNode.prototype = {

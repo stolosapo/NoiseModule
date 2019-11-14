@@ -21,6 +21,8 @@
     };
 
     $.LiveInputModuleNode.defaults     = {
+
+        started: false
     };
 
     $.LiveInputModuleNode.prototype    = {

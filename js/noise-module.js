@@ -51,6 +51,7 @@
         fileMode        : false,
 
         moduleDefaults  : {
+
             started         : true,
             lockPosition    : false,
 

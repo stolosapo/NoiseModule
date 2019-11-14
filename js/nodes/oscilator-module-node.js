@@ -22,6 +22,8 @@
 
     $.OscilatorModuleNode.defaults     = {
 
+        started             : false,
+
         oscillatorFrequency : 440,
         oscillatorDetune    : 0
     };

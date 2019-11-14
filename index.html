@@ -49,18 +49,18 @@
 
                     modules                 : [
 
-                        { name: "WhiteNoise", nodeType: "noise", type: "white", options: { started: false } },
-                        { name: "Gain", nodeType: "gain", type: "", options: { gainGain: 0.5 } },
+                        { name: "WhiteNoise", nodeType: "noise", type: "white" },
+                        { name: "Gain", nodeType: "gain", options: { gainGain: 0.5 } },
 
-                        { name: "KingTubby", nodeType: "kingtubbynode", options: { started: true } },
+                        { name: "KingTubby", nodeType: "kingtubbynode" },
 
-                        { name: "SineWave", nodeType: "oscillator", type: "sine", options: { started: false } },
+                        { name: "SineWave", nodeType: "oscillator", type: "sine" },
 
-                        { name: "LiveInput", nodeType: "liveinput", type: "", options: { started: false } },
+                        { name: "LiveInput", nodeType: "liveinput" },
                         { name: "Eq", nodeType: "equalizer" },
 
 
-                        { name: "Master", nodeType: "gain", type: "" },
+                        { name: "Master", nodeType: "gain" },
                         { name: "MasterAnalyser", nodeType: "analyser", type: "frequencybars" }
 
                     ],
@@ -72,7 +72,7 @@
 
                         { srcNode: "Gain", destNode: "KingTubby" },
 
-                        // { srcNode: "SineWave", destNode: "KingTubby" },
+                        { srcNode: "SineWave", destNode: "Eq" },
                         { srcNode: "KingTubby", destNode: "Eq" },
 
                         { srcNode: "LiveInput", destNode: "Eq" },
