@@ -52,7 +52,7 @@
             this.nm.ui.resetSliderSetting( this.$div, audioNode, "gain", module.options.gainGain );
         },
 
-        exportSettings        : function ( ) {
+        exportOptions         : function ( ) {
 
             let settings = this.nm.buildModuleSettings( );
 

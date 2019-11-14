@@ -86,7 +86,8 @@
             // create modules
             this._createModules();
 
-            this.exportSettings();
+            let settings = this.export();
+            console.log("settings", settings);
         },
 
         _registerModuleFactories        : function ( ) {
@@ -369,32 +370,53 @@
             return settings;
         },
 
-        exportSettings                  : function ( ) {
+        _exportModuleOptions            : function ( moduleImpl ) {
 
-            let settings = {};
+            let options;
+
+            if ( moduleImpl.exportOptions ) {
+                options = moduleImpl.exportOptions();
+            }
+            else {
+                options = moduleImpl.defaultOptions();
+            }
+
+            return options;
+        },
+
+        _exportModuleSettings           : function ( moduleInstace ) {
+
+            let impl    = moduleInstace.moduleImpl;
+            let mod     = moduleInstace.module;
+
+            let data    = {};
+
+            data.name       = mod.name;
+            data.nodeType   = mod.nodeType;
+
+            if ( mod.type ) {
+                data.type   = mod.type;
+            }
+
+            data.options    = this._exportModuleOptions( impl );
+
+            return data;
+        },
+
+        export                          : function ( ) {
+
+            let _self       = this;
+            let settings    = {};
 
             settings.modules =
                 this.moduleInstaces
-                    .map( m => {
-
-                        let impl = m.moduleImpl;
-
-                        let settings;
-                        if ( impl.exportSettings ) {
-                            settings = impl.exportSettings();
-                        }
-                        else {
-                            settings = impl.defaultOptions();
-                        }
-
-                        return settings;
-                    } );
+                    .map( m => _self._exportModuleSettings( m ) );
 
             settings.connections =
                 this.options.connections
                     .map(c => Object.assign( {}, c ));
 
-            console.log("settings", settings);
+            return settings;
         },
 
         _requestGET                     : function ( url, callback ) {
