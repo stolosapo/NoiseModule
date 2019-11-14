@@ -54,7 +54,8 @@
 
         exportOptions         : function ( ) {
 
-            let settings = this.nm.buildModuleSettings( );
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
 
             settings.gainGain = this._self.outNode.gain.value;
 

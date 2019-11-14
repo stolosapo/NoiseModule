@@ -363,11 +363,15 @@
                 });
         },
 
-        buildModuleSettings             : function ( ) {
+        buildModuleOptions              : function ( moduleOptions ) {
 
-            let settings = {};
+            let options = {};
 
-            return settings;
+            options.started         = moduleOptions.started;
+            options.lockPosition    = moduleOptions.lockPosition;
+            options.position        = moduleOptions.position;
+
+            return options;
         },
 
         _exportModuleOptions            : function ( moduleImpl ) {
