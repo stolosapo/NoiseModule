@@ -80,6 +80,20 @@
 
         },
 
+        exportOptions                 : function ( ) {
+
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
+            let def         = this.defaultOptions();
+
+            settings.analyserFftSize        = def.analyserFftSize;
+            settings.analyserMainBgColor    = def.analyserMainBgColor;
+            settings.analyserBarBgColor     = def.analyserBarBgColor;
+            settings.analyserSineBgColor    = def.analyserSineBgColor;
+
+            return settings;
+        },
+
         _createSinewaveAnalyser       : function ( module, $canvas, canvasCtx, audioNode ) {
 
             var WIDTH       = $canvas[ 0 ].width;

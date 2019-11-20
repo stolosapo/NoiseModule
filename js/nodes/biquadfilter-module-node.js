@@ -65,6 +65,21 @@
 
         },
 
+        exportOptions         : function ( ) {
+
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
+
+            settings.gainGain = this._self.outNode.gain.value;
+
+            settings.biquadFilterFrequency = this._self.outNode.frequency.value;
+            settings.biquadFilterDetune = this._self.outNode.detune.value;
+            settings.biquadFilterQ = this._self.outNode.Q.value;
+            settings.biquadFilterGain = this._self.outNode.gain.value;
+
+            return settings;
+        },
+
         createBiquadFilter    : function ( module, type, frequency, detune, Q, gain ) {
 
             var node = this.nm.audioContext.createBiquadFilter();
