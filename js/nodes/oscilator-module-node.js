@@ -67,6 +67,18 @@
             this.nm.ui.resetSliderSetting( this.$div, audioNode, 'frequency', module.options.oscillatorFrequency );
             this.nm.ui.resetSliderSetting( this.$div, audioNode, 'detune', module.options.oscillatorDetune );
         },
+
+        exportOptions           : function ( ) {
+
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
+            let wave        = this._self.outNode;
+
+            settings.oscillatorFrequency = wave.frequency.value;
+            settings.oscillatorDetune =  wave.detune.value;
+
+            return settings;
+        },
     };
 
 } )( window, navigator, jQuery );

@@ -48,10 +48,14 @@
 
             let delay        = this.nm.audioContext.createDelay( );
             delay.delayTime.value    = module.options.kingTubbyDelayTime;
+            delay._id        = 1;
 
             let feedback     = this.gainNode.createGain( module, module.options.kingTubbyGain );
+            feedback._id     = 2;
+
             let filter       = this.nm.audioContext.createBiquadFilter( );
             filter.frequency.value  = module.options.kingTubbyCutOffFreq;
+            filter._id       = 3;
 
             let nodes = [ ];
             nodes.push( preAmp );
@@ -123,6 +127,37 @@
 
         },
 
+        exportOptions         : function ( ) {
+
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
+
+            let inNode      = this._self.inNode;
+            let outNode     = this._self.outNode;
+            let allNodes    = this._self.allNodes;
+
+            function getNode(id) {
+                let arr = allNodes.filter(n => n._id === id);
+
+                if (arr.length != 1) {
+                    return void(0);
+                }
+
+                return arr[0];
+            }
+
+            let delay = getNode(1);
+            let feedback = getNode(2);
+            let filter = getNode(3);
+
+            settings.kingTubbyPreAmpInGain = inNode.gain.value;
+            settings.kingTubbyPreAmpOutGain = outNode.gain.value;
+            settings.kingTubbyDelayTime = delay ? delay.delayTime.value : options.kingTubbyDelayTime;
+            settings.kingTubbyGain = feedback ? feedback.gain.value : options.kingTubbyGain;
+            settings.kingTubbyCutOffFreq = filter ? filter.frequency.value : options.kingTubbyCutOffFreq;
+
+            return settings;
+        },
     };
 
 } )( window, navigator, jQuery );

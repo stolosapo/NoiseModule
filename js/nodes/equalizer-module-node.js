@@ -85,6 +85,8 @@
                     band.Q,
                     band.gain );
 
+                bandNode._id = index;
+
                 _self.nm.connectNodes( prevNode, bandNode );
 
                 prevNode        = bandNode;
@@ -147,6 +149,47 @@
             audioNode.allNodes.forEach( (node, index) => {
                 _self._resetFilter( _self, index, lastIndex, module, node )
             } );
+        },
+
+        exportOptions           : function ( ) {
+
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
+
+            let inNode      = this._self.inNode;
+            let outNode     = this._self.outNode;
+            let allNodes    = this._self.allNodes;
+
+            settings.biquadFilterFrequency = options.biquadFilterFrequency;
+            settings.biquadFilterDetune = options.biquadFilterDetune;
+            settings.biquadFilterQ = options.biquadFilterQ;
+            settings.biquadFilterGain = options.biquadFilterGain;
+
+            settings.eqPreAmpInGain = inNode.gain.value;
+            settings.eqPreAmpOutGain = outNode.gain.value;
+            settings.eqBandControl = options.eqBandControl;
+            settings.eqBandMin = options.eqBandMin;
+            settings.eqBandMax = options.eqBandMax;
+            settings.eqBandStep = options.eqBandStep;
+
+            settings.eqBands =
+                options.eqBands.map( (b, i) => {
+
+                    let nb = Object.assign( {}, b );
+                    let nodeArr = allNodes.filter(n => n._id === i);
+
+                    if (nodeArr.length != 1) {
+                        return nb;
+                    }
+
+                    let node = nodeArr[0];
+
+                    nb.gain = node.gain.value;
+
+                    return nb;
+                } );
+
+            return settings;
         },
 
         _createFilterUI         : function ( _self, index, lastIndex, module, node ) {

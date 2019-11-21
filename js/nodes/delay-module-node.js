@@ -58,6 +58,16 @@
 
         },
 
+        exportOptions        : function ( ) {
+
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
+
+            settings.delayTime  = this._self.outNode.delayTime.value;
+
+            return settings;
+        },
+
     };
 
 } )( window, navigator, jQuery );

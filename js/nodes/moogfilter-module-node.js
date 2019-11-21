@@ -82,7 +82,15 @@
 
         resetModuleSettings   : function ( module, audioNode ) {
 
-        }
+        },
+
+        exportOptions         : function ( ) {
+
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
+
+            return settings;
+        },
 
     };
 

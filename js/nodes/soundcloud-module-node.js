@@ -118,6 +118,17 @@
             audio.load( );
         },
 
+        exportOptions             : function ( ) {
+
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
+
+            settings.soundCloudClientId = options.soundCloudClientId;
+            settings.soundCloudTrackUrl = options.soundCloudTrackUrl;
+            settings.soundCloudAudio = options.soundCloudAudio;
+
+            return settings;
+        },
 
         /* Private Methods */
         _soundCloudPlayPauseEvent : function ( self, $moduleEl, module, audioNode, playPause ) {

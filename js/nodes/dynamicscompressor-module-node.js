@@ -83,6 +83,21 @@
 
         },
 
+        exportOptions         : function ( ) {
+
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
+            let node        = this._self.outNode;
+
+            settings.compressorThreshold = node.threshold.value;
+            settings.compressorKnee = node.knee.value;
+            settings.compressorRatio = node.ratio.value;
+            settings.compressorReduction = node.reduction.value;
+            settings.compressorAttack = node.attack.value;
+            settings.compressorRelease = node.release.value;
+
+            return settings;
+        },
     };
 
 } )( window, navigator, jQuery );

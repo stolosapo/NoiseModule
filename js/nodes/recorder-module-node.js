@@ -113,6 +113,14 @@
 
         },
 
+        exportOptions         : function ( ) {
+
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
+
+            return settings;
+        },
+
         _recorderPlayPauseClickEvent  : function ( self, $moduleEl, module, audioNode, playPause ) {
 
             let mediaRecorder   = module.options.recorderMediaRecorder;

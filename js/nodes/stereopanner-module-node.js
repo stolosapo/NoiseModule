@@ -54,7 +54,17 @@
         resetModuleSettings   : function ( module, audioNode ) {
 
             this.nm.ui.resetSliderSetting( this.$div, audioNode, 'pan', module.options.stereoPannerPan );
-        }
+        },
+
+        exportOptions         : function ( ) {
+
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
+
+            settings.stereoPannerPan = this._self.outNode.pan.value;
+
+            return settings;
+        },
 
     };
 

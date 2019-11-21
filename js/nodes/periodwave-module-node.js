@@ -45,6 +45,14 @@
 
         },
 
+        exportOptions         : function ( ) {
+
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
+
+            return settings;
+        },
+
         _connectPeriodicWave  : function ( module, oscillator ) {
 
             var wave = this.nm.audioContext.createPeriodicWave(

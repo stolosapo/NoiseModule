@@ -91,6 +91,18 @@
 
         },
 
+        exportOptions             : function ( ) {
+
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
+
+            settings.radioAudioElement = options.radioAudioElement;
+            settings.radioAudioIdSelector = options.radioAudioIdSelector;
+            settings.radioAudioClassSelector = options.radioAudioClassSelector;
+
+            return settings;
+        },
+
 
         /* Private Methods */
         _getRadioAudioElement     : function ( module ) {

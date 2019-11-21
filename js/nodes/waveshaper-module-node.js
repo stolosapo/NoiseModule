@@ -72,6 +72,19 @@
             this.nm.ui.resetSliderSetting( this.$div, audioNode, 'oversample', module.options.waveShapperOversample );
         },
 
+        exportOptions            : function ( ) {
+
+            let options     = this._self.module.options;
+            let settings    = this.nm.buildModuleOptions( options );
+
+            settings.gainGain = this._self.outNode.gain.value;
+
+            settings.waveShapperCurveAmount = options.waveShapperCurveAmount;
+            settings.waveShapperOversample = options.waveShapperOversample;
+
+            return settings;
+        },
+
         _createDistortionCurve    : function ( amount ) {
 
             let k = typeof amount === 'number' ? amount : 50;
