@@ -84,12 +84,11 @@
 
             let options     = this._self.module.options;
             let settings    = this.nm.buildModuleOptions( options );
-            let def         = this.defaultOptions();
 
-            settings.analyserFftSize        = def.analyserFftSize;
-            settings.analyserMainBgColor    = def.analyserMainBgColor;
-            settings.analyserBarBgColor     = def.analyserBarBgColor;
-            settings.analyserSineBgColor    = def.analyserSineBgColor;
+            settings.analyserFftSize        = options.analyserFftSize;
+            settings.analyserMainBgColor    = options.analyserMainBgColor;
+            settings.analyserBarBgColor     = options.analyserBarBgColor;
+            settings.analyserSineBgColor    = options.analyserSineBgColor;
 
             return settings;
         },
