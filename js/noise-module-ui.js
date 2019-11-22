@@ -594,6 +594,10 @@
             } );
         },
 
+        _calculateModulePosision        : function ( module ) {
+
+        },
+
         /* TODO: Make it simpler, catch option's position */
         _lineUpModules                  : function ( ) {
 
@@ -701,7 +705,7 @@
             return $( template );
         },
 
-        _makeElementDraggable           : function ( $element ) {
+        _makeElementDraggable           : function ( $element, x, y ) {
 
             let _self = this;
 
@@ -711,8 +715,8 @@
 
             let currentX = 0;
             let currentY = 0;
-            let initialX = 0;
-            let initialY = 0;
+            let initialX = x != undefined ? x : 0;
+            let initialY = y != undefined ? y : 0;
             let xOffset = 0;
             let yOffset = 0;
 
@@ -728,6 +732,9 @@
 
                 e = e || window.event;
                 e.preventDefault();
+
+                let x = xOffset === 0 && $element._x != undefined ? $element._x : xOffset;
+                let y = yOffset === 0 && $element._y != undefined ? $element._y : yOffset;
 
                 // get the mouse cursor position at startup:
                 initialX = e.clientX - xOffset;
