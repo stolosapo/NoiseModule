@@ -72,7 +72,7 @@ DelayModuleNodeUI.prototype = {
         let $slider = createSliderControl(
             this.moduleItem.audioNode["delayTime"].value,
             0,
-            10,
+            1,
             0.01,
             this._sliderChanged("delayTime"),
         );
