@@ -5,6 +5,7 @@ let noiseModuleInit = function(containerElId) {
     
     config.modules = [
         { name: "WhiteNoise", nodeType: "noise", type: "white", options: { started: false } },
+        { name: "NoiseRadio", nodeType: "noiseradionode", options: { audioIdSelector: undefined } },
         { name: "SineWave", nodeType: "oscillator", options: { type: "sine", started: false, frequency: 440, detune: 0 } },
         { name: "BiquadFilter", nodeType: "biquadfilter", options: { type: "lowpass", frequency: 440, detune: 0, Q: 1, gain: 0 } },
         { name: "Delay", nodeType: "delay", options: { delayTime: 0.2 } },
@@ -53,6 +54,7 @@ let noiseModuleInit = function(containerElId) {
         { srcNode: "WaveShaper", destNode: "Panner", connected: true },
         { srcNode: "Panner", destNode: "Eq", connected: true },
         // { srcNode: "Convolver", destNode: "Eq", connected: true },
+        // { srcNode: "NoiseRadio", destNode: "Eq", connected: true },
         { srcNode: "Eq", destNode: "Gain", connected: true },
         { srcNode: "Gain", destNode: "Analyser", connected: true },
         { srcNode: "Gain", destNode: "output", connected: true },
