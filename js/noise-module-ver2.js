@@ -16,7 +16,7 @@ const ALL_NODES_FACTORIES = function() {
     let pannerFactory = new StereoPannerModuleNodeFactory();
     let shapperFactory = new WaveShaperModuleNodeFactory();
     // let waveFactory = new $.PeriodWaveModuleNodeFactory( );
-    // let analyserFactory = new $.AnalyserModuleNodeFactory( );
+    let analyserFactory = new AnalyserModuleNodeFactory();
     // let recorderFactory = new $.RecorderModuleNodeFactory( );
 
     let config = {};
@@ -37,7 +37,7 @@ const ALL_NODES_FACTORIES = function() {
     config[pannerFactory.typeName] = pannerFactory;
     config[shapperFactory.typeName] = shapperFactory;
     // config[ waveFactory.typeName ] = waveFactory;
-    // config[ analyserFactory.typeName ] = analyserFactory;
+    config[analyserFactory.typeName] = analyserFactory;
     // config[ recorderFactory.typeName ] = recorderFactory;
 
     return config; 

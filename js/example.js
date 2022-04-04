@@ -34,6 +34,14 @@ let noiseModuleInit = function(containerElId) {
             ]
         }},
         { name: "Gain", nodeType: "gain", options: { gainGain: 0.7 } },
+        { name: "Analyser", nodeType: "analyser", options: {
+            // { sinewave, frequencybars }
+            type: "sinewave",
+            fftSize: 2048,
+            mainBgColor: 200,
+            barBgColor: 50,
+            sineBgColor: 0
+        }},
     ];
 
     config.connections = [
@@ -46,6 +54,7 @@ let noiseModuleInit = function(containerElId) {
         { srcNode: "Panner", destNode: "Eq", connected: true },
         // { srcNode: "Convolver", destNode: "Eq", connected: true },
         { srcNode: "Eq", destNode: "Gain", connected: true },
+        { srcNode: "Gain", destNode: "Analyser", connected: true },
         { srcNode: "Gain", destNode: "output", connected: true },
     ];
 
