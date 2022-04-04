@@ -11,6 +11,7 @@ let noiseModuleInit = function(containerElId) {
         { name: "DynamicsCompressor", nodeType: "dynamicscompressor", options: { threshold: -25, knee: 30, ratio: 12, reduction: -20, attack: 0.003, release: 0.25 } },
         { name: "WaveShaper", nodeType: "waveshapernode", options: { curveAmount: 400, oversample: '4x' } },
         { name: "Panner", nodeType: "stereopannernode", options: { pan: 0 } },
+        // { name: "Convolver", nodeType: "convolver", options: {} },
         { name: "Eq", nodeType: "equalizer", options: {
             eqPreAmpInGain: 1,
             eqPreAmpOutGain: 1,
@@ -43,6 +44,7 @@ let noiseModuleInit = function(containerElId) {
         { srcNode: "DynamicsCompressor", destNode: "WaveShaper", connected: true },
         { srcNode: "WaveShaper", destNode: "Panner", connected: true },
         { srcNode: "Panner", destNode: "Eq", connected: true },
+        // { srcNode: "Convolver", destNode: "Eq", connected: true },
         { srcNode: "Eq", destNode: "Gain", connected: true },
         { srcNode: "Gain", destNode: "output", connected: true },
     ];
