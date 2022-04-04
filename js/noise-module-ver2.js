@@ -2,7 +2,7 @@ const ALL_NODES_FACTORIES = function() {
 
     let gainFactory = new GainModuleNodeFactory();
     let filterFactory = new BiquadFilterModuleNodeFactory();
-    // let eqFactory = new $.EqualizerModuleNodeFactory( gainFactory, filterFactory );
+    let eqFactory = new EqualizerModuleNodeFactory(gainFactory, filterFactory);
     // let kingFactory = new $.KingTubbyModuleNodeFactory( gainFactory );
     let noiseFactory = new NoiseModuleNodeFactory();
     // let moogFactory = new $.MoogFilterModuleNodeFactory( );
@@ -23,7 +23,7 @@ const ALL_NODES_FACTORIES = function() {
 
     config[gainFactory.typeName] = gainFactory;
     config[filterFactory.typeName] = filterFactory;
-    // config[ eqFactory.typeName ] = eqFactory;
+    config[eqFactory.typeName] = eqFactory;
     // config[ kingFactory.typeName ] = kingFactory;
     config[noiseFactory.typeName] = noiseFactory;
     // config[ moogFactory.typeName ] = moogFactory;

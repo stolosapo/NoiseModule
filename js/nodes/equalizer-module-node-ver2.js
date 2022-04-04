@@ -7,8 +7,8 @@ EqualizerModuleNodeFactory.prototype = {
     typeName: "equalizer",
 
     create: function(noiseModule) {
-        let gainModuleNode = this.gainModuleFactory.create( noiseModule );
-        let biquadfilterModuleNode = this.biquadfilterModuleFactory.create( noiseModule );
+        let gainModuleNode = this.gainModuleFactory.create(noiseModule);
+        let biquadfilterModuleNode = this.biquadfilterModuleFactory.create(noiseModule);
 
         return new EqualizerModuleNode(noiseModule, gainModuleNode, biquadfilterModuleNode);
     },
