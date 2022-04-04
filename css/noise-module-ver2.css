@@ -9,13 +9,13 @@ body {
 }
 
 .noise-module-node {
-	/* border-radius: 5px; */
-	/* box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); */
-	/* margin: 10px; */
-	/* display: inline-block; */
+	border-radius: 5px;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	margin: 10px;
+	display: inline-block;
 	/* position: absolute; */
 	/* position: relative; */
-    /* z-index: 9; */
+    z-index: 9;
 }
 
 .noise-module-node header {
@@ -30,7 +30,6 @@ body {
 
 .noise-module-node header h6 {
 	text-decoration: none;
-	/* border-bottom: 1px solid #dbdbdb; */
 	border-radius: 5px 5px 0 0;
 	padding-bottom: 5px;
 	font-size: 11px;
