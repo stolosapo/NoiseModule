@@ -114,50 +114,75 @@ KingTubbyModuleNodeUI.prototype = {
 
         let $section = document.createElement("section");
 
-        let $inGainSlider = createSliderControl(
-            inGain["gain"].value,
-            0,
-            2,
-            0.1,
-            this._sliderChanged(inGain, "gain"),
+        let $inGainSlider = createSliderWrapper(
+            createSliderControl(
+                inGain["gain"].value,
+                0,
+                2,
+                0.1,
+                this._sliderChanged(inGain, "gain"),
+            ),
+            "gain",
+            "preAmp In",
+            "",
         );
         $inGainSlider.classList.add("pre-amp");
         $inGainSlider.classList.add("in");
 
-        let $outGainSlider = createSliderControl(
-            outGain["gain"].value,
-            0,
-            2,
-            0.1,
-            this._sliderChanged(outGain, "gain"),
+        let $outGainSlider = createSliderWrapper(
+            createSliderControl(
+                outGain["gain"].value,
+                0,
+                2,
+                0.1,
+                this._sliderChanged(outGain, "gain"),
+            ),
+            "gain",
+            "preAmp Out",
+            "",
         );
         $outGainSlider.classList.add("pre-amp");
         $outGainSlider.classList.add("out");
 
-        let $delaySlider = createSliderControl(
-            delay["delayTime"].value,
-            0,
-            1,
-            0.01,
-            this._sliderChanged(delay, "delayTime"),
+        let $delaySlider = createSliderWrapper(
+            createSliderControl(
+                delay["delayTime"].value,
+                0,
+                1,
+                0.01,
+                this._sliderChanged(delay, "delayTime"),
+            ),
+            "delayTime",
+            "delay",
+            "Sec",
         );
         $delaySlider.classList.add("delay");
 
-        let $feedbackSlider = createSliderControl(
-            feedback["gain"].value,
-            0,
-            1,
-            0.01,
-            this._sliderChanged(feedback, "gain"),
+        let $feedbackSlider = createSliderWrapper(
+            createSliderControl(
+                feedback["gain"].value,
+                0,
+                1,
+                0.01,
+                this._sliderChanged(feedback, "gain"),
+            ),
+            "gain",
+            "feedback",
+            "",
         );
         $feedbackSlider.classList.add("feedback");
 
-        let $filterSlider = createSliderControl(
-            filter["frequency"].value,
-            0,
-            8000,
-            1,
-            this._sliderChanged(filter, "frequency"),
+        let $filterSlider = createSliderWrapper(
+            createSliderControl(
+                filter["frequency"].value,
+                0,
+                8000,
+                1,
+                this._sliderChanged(filter, "frequency"),
+            ),
+            "frequency",
+            "cutoff",
+            "Hz",
         );
         $filterSlider.classList.add("biquadfilter");
 

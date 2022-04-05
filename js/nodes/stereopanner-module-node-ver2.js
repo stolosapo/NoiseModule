@@ -69,12 +69,17 @@ StereoPannerModuleNodeUI.prototype = {
     $_content: function() {
         let $section = document.createElement("section");
 
-        let $panSlider = createSliderControl(
-            this.moduleItem.audioNode["pan"].value,
-            -1,
-            1,
-            0.01,
-            this._sliderChanged("pan"),
+        let $panSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["pan"].value,
+                -1,
+                1,
+                0.01,
+                this._sliderChanged("pan"),
+            ),
+            "pan",
+            "pan",
+            "",
         );
 
         appendElementToTarget($panSlider, $section);

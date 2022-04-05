@@ -90,20 +90,30 @@ WaveShaperModuleNodeUI.prototype = {
     $_content: function() {
         let $section = document.createElement("section");
 
-        let $curveSlider = createSliderControl(
-            this.moduleItem.audioNode.curve,
-            0,
-            1000,
-            1,
-            this._curveChanged(),
+        let $curveSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode.curve,
+                0,
+                1000,
+                1,
+                this._curveChanged(),
+            ),
+            "curve",
+            "curve",
+            "",
         );
 
-        let $oversampleSlider = createSliderControl(
-            this.moduleItem.audioNode.oversample,
-            0,
-            4,
-            2,
-            this._oversampleChanged(),
+        let $oversampleSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode.oversample,
+                0,
+                4,
+                2,
+                this._oversampleChanged(),
+            ),
+            "oversample",
+            "oversample",
+            "",
         );
 
         appendElementToTarget($curveSlider, $section);

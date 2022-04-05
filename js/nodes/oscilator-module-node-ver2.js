@@ -77,20 +77,30 @@ OscilatorModuleNodeUI.prototype = {
     $_content: function() {
         let $section = document.createElement("section");
 
-        let $frequencySlider = createSliderControl(
-            this.moduleItem.audioNode["frequency"].value,
-            0,
-            8000,
-            1,
-            this._sliderChanged("frequency"),
+        let $frequencySlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["frequency"].value,
+                0,
+                8000,
+                1,
+                this._sliderChanged("frequency"),
+            ),
+            "frequency",
+            "frequency",
+            "Hz",
         );
 
-        let $detuneSlider = createSliderControl(
-            this.moduleItem.audioNode["detune"].value,
-            -1200,
-            1200,
-            1,
-            this._sliderChanged("detune"),
+        let $detuneSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["detune"].value,
+                -1200,
+                1200,
+                1,
+                this._sliderChanged("detune"),
+            ),
+            "detune",
+            "detune",
+            "cents",
         );
 
         let $button = createPlayStopButton(this.noiseModule, this.moduleItem.module);
