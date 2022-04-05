@@ -68,6 +68,37 @@ let createPlayPauseButton = function(noiseModule, module, audioNode, playPauseCl
     return $button;
 }
 
+let createSliderWrapper = function($input, property, description, units) {
+    let value = function(v) {
+        return v + " " + units;
+    }
+    
+    let $wrapperDiv = document.createElement("div");
+    $wrapperDiv.classList.add(property);
+    $wrapperDiv.name = description;
+
+    let $divInfo = document.createElement("div");
+    $divInfo.classList.add("nm-slider-info");   
+    appendElementToTarget($divInfo, $wrapperDiv);
+
+    let $spanDescription = document.createElement("span");
+    $spanDescription.classList.add("nm-label");
+    $spanDescription.innerText = description;
+    appendElementToTarget($spanDescription, $divInfo);
+
+    let $spanValue = document.createElement("span");
+    $spanValue.classList.add("nm-value");
+    $spanValue.innerText = value($input.value);
+    appendElementToTarget($spanValue, $divInfo);  
+
+    $input.addEventListener("input", function(e) {
+        $spanValue.innerText = value(this.value);
+    })
+
+    appendElementToTarget($input, $divInfo);
+    return $wrapperDiv;
+}
+
 let createSliderControl = function(initialValue, min, max, step, changeEvent) {
     let $input = document.createElement("input");  
     $input.min = min;

@@ -73,12 +73,17 @@ GainModuleNodeUI.prototype = {
     $_content: function() {
         let $section = document.createElement("section");
 
-        let $slider = createSliderControl(
-            this.moduleItem.audioNode["gain"].value,
-            0,
-            1,
-            0.01,
-            this._gainChanged(),
+        let $slider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["gain"].value,
+                0,
+                1,
+                0.01,
+                this._gainChanged(),
+            ),
+            "gain",
+            "gain",
+            "",
         );
 
         appendElementToTarget($slider, $section);

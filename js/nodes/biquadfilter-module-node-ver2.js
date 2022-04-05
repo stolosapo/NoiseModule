@@ -88,36 +88,56 @@ BiquadFilterModuleNodeUI.prototype = {
     $_content: function() {
         let $section = document.createElement("section");
 
-        let $frequencySlider = createSliderControl(
-            this.moduleItem.audioNode["frequency"].value,
-            0,
-            8000,
-            1,
-            this._sliderChanged("frequency"),
+        let $frequencySlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["frequency"].value,
+                0,
+                8000,
+                1,
+                this._sliderChanged("frequency"),
+            ),
+            "frequency",
+            "freq",
+            "Hz",
         );
 
-        let $detuneSlider = createSliderControl(
-            this.moduleItem.audioNode["detune"].value,
-            -1200,
-            1200,
-            1,
-            this._sliderChanged("detune"),
+        let $detuneSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["detune"].value,
+                -1200,
+                1200,
+                1,
+                this._sliderChanged("detune"),
+            ),
+            "detune",
+            "detune",
+            "cents",
         );
 
-        let $QSlider = createSliderControl(
-            this.moduleItem.audioNode["Q"].value,
-            1,
-            100,
-            0.1,
-            this._sliderChanged("Q"),
-        );
+        let $QSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["Q"].value,
+                1,
+                100,
+                0.1,
+                this._sliderChanged("Q"),
+            ),
+            "Q",
+            "Q",
+            "",
+        )
 
-        let $gainSlider = createSliderControl(
-            this.moduleItem.audioNode["gain"].value,
-            0,
-            1,
-            0.01,
-            this._sliderChanged("gain"),
+        let $gainSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["gain"].value,
+                0,
+                1,
+                0.01,
+                this._sliderChanged("gain"),
+            ),
+            "gain",
+            "gain",
+            "",
         );
 
         appendElementToTarget($frequencySlider, $section);

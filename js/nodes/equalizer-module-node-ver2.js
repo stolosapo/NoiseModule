@@ -133,22 +133,32 @@ EqualizerModuleNodeUI.prototype = {
 
         let $section = document.createElement("section");
 
-        let $inGainSlider = createSliderControl(
-            inGain["gain"].value,
-            0,
-            2,
-            0.1,
-            this._sliderChanged(inGain, "gain"),
+        let $inGainSlider = createSliderWrapper(
+            createSliderControl(
+                inGain["gain"].value,
+                0,
+                2,
+                0.1,
+                this._sliderChanged(inGain, "gain"),
+            ),
+            "gain",
+            "preAmp In",
+            "",
         );
         $inGainSlider.classList.add('pre-amp');
         $inGainSlider.classList.add('in');
 
-        let $outGainSlider = createSliderControl(
-            outGain["gain"].value,
-            0,
-            2,
-            0.1,
-            this._sliderChanged(outGain, "gain"),
+        let $outGainSlider = createSliderWrapper(
+            createSliderControl(
+                outGain["gain"].value,
+                0,
+                2,
+                0.1,
+                this._sliderChanged(outGain, "gain"),
+            ),
+            "gain",
+            "preAmp Out",
+            "",
         );
         $outGainSlider.classList.add('pre-amp');
         $outGainSlider.classList.add('out');
@@ -188,12 +198,17 @@ EqualizerModuleNodeUI.prototype = {
         let bandIndex = index - 1;
         let description = module.options.eqBands[bandIndex].description;
 
-        let $filterSlider = createSliderControl(
-            node[module.options.eqBandControl].value,
-            min,
-            max,
-            step,
-            this._sliderChanged(node, module.options.eqBandControl),
+        let $filterSlider = createSliderWrapper(
+            createSliderControl(
+                node[module.options.eqBandControl].value,
+                min,
+                max,
+                step,
+                this._sliderChanged(node, module.options.eqBandControl),
+            ),
+            module.options.eqBandControl,
+            description,
+            "",
         );
 
         $filterSlider.classList.add('eq-band');

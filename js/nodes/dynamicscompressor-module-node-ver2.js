@@ -79,52 +79,82 @@ DynamicsCompressorModuleNodeUI.prototype = {
     $_content: function() {
         let $section = document.createElement("section");
 
-        let $thresholdSlider = createSliderControl(
-            this.moduleItem.audioNode["threshold"].value,
-            -36,
-            0,
-            0.01,
-            this._sliderChanged("threshold"),
+        let $thresholdSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["threshold"].value,
+                -36,
+                0,
+                0.01,
+                this._sliderChanged("threshold"),
+            ),
+            "threshold",
+            "threshold",
+            "DB",
         );
 
-        let $kneeSlider = createSliderControl(
-            this.moduleItem.audioNode["knee"].value,
-            0,
-            40,
-            0.01,
-            this._sliderChanged("knee"),
+        let $kneeSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["knee"].value,
+                0,
+                40,
+                0.01,
+                this._sliderChanged("knee"),
+            ),
+            "knee",
+            "knee",
+            "DB",
         );
 
-        let $ratioSlider = createSliderControl(
-            this.moduleItem.audioNode["ratio"].value,
-            1,
-            20,
-            0.1,
-            this._sliderChanged("ratio"),
+        let $ratioSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["ratio"].value,
+                1,
+                20,
+                0.1,
+                this._sliderChanged("ratio"),
+            ),
+            "ratio",
+            "ratio",
+            "Sec",
         );
 
-        let $reductionSlider = createSliderControl(
-            this.moduleItem.audioNode["reduction"].value,
-            -20,
-            0,
-            0.01,
-            this._sliderChanged("reduction"),
+        let $reductionSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["reduction"].value,
+                -20,
+                0,
+                0.01,
+                this._sliderChanged("reduction"),
+            ),
+            "reduction",
+            "reduction",
+            "DB",
         );
 
-        let $attackSlider = createSliderControl(
-            this.moduleItem.audioNode["attack"].value,
-            0,
-            1,
-            0.001,
-            this._sliderChanged("attack"),
+        let $attackSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["attack"].value,
+                0,
+                1,
+                0.001,
+                this._sliderChanged("attack"),
+            ),
+            "attack",
+            "attack",
+            "Sec",
         );
 
-        let $releaseSlider = createSliderControl(
-            this.moduleItem.audioNode["release"].value,
-            0,
-            1,
-            0.001,
-            this._sliderChanged("release"),
+        let $releaseSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["release"].value,
+                0,
+                1,
+                0.001,
+                this._sliderChanged("release"),
+            ),
+            "release",
+            "release",
+            "Sec",
         );
 
         appendElementToTarget($thresholdSlider, $section);

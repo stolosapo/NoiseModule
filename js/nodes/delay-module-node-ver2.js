@@ -69,12 +69,17 @@ DelayModuleNodeUI.prototype = {
     $_content: function() {
         let $section = document.createElement("section");
 
-        let $slider = createSliderControl(
-            this.moduleItem.audioNode["delayTime"].value,
-            0,
-            1,
-            0.01,
-            this._sliderChanged("delayTime"),
+        let $slider = createSliderWrapper(
+                createSliderControl(
+                this.moduleItem.audioNode["delayTime"].value,
+                0,
+                1,
+                0.01,
+                this._sliderChanged("delayTime"),
+            ),
+            "delayTime",
+            "delayTime",
+            "Sec",
         );
 
         appendElementToTarget($slider, $section);
