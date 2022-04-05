@@ -58,6 +58,31 @@ body {
     width: 100%;
 }
 
+.noise-module-node div.nm-slider-info {
+	font-size: 10px;
+	margin-bottom: 1px;
+	overflow: hidden;
+	padding-bottom: 3.4px;
+	position: relative;
+}
+
+.noise-module-node .nm-slider-info span.nm-label {
+	font-size: 10px;
+	display: inline;
+	float: left;
+	text-transform: uppercase;
+	width: 49%;
+}
+
+.noise-module-node .nm-slider-info span.nm-value {
+	display: inline;
+	float: right;
+	font-weight: bold;
+	text-align: right;
+	text-transform: uppercase;
+	width: 49%;
+}
+
 .noise-module-node section img.nm-play-button {
 	display: block;
 	margin: 0 auto;

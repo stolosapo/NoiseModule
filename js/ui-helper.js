@@ -95,7 +95,7 @@ let createSliderWrapper = function($input, property, description, units) {
         $spanValue.innerText = value(this.value);
     })
 
-    appendElementToTarget($input, $divInfo);
+    appendElementToTarget($input, $wrapperDiv);
     return $wrapperDiv;
 }
 
