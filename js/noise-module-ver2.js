@@ -7,7 +7,7 @@ const ALL_NODES_FACTORIES = function() {
     let noiseFactory = new NoiseModuleNodeFactory();
     // let moogFactory = new $.MoogFilterModuleNodeFactory( );
     let oscFactory = new OscilatorModuleNodeFactory();
-    // let liveFactory = new $.LiveInputModuleNodeFactory( );
+    let liveFactory = new LiveInputModuleNodeFactory();
     let radioFactory = new NoiseRadioModuleNodeFactory();
     // let soundCloudFactory = new $.SoundCloudModuleNodeFactory( );
     let delayFactory = new DelayModuleNodeFactory();
@@ -28,7 +28,7 @@ const ALL_NODES_FACTORIES = function() {
     config[noiseFactory.typeName] = noiseFactory;
     // config[ moogFactory.typeName ] = moogFactory;
     config[oscFactory.typeName] = oscFactory;
-    // config[ liveFactory.typeName ] = liveFactory;
+    config[liveFactory.typeName] = liveFactory;
     config[radioFactory.typeName] = radioFactory;
     // config[ soundCloudFactory.typeName ] = soundCloudFactory;
     config[delayFactory.typeName] = delayFactory;
@@ -308,6 +308,16 @@ NoiseModule.prototype = {
         }
 
         srcNode.disconnect(destNode);
+    },
+
+    updateAudioNode: function(moduleName, audioInNode, audioOutNode) {
+        let instance = this._findModuleInstanseByName(moduleName);
+        if (!instance) {
+            return;
+        }
+
+        instance.inNode  = audioInNode;
+        instance.outNode = audioOutNode || audioInNode;
     },
 
     connectAllDestinations: function(module) {

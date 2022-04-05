@@ -6,6 +6,7 @@ let noiseModuleInit = function(containerElId) {
     config.modules = [
         { name: "WhiteNoise", nodeType: "noise", type: "white", options: { started: false } },
         { name: "NoiseRadio", nodeType: "noiseradionode", options: { audioIdSelector: undefined } },
+        { name: "LiveInput", nodeType: "liveinput", options: { started: false } },
         { name: "KingTubby", nodeType: "kingtubbynode", options: {
             preAmpInGain: 1,
             preAmpOutGain: 1,
@@ -55,6 +56,7 @@ let noiseModuleInit = function(containerElId) {
     config.connections = [
         { srcNode: "WhiteNoise", destNode: "BiquadFilter", connected: true },
         { srcNode: "SineWave", destNode: "BiquadFilter", connected: true },
+        { srcNode: "LiveInput", destNode: "BiquadFilter", connected: true },
         { srcNode: "BiquadFilter", destNode: "Delay", connected: true },
         { srcNode: "Delay", destNode: "DynamicsCompressor", connected: true },
         { srcNode: "DynamicsCompressor", destNode: "WaveShaper", connected: true },
