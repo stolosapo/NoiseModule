@@ -43,6 +43,7 @@ let noiseModuleInit = function(containerElId) {
             ]
         }},
         { name: "Gain", nodeType: "gain", options: { gainGain: 0.7 } },
+        { name: "Recorder", nodeType: "recorder", options: { } },
         { name: "Analyser", nodeType: "analyser", options: {
             // { sinewave, frequencybars }
             type: "sinewave",
@@ -66,6 +67,7 @@ let noiseModuleInit = function(containerElId) {
         // { srcNode: "NoiseRadio", destNode: "KingTubby", connected: true },
         // { srcNode: "KingTubby", destNode: "Eq", connected: true },
         { srcNode: "Eq", destNode: "Gain", connected: true },
+        { srcNode: "Gain", destNode: "Recorder", connected: true },
         { srcNode: "Gain", destNode: "Analyser", connected: true },
         { srcNode: "Gain", destNode: "output", connected: true },
     ];

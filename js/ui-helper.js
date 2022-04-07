@@ -36,7 +36,7 @@ let createPlayStopButton = function(noiseModule, module) {
     return $button;
 }
 
-let createPlayPauseButton = function(noiseModule, module, audioNode, playPauseClickEvent) {
+let createPlayPauseButton = function(noiseModule, module, clickEvent) {
     let playClass   = 'play';
     let pauseClass  = 'pause';
 
@@ -50,17 +50,15 @@ let createPlayPauseButton = function(noiseModule, module, audioNode, playPauseCl
         $button.classList.add(playClass);
     }
 
-    $button.addEventListener('click', function() {
+    $button.addEventListener('click', function(e) {
         noiseModule.resumeAudioContext();
 
         if (this.classList.contains(playClass)) {
-            // playPauseClickEvent(_self, module, audioNode, true );
-
+            clickEvent(this, e);
             this.classList.replace(playClass, pauseClass);
         }
         else {
-            // playPauseClickEvent( _self, module, audioNode, false );
-
+            clickEvent(this, e);
             this.classList.replace(pauseClass, playClass);
         }
     });
