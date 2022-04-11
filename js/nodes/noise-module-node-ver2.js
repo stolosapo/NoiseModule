@@ -14,7 +14,7 @@ NoiseModuleNodeFactory.prototype = {
 }
 
 NoiseModuleNode = function(noiseModule) {
-    this.nm = noiseModule;
+    this.noiseModule = noiseModule;
 };
 
 NoiseModuleNode.defaults = {
@@ -29,7 +29,7 @@ NoiseModuleNode.prototype = {
     },
 
     createModuleAudioNode: function(module) {
-        let type = module.type;
+        let type = module.options.type;
 
         if (type === "white") {
             return this._createWhiteNoise();
@@ -47,7 +47,7 @@ NoiseModuleNode.prototype = {
     _createWhiteNoise: function(bufferSize) {
         bufferSize = bufferSize || 4096;
 
-        let node = this.nm.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
+        let node = this.noiseModule.audioContext.createScriptProcessor(bufferSize, 1, 1);
 
         node.onaudioprocess = function (e) {
             let output = e.outputBuffer.getChannelData(0);
@@ -66,7 +66,7 @@ NoiseModuleNode.prototype = {
         let b0, b1, b2, b3, b4, b5, b6;
         b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
 
-        let node = this.nm.audioContext.createScriptProcessor(bufferSize, 1, 1 );
+        let node = this.noiseModule.audioContext.createScriptProcessor(bufferSize, 1, 1 );
 
         node.onaudioprocess = function(e) {
             let output = e.outputBuffer.getChannelData ( 0 );
@@ -94,7 +94,7 @@ NoiseModuleNode.prototype = {
         bufferSize = bufferSize || 4096;
 
         let lastOut = 0.0;
-        let node = this.nm.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
+        let node = this.noiseModule.audioContext.createScriptProcessor ( bufferSize, 1, 1 );
 
         node.onaudioprocess = function( e ) {
             let output = e.outputBuffer.getChannelData(0);

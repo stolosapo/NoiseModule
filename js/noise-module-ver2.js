@@ -5,17 +5,14 @@ const ALL_NODES_FACTORIES = function() {
     let eqFactory = new EqualizerModuleNodeFactory(gainFactory, filterFactory);
     let kingFactory = new KingTubbyModuleNodeFactory(gainFactory);
     let noiseFactory = new NoiseModuleNodeFactory();
-    // let moogFactory = new $.MoogFilterModuleNodeFactory( );
     let oscFactory = new OscilatorModuleNodeFactory();
     let liveFactory = new LiveInputModuleNodeFactory();
     let radioFactory = new NoiseRadioModuleNodeFactory();
-    // let soundCloudFactory = new $.SoundCloudModuleNodeFactory( );
     let delayFactory = new DelayModuleNodeFactory();
     let convolverFactory = new ConvolverModuleNodeFactory();
     let compressorFactory = new DynamicsCompressorModuleNodeFactory();
     let pannerFactory = new StereoPannerModuleNodeFactory();
     let shapperFactory = new WaveShaperModuleNodeFactory();
-    // let waveFactory = new $.PeriodWaveModuleNodeFactory( );
     let analyserFactory = new AnalyserModuleNodeFactory();
     let recorderFactory = new RecorderModuleNodeFactory();
 
@@ -26,17 +23,14 @@ const ALL_NODES_FACTORIES = function() {
     config[eqFactory.typeName] = eqFactory;
     config[kingFactory.typeName] = kingFactory;
     config[noiseFactory.typeName] = noiseFactory;
-    // config[ moogFactory.typeName ] = moogFactory;
     config[oscFactory.typeName] = oscFactory;
     config[liveFactory.typeName] = liveFactory;
     config[radioFactory.typeName] = radioFactory;
-    // config[ soundCloudFactory.typeName ] = soundCloudFactory;
     config[delayFactory.typeName] = delayFactory;
     config[convolverFactory.typeName] = convolverFactory;
     config[compressorFactory.typeName] = compressorFactory;
     config[pannerFactory.typeName] = pannerFactory;
     config[shapperFactory.typeName] = shapperFactory;
-    // config[ waveFactory.typeName ] = waveFactory;
     config[analyserFactory.typeName] = analyserFactory;
     config[recorderFactory.typeName] = recorderFactory;
 
@@ -71,13 +65,17 @@ NoiseModule.defaults = {
         recorder
     */
     modules: [
-        { name: "WhiteNoise", nodeType: "noise", type: "white", options: { started: false } },
-        { name: "Gain", nodeType: "gain", type: "", options: { gainGain: 0.7 } }
+        /* Example:
+        { name: "WhiteNoise", nodeType: "noise", options: { type: "white", started: false } },
+        { name: "Gain", nodeType: "gain", options: { gain: 0.7 } }
+        */
     ],
 
     connections: [
+        /* Example:
         { srcNode: "WhiteNoise", destNode: "Gain", connected: true },
         { srcNode: "Gain", destNode: "output", connected: true }
+        */
     ],
 
     nodesFactories: ALL_NODES_FACTORIES,
@@ -90,7 +88,6 @@ NoiseModule.prototype = {
         this.options = options;
 
         // initialize members
-        this.audioContext = void(0);
         this.moduleCounter = 0;
         this.moduleInstaces = [];
         this.registeredFactories = this.options.nodesFactories();
@@ -197,8 +194,6 @@ NoiseModule.prototype = {
             factory: factory,
         };
 
-        moduleItem.moduleImpl._self = moduleItem;
-
         return moduleItem;
     },
 
@@ -294,7 +289,7 @@ NoiseModule.prototype = {
 
     connectNodes: function(srcNode, destNode) {
         if (!srcNode || !destNode) {
-            console.error( "Could not create connection. Source and Destination should exist.", srcNode, destNode );
+            console.error( "Could not create connection. Source and Destination should exist.", srcNode, destNode);
             return;
         }
 
