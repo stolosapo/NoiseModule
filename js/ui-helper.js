@@ -43,7 +43,7 @@ let createPlayPauseButton = function(noiseModule, module, clickEvent) {
     let $button = document.createElement("img");
     $button.classList.add("nm-play-button");
 
-    if ( module.options.started ) {
+    if (module.options.started) {
         $button.classList.add(pauseClass);
     }
     else {

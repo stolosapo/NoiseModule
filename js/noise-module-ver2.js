@@ -84,8 +84,7 @@ NoiseModule.defaults = {
 NoiseModule.prototype = {
 
     _init: function(options) {
-        // TODO: this.options = $.extend( true, {}, $.NoiseModule.defaults, options );
-        this.options = options;
+        this.options = extend({}, NoiseModule.defaults, options);
 
         // initialize members
         this.moduleCounter = 0;
@@ -157,9 +156,7 @@ NoiseModule.prototype = {
         // Create new instance for the module
         let moduleImpl  = factory.create(this);
 
-        /* TODO: module.options = $.extend(true, {}, moduleImpl.defaultOptions(), module.options); */
-        // module.options =
-        //     $.extend( true, {}, moduleDefaultOptions, module.options );
+        module.options = extend({}, moduleImpl.defaultOptions(), module.options);
 
         let audioNode = moduleImpl.createModuleAudioNode(module);
 
@@ -340,4 +337,18 @@ NoiseModule.prototype = {
                 _self._disconnectNodes(srcNode.outNode, destNode.inNode);
             });
     },
+};
+
+let extend = function() {
+    for (let i = 1; i < arguments.length; i++) {
+        if (!arguments[i]) {
+            continue;
+        }
+        for (let key in arguments[i]) {
+            if (arguments[i].hasOwnProperty(key)) {
+                arguments[0][key] = arguments[i][key];
+            }
+        }
+    }
+    return arguments[0];
 }
