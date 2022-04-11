@@ -41,4 +41,13 @@ let noiseModuleInit = function(containerElId) {
 
     let noiseModule = new NoiseModule(config);
     console.log(noiseModule);
+
+    let $btn = document.getElementById("start-button");
+    $btn.addEventListener('click', function(e) {
+        let started = this.classList.contains("started");
+        if (!started) {
+            noiseModule.start();
+            this.classList.add("started");
+        }
+    });
 }

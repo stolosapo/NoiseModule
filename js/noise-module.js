@@ -89,6 +89,17 @@ NoiseModule.prototype = {
         this.moduleInstaces = [];
         this.registeredFactories = this.options.nodesFactories();
 
+        // // create audio context
+        // this.audioContext = this._createAudioContext();
+
+        // // create modules
+        // this._createModules();
+
+        // // create modules UI
+        // this._createModulesUI();
+    },
+
+    start: function() {
         // create audio context
         this.audioContext = this._createAudioContext();
 
