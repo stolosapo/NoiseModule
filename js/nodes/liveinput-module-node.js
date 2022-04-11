@@ -1,102 +1,116 @@
-( function( window, navigator, $, undefined ) {
+LiveInputModuleNodeFactory = function() {
+};
 
-    /* LiveInputModuleNode: Class for 'liveinput' node */
+LiveInputModuleNodeFactory.prototype = {
+    typeName: "liveinput",
 
-    $.LiveInputModuleNodeFactory             = function () {
-    };
+    create: function(noiseModule) {
+        return new LiveInputModuleNode(noiseModule);
+    },
 
-    $.LiveInputModuleNodeFactory.prototype   = {
+    createUI: function(noiseModule, moduleItem) {
+        return new LiveInputModuleNodeUI(noiseModule, moduleItem);
+    }
+}
 
-        typeName    : "liveinput",
+LiveInputModuleNode = function(noiseModule) {
+    this.noiseModule = noiseModule;
+};
 
-        create      : function ( noiseModule ) {
+LiveInputModuleNode.defaults = {
+    started: false
+};
 
-            return new $.LiveInputModuleNode( noiseModule );
-        }
-    };
+LiveInputModuleNode.prototype = {
 
-    $.LiveInputModuleNode              = function ( noiseModule ) {
+    defaultOptions: function() {
+        return LiveInputModuleNode.defaults;
+    },
 
-        this.nm = noiseModule;
-    };
+    createModuleAudioNode: function(module) {
+        navigator.getUserMedia = navigator.getUserMedia ||
+                    navigator.webkitGetUserMedia ||
+                    navigator.mozGetUserMedia;
 
-    $.LiveInputModuleNode.defaults     = {
+        if (navigator.mediaDevices) {
+            let _self = this;
+            let source;
 
-        started: false
-    };
-
-    $.LiveInputModuleNode.prototype    = {
-
-        defaultOptions          : function ( ) {
-            return $.LiveInputModuleNode.defaults;
-        },
-
-        createModuleAudioNode   : function ( module ) {
-
-            navigator.getUserMedia = navigator.getUserMedia ||
-                        navigator.webkitGetUserMedia ||
-                        navigator.mozGetUserMedia;
-
-            if (navigator.mediaDevices) {
-
-                var _self = this;
-
-                var source;
-
-                navigator.mediaDevices.getUserMedia(
-                {
-                    "audio": {
-                        "mandatory": {
-                            "googEchoCancellation": "false",
-                            "googAutoGainControl": "false",
-                            "googNoiseSuppression": "false",
-                            "googHighpassFilter": "false"
-                        },
-                        "optional": [ ]
+            navigator.mediaDevices.getUserMedia(
+            {
+                "audio": {
+                    "mandatory": {
+                        "googEchoCancellation": "false",
+                        "googAutoGainControl": "false",
+                        "googNoiseSuppression": "false",
+                        "googHighpassFilter": "false"
                     },
-                }).then( function( stream ) {
+                    "optional": [ ]
+                },
+            }).then(function(stream) {
 
-                    source      = _self.nm.audioContext.createMediaStreamSource( stream );
+                source = _self.noiseModule.audioContext.createMediaStreamSource(stream);
 
-                    /* Update source node map with this new instance */
-                    _self.nm._updateAudioNode( module.name, source );
+                /* Update source node map with this new instance */
+                _self.noiseModule.updateAudioNode(module.name, source);
 
-                    let $footer = _self.nm.ui.createModuleFooter( module, source );
-                    _self.nm.ui.appendElementToTarget( $footer, _self.$div[0].parentNode );
+                if (module.options.started) {
+                    _self.noiseModule.connectAllDestinations(module);
+                }
+            });
 
-                    /* If module option is started then do the connection */
-                    if (module.options.started) {
-                        _self.nm._connectAllDestinations( module );
-                    }
+            return source;
+        }
+    },
+};
 
-                } );
+LiveInputModuleNodeUI = function(noiseModule, moduleItem) {
+    this.noiseModule = noiseModule;
+    this.moduleItem = moduleItem;
+}
 
-                return source;
+LiveInputModuleNodeUI.prototype = {
+    create: function() {
+        const moduleId = "module" + this.moduleItem.id;
 
-            }
+        let $section = document.createElement("section");
+        $section.id = moduleId;
+        $section.name = this.moduleItem.module.name;
+        $section.classList.add("noise-module-node");
+        $section.classList.add(this.moduleItem.module.nodeType);
 
-        },
+        appendElementToTarget(this.$_header(), $section);
+        appendElementToTarget(this.$_content(), $section);
+        appendElementToTarget(this.$_footer(), $section);
 
-        createModuleDiv         : function ( module, audioNode ) {
+        return $section;
+    },
 
-            let $container  = this.nm.ui.createContentContainer( );
-            let $button = this.nm.ui.createPlayStopButton( module, audioNode );
+    $_header: function() {
+        let $name = document.createElement("h6");
+        $name.innerText = this.moduleItem.module.name;
 
-            this.nm.ui.appendElementToTarget( $button, $container );
+        let $header = document.createElement("header");
+        appendElementToTarget($name, $header);
+        return $header;
+    },
 
-            return $container;
-        },
+    $_content: function() {
+        let $section = document.createElement("section");
+        let $button = createPlayStopButton(this.noiseModule, this.moduleItem.module);
+        appendElementToTarget($button, $section);
+        return $section;
+    },
 
-        resetModuleSettings     : function ( module, audioNode ) {
-        },
+    _gainChanged: function() {
+        let _self = this;
+        return function(e) {
+            _self.moduleItem.audioNode["gain"].value = this.value;
+        }
+    },
 
-        exportOptions           : function ( ) {
-
-            let options     = this._self.module.options;
-            let settings    = this.nm.buildModuleOptions( options );
-
-            return settings;
-        },
-    };
-
-} )( window, navigator, jQuery );
+    $_footer: function() {
+        let $footer = document.createElement("footer");
+        return $footer;
+    }
+};

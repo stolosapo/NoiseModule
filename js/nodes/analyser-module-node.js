@@ -1,197 +1,204 @@
-( function( window, navigator, $, undefined ) {
+AnalyserModuleNodeFactory = function () {
+}
 
-    /* AnalyserModuleNode: Class for 'analyser' node */
+AnalyserModuleNodeFactory.prototype = {
+    typeName: "analyser",
 
-    $.AnalyserModuleNodeFactory             = function () {
-    };
+    create: function (noiseModule) {
+        return new AnalyserModuleNode(noiseModule);
+    },
 
-    $.AnalyserModuleNodeFactory.prototype   = {
+    createUI: function(noiseModule, moduleItem) {
+        return new AnalyserModuleNodeUI(noiseModule, moduleItem);
+    }
+}
 
-        typeName    : "analyser",
+AnalyserModuleNode = function(noiseModule) {
+    this.noiseModule = noiseModule;
+};
 
-        create      : function ( noiseModule ) {
+AnalyserModuleNode.defaults = {
+    // { sinewave, frequencybars }
+    type: "sinewave",
+    fftSize: 2048,
+    mainBgColor: 200,
+    barBgColor: 50,
+    sineBgColor: 0
+};
 
-            return new $.AnalyserModuleNode( noiseModule );
+AnalyserModuleNode.prototype = {
+    defaultOptions: function() {
+        return AnalyserModuleNode.defaults;
+    },
+
+    createModuleAudioNode: function(module ) {
+        let analyser = this.noiseModule.audioContext.createAnalyser();
+
+        analyser.fftSize = module.options.fftSize;
+
+        let bufferLength = analyser.frequencyBinCount;
+        let dataArray = new Uint8Array (bufferLength);
+
+        analyser.getByteTimeDomainData(dataArray);
+
+        return analyser;
+    },
+};
+
+AnalyserModuleNodeUI = function(noiseModule, moduleItem) {
+    this.noiseModule = noiseModule;
+    this.moduleItem = moduleItem;
+}
+
+AnalyserModuleNodeUI.prototype = {
+    create: function() {
+        const moduleId = "module" + this.moduleItem.id;
+
+        let $section = document.createElement("section");
+        $section.id = moduleId;
+        $section.name = this.moduleItem.module.name;
+        $section.classList.add("noise-module-node");
+        $section.classList.add(this.moduleItem.module.nodeType);
+
+        appendElementToTarget(this.$_header(), $section);
+        appendElementToTarget(this.$_content(), $section);
+        appendElementToTarget(this.$_footer(), $section);
+
+        return $section;
+    },
+
+    $_header: function() {
+        let $name = document.createElement("h6");
+        $name.innerText = this.moduleItem.module.name;
+
+        let $header = document.createElement("header");
+        appendElementToTarget($name, $header);
+        return $header;
+    },
+
+    $_content: function() {
+        let module = this.moduleItem.module;
+        let audioNode = this.moduleItem.audioNode;
+
+        let $section = document.createElement("section");
+
+        let $canvas = document.createElement("canvas");
+        let canvasCtx = $canvas.getContext("2d");
+
+        if (module.type === 'sinewave') {
+            this._createSinewaveAnalyser(module, $canvas, canvasCtx, audioNode);
         }
-    };
+        else if (module.type === 'frequencybars') {
+            this._createFequencyBarsAnalyser(module, $canvas, canvasCtx, audioNode);
+        }
+        else {
+            this._createSinewaveAnalyser(module, $canvas, canvasCtx, audioNode);
+        }
 
-    $.AnalyserModuleNode           = function ( noiseModule ) {
+        appendElementToTarget($canvas, $section);
+        return $section;
+    },
 
-        this.nm = noiseModule;
+    _createSinewaveAnalyser: function(module, $canvas, canvasCtx, audioNode) {
 
-    };
+        let WIDTH       = $canvas.width;
+        let HEIGHT      = $canvas.height;
 
-    $.AnalyserModuleNode.defaults  = {
+        let mainBg      = module.options.mainBgColor;
+        let sineBg      = module.options.sineBgColor;
 
-        analyserFftSize     : 2048,
-        analyserMainBgColor : 200,
-        analyserBarBgColor  : 50,
-        analyserSineBgColor : 0
-    };
+        audioNode.fftSize   = 2048;
+        let bufferLength    = audioNode.fftSize;
 
-    $.AnalyserModuleNode.prototype = {
+        let dataArray       = new Uint8Array( bufferLength );
 
-        defaultOptions                : function ( ) {
-            return $.AnalyserModuleNode.defaults;
-        },
+        canvasCtx.clearRect( 0, 0, WIDTH, HEIGHT );
 
-        createModuleAudioNode         : function ( module ) {
+        function draw( ) {
 
-            var analyser        = this.nm.audioContext.createAnalyser ( );
+            drawVisual      = requestAnimationFrame( draw );
 
-            analyser.fftSize    = module.options.analyserFftSize;
+            audioNode.getByteTimeDomainData( dataArray );
 
-            var bufferLength    = analyser.frequencyBinCount;
-            var dataArray       = new Uint8Array ( bufferLength );
+            canvasCtx.fillStyle     = 'rgb(' + mainBg + ', ' + mainBg + ', ' + mainBg + ')';
+            canvasCtx.fillRect( 0, 0, WIDTH, HEIGHT );
 
-            analyser.getByteTimeDomainData ( dataArray );
+            canvasCtx.lineWidth     = 2;
+            canvasCtx.strokeStyle   = 'rgb(' + sineBg + ', ' + sineBg + ', ' + sineBg + ')';
 
-            return analyser;
+            canvasCtx.beginPath();
 
-        },
+            let sliceWidth = WIDTH * 1.0 / bufferLength;
+            let x = 0;
 
-        createModuleDiv               : function ( module, audioNode ) {
+            for ( let i = 0; i < bufferLength; i++ ) {
 
-            let $container  = this.nm.ui.createContentContainer( );
+                let v = dataArray[ i ] / 128.0;
+                let y = v * HEIGHT / 2;
 
-            let template    = '<canvas class="nm-analyser-canvas"></canvas>';
-            let $canvas     = $( template );
-            let canvasCtx   = $canvas[0].getContext("2d");
-
-            if (module.type === 'sinewave') {
-
-                this._createSinewaveAnalyser( module, $canvas, canvasCtx, audioNode );
-            }
-            else if (module.type === 'frequencybars') {
-
-                this._createFequencyBarsAnalyser( module, $canvas, canvasCtx, audioNode );
-            }
-            else {
-
-                this._createSinewaveAnalyser( module, $canvas, canvasCtx, audioNode );
-            }
-
-            this.nm.ui.appendElementToTarget( $canvas, $container );
-
-            return $container;
-        },
-
-        resetModuleSettings           : function ( module, audioNode ) {
-
-        },
-
-        exportOptions                 : function ( ) {
-
-            let options     = this._self.module.options;
-            let settings    = this.nm.buildModuleOptions( options );
-
-            settings.analyserFftSize        = options.analyserFftSize;
-            settings.analyserMainBgColor    = options.analyserMainBgColor;
-            settings.analyserBarBgColor     = options.analyserBarBgColor;
-            settings.analyserSineBgColor    = options.analyserSineBgColor;
-
-            return settings;
-        },
-
-        _createSinewaveAnalyser       : function ( module, $canvas, canvasCtx, audioNode ) {
-
-            var WIDTH       = $canvas[ 0 ].width;
-            var HEIGHT      = $canvas[ 0 ].height;
-
-            var mainBg      = module.options.analyserMainBgColor;
-            var sineBg      = module.options.analyserSineBgColor;
-
-            audioNode.fftSize   = 2048;
-            var bufferLength    = audioNode.fftSize;
-
-            var dataArray       = new Uint8Array( bufferLength );
-
-            canvasCtx.clearRect( 0, 0, WIDTH, HEIGHT );
-
-            function draw( ) {
-
-                drawVisual      = requestAnimationFrame( draw );
-
-                audioNode.getByteTimeDomainData( dataArray );
-
-                canvasCtx.fillStyle     = 'rgb(' + mainBg + ', ' + mainBg + ', ' + mainBg + ')';
-                canvasCtx.fillRect( 0, 0, WIDTH, HEIGHT );
-
-                canvasCtx.lineWidth     = 2;
-                canvasCtx.strokeStyle   = 'rgb(' + sineBg + ', ' + sineBg + ', ' + sineBg + ')';
-
-                canvasCtx.beginPath();
-
-                var sliceWidth = WIDTH * 1.0 / bufferLength;
-                var x = 0;
-
-                for ( var i = 0; i < bufferLength; i++ ) {
-
-                    var v = dataArray[ i ] / 128.0;
-                    var y = v * HEIGHT / 2;
-
-                    if ( i === 0 ) {
-                        canvasCtx.moveTo( x, y );
-                    } else {
-                        canvasCtx.lineTo( x, y );
-                    }
-
-                    x += sliceWidth;
-
+                if ( i === 0 ) {
+                    canvasCtx.moveTo( x, y );
+                } else {
+                    canvasCtx.lineTo( x, y );
                 }
 
-                canvasCtx.lineTo( WIDTH, HEIGHT / 2);
-                canvasCtx.stroke( );
-            };
-
-            draw( );
-
-        },
-
-        _createFequencyBarsAnalyser   : function ( module, $canvas, canvasCtx, audioNode ) {
-
-            var WIDTH       = $canvas[ 0 ].width;
-            var HEIGHT      = $canvas[ 0 ].height;
-
-            var mainBg      = module.options.analyserMainBgColor;
-            var barBg       = module.options.analyserBarBgColor;
-
-            audioNode.fftSize   = 256;
-
-            var bufferLength    = audioNode.frequencyBinCount;
-            var dataArray       = new Uint8Array( bufferLength );
-
-            canvasCtx.clearRect( 0, 0, WIDTH, HEIGHT );
-
-            function draw( ) {
-
-                drawVisual  = requestAnimationFrame( draw );
-
-                audioNode.getByteFrequencyData( dataArray );
-
-                canvasCtx.fillStyle = 'rgb(' + mainBg + ', ' + mainBg + ', ' + mainBg + ')';
-                canvasCtx.fillRect( 0, 0, WIDTH, HEIGHT );
-
-                var barWidth = ( WIDTH / bufferLength ) * 2.5;
-                var barHeight;
-                var x = 0;
-
-                for(var i = 0; i < bufferLength; i++) {
-
-                    barHeight = dataArray[ i ];
-
-                    canvasCtx.fillStyle = 'rgb(' + ( barHeight + 100 ) + ', ' + barBg + ', ' + barBg + ')';
-                    canvasCtx.fillRect( x, HEIGHT - barHeight / 2, barWidth, barHeight / 2 );
-
-                    x += barWidth + 1;
-                }
+                x += sliceWidth;
 
             }
 
-            draw( );
+            canvasCtx.lineTo( WIDTH, HEIGHT / 2);
+            canvasCtx.stroke( );
+        };
 
-        },
+        draw( );
 
-    };
+    },
 
-} )( window, navigator, jQuery );
+    _createFequencyBarsAnalyser: function(module, $canvas, canvasCtx, audioNode) {
+
+        let WIDTH       = $canvas.width;
+        let HEIGHT      = $canvas.height;
+
+        let mainBg      = module.options.mainBgColor;
+        let barBg       = module.options.barBgColor;
+
+        audioNode.fftSize   = 256;
+
+        let bufferLength    = audioNode.frequencyBinCount;
+        let dataArray       = new Uint8Array( bufferLength );
+
+        canvasCtx.clearRect( 0, 0, WIDTH, HEIGHT );
+
+        function draw( ) {
+
+            drawVisual  = requestAnimationFrame( draw );
+
+            audioNode.getByteFrequencyData( dataArray );
+
+            canvasCtx.fillStyle = 'rgb(' + mainBg + ', ' + mainBg + ', ' + mainBg + ')';
+            canvasCtx.fillRect( 0, 0, WIDTH, HEIGHT );
+
+            let barWidth = ( WIDTH / bufferLength ) * 2.5;
+            let barHeight;
+            let x = 0;
+
+            for(let i = 0; i < bufferLength; i++) {
+
+                barHeight = dataArray[ i ];
+
+                canvasCtx.fillStyle = 'rgb(' + ( barHeight + 100 ) + ', ' + barBg + ', ' + barBg + ')';
+                canvasCtx.fillRect( x, HEIGHT - barHeight / 2, barWidth, barHeight / 2 );
+
+                x += barWidth + 1;
+            }
+
+        }
+
+        draw( );
+    },
+
+    $_footer: function() {
+        let $footer = document.createElement("footer");
+        return $footer;
+    }
+};

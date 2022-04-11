@@ -1,71 +1,100 @@
-( function( window, navigator, $, undefined ) {
+StereoPannerModuleNodeFactory = function () {
+}
 
-    /* StereoPannerModuleNode: Class for 'stereopannernode' node */
+StereoPannerModuleNodeFactory.prototype = {
+    typeName: "stereopanner",
 
-    $.StereoPannerModuleNodeFactory             = function () {
-    };
+    create: function(noiseModule) {
+        return new StereoPannerModuleNode(noiseModule);
+    },
 
-    $.StereoPannerModuleNodeFactory.prototype   = {
+    createUI: function(noiseModule, moduleItem) {
+        return new StereoPannerModuleNodeUI(noiseModule, moduleItem);
+    }
+}
 
-        typeName    : "stereopannernode",
+StereoPannerModuleNode = function(noiseModule) {
+    this.noiseModule = noiseModule;
+};
 
-        create      : function ( noiseModule ) {
+StereoPannerModuleNode.defaults = {
+    pan: 0
+};
 
-            return new $.StereoPannerModuleNode( noiseModule );
+StereoPannerModuleNode.prototype = {
+    defaultOptions: function() {
+        return StereoPannerModuleNode.defaults;
+    },
+
+    createModuleAudioNode: function(module) {
+        var node = this.noiseModule.audioContext.createStereoPanner();
+
+        node.pan.value = module.options.pan;
+
+        return node;
+    },
+};
+
+StereoPannerModuleNodeUI = function(noiseModule, moduleItem) {
+    this.noiseModule = noiseModule;
+    this.moduleItem = moduleItem;
+}
+
+StereoPannerModuleNodeUI.prototype = {
+    create: function() {
+        const moduleId = "module" + this.moduleItem.id;
+
+        let $section = document.createElement("section");
+        $section.id = moduleId;
+        $section.name = this.moduleItem.module.name;
+        $section.classList.add("noise-module-node");
+        $section.classList.add(this.moduleItem.module.nodeType);
+
+        appendElementToTarget(this.$_header(), $section);
+        appendElementToTarget(this.$_content(), $section);
+        appendElementToTarget(this.$_footer(), $section);
+
+        return $section;
+    },
+
+    $_header: function() {
+        let $name = document.createElement("h6");
+        $name.innerText = this.moduleItem.module.name;
+
+        let $header = document.createElement("header");
+        appendElementToTarget($name, $header);
+        return $header;
+    },
+
+    $_content: function() {
+        let $section = document.createElement("section");
+
+        let $panSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["pan"].value,
+                -1,
+                1,
+                0.01,
+                this._sliderChanged("pan"),
+            ),
+            "pan",
+            "pan",
+            "",
+        );
+
+        appendElementToTarget($panSlider, $section);
+        return $section;
+    },
+
+    _sliderChanged: function(property) {
+        let _self = this;
+        return function(e) {
+            _self.moduleItem.audioNode[property].value = this.value;
         }
-    };
+    },
 
-    $.StereoPannerModuleNode           = function ( noiseModule ) {
-
-        this.nm = noiseModule;
-    };
-
-    $.StereoPannerModuleNode.defaults  = {
-
-        stereoPannerPan : 0
-    };
-
-    $.StereoPannerModuleNode.prototype = {
-
-        defaultOptions        : function ( ) {
-            return $.StereoPannerModuleNode.defaults;
-        },
-
-        createModuleAudioNode : function ( module ) {
-
-            var node = this.nm.audioContext.createStereoPanner ( );
-
-            node.pan.value = module.options.stereoPannerPan;
-
-            return node;
-
-        },
-
-        createModuleDiv       : function ( module, audioNode ) {
-
-            let $container  = this.nm.ui.createContentContainer( );
-            let $panDiv     = this.nm.ui.createSimpleSliderControl( audioNode, 'pan', -1, 1, 0.01, "" );
-
-            this.nm.ui.appendElementToTarget( $panDiv, $container );
-
-            return $container;
-        },
-
-        resetModuleSettings   : function ( module, audioNode ) {
-
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'pan', module.options.stereoPannerPan );
-        },
-
-        exportOptions         : function ( ) {
-
-            let options     = this._self.module.options;
-            let settings    = this.nm.buildModuleOptions( options );
-
-            settings.stereoPannerPan = this._self.outNode.pan.value;
-
-            return settings;
-        },
-
-    };
-
-} )( window, navigator, jQuery );
+    $_footer: function() {
+        let $footer = document.createElement("footer");
+        return $footer;
+    }
+}

@@ -1,445 +1,336 @@
-( function( window, navigator, $, undefined ) {
+const ALL_NODES_FACTORIES = function() {
 
-    /* Noise Module Object */
+    let gainFactory = new GainModuleNodeFactory();
+    let filterFactory = new BiquadFilterModuleNodeFactory();
+    let eqFactory = new EqualizerModuleNodeFactory(gainFactory, filterFactory);
+    let kingFactory = new KingTubbyModuleNodeFactory(gainFactory);
+    let noiseFactory = new NoiseModuleNodeFactory();
+    let oscFactory = new OscilatorModuleNodeFactory();
+    let liveFactory = new LiveInputModuleNodeFactory();
+    let noiseRadioFactory = new NoiseRadioModuleNodeFactory();
+    let delayFactory = new DelayModuleNodeFactory();
+    let convolverFactory = new ConvolverModuleNodeFactory();
+    let compressorFactory = new DynamicsCompressorModuleNodeFactory();
+    let pannerFactory = new StereoPannerModuleNodeFactory();
+    let shapperFactory = new WaveShaperModuleNodeFactory();
+    let analyserFactory = new AnalyserModuleNodeFactory();
+    let recorderFactory = new RecorderModuleNodeFactory();
 
-    $.NoiseModule           = function ( options, element ) {
+    let config = {};
 
-        this.$el    = $( element );
+    config[gainFactory.typeName] = gainFactory;
+    config[filterFactory.typeName] = filterFactory;
+    config[eqFactory.typeName] = eqFactory;
+    config[kingFactory.typeName] = kingFactory;
+    config[noiseFactory.typeName] = noiseFactory;
+    config[oscFactory.typeName] = oscFactory;
+    config[liveFactory.typeName] = liveFactory;
+    config[noiseRadioFactory.typeName] = noiseRadioFactory;
+    config[delayFactory.typeName] = delayFactory;
+    config[convolverFactory.typeName] = convolverFactory;
+    config[compressorFactory.typeName] = compressorFactory;
+    config[pannerFactory.typeName] = pannerFactory;
+    config[shapperFactory.typeName] = shapperFactory;
+    config[analyserFactory.typeName] = analyserFactory;
+    config[recorderFactory.typeName] = recorderFactory;
 
-        if ( !options.fileMode ) {
+    return config; 
+}
 
-            this._init ( options );
+let NoiseModule = function(options) {
+    this._init(options);
+}
+
+NoiseModule.defaults = {
+    
+    containerElId: undefined,
+
+    /* Node Type :
+        noise           { white, pink, brown }
+        oscillator      { sine, square, sawtooth, triangle }
+        liveinput
+        noiseradio
+        biquadfilter    { lowpass, highpass, bandpass, lowshelf, highshelf, peaking, notch, allpass }
+        equalizer
+        delay
+        kingtubby
+        convolver       {  }
+        dynamicscompressor
+        gain
+        stereopanner
+        waveshaper
+        analyser        { sinewave, frequencybars }
+        recorder
+    */
+    modules: [
+        /* Example:
+        { name: "WhiteNoise", nodeType: "noise" },
+        { name: "Gain", nodeType: "gain" }
+        */
+    ],
+
+    connections: [
+        /* Example:
+        { srcNode: "WhiteNoise", destNode: "Gain", connected: true },
+        { srcNode: "Gain", destNode: "output", connected: true }
+        */
+    ],
+
+    nodesFactories: ALL_NODES_FACTORIES,
+}
+
+NoiseModule.prototype = {
+
+    _init: function(options) {
+        this.options = extend({}, NoiseModule.defaults, options);
+
+        // initialize members
+        this.moduleCounter = 0;
+        this.moduleInstaces = [];
+        this.registeredFactories = this.options.nodesFactories();
+
+        // create audio context
+        this.audioContext = this._createAudioContext();
+
+        // create modules
+        this._createModules();
+
+        // create modules UI
+        this._createModulesUI();
+    },
+
+    _createAudioContext: function() {
+        let AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioContext = new AudioContext();
+
+        console.log('AudioContext state is', audioContext.state);
+
+        audioContext.addEventListener('statechange', function(e) {
+            console.log( 'AudioContext state changed to', audioContext.state);
+        });
+
+        return audioContext;
+    },
+
+    resumeAudioContext: function() {
+        if (!this.audioContext || this.audioContext.state === 'running') {
+            return;
+        }
+
+        /* TODO: Error in Chrome: https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio */
+        this.audioContext.resume().then(() => {
+            console.log('Playback resumed successfully');
+        });
+    },
+
+    _createModules: function() {
+        let _self = this;
+
+        // create all modules
+        this.moduleInstaces =
+            this.options.modules.map(m => _self._createModule(m));
+
+        // create module connections
+        this.options.connections
+            .forEach(c => _self._createConnection(c));
+    },
+
+    _createModule: function(module) {
+        // Find Factory for module
+        let factory  = this.registeredFactories[module.nodeType];
+        if (!factory) {
+            console.error("Could not find factory for module:", module);
+            return;
+        }
+
+        // Create new instance for the module
+        let moduleImpl  = factory.create(this);
+
+        module.options = extend({}, moduleImpl.defaultOptions(), module.options);
+
+        let audioNode = moduleImpl.createModuleAudioNode(module);
+
+        let inNode;
+        let outNode;
+        let allNodes;
+
+        if (!audioNode) {
+            inNode = undefined;
+            outNode = undefined;
+            allNodes = undefined;
         }
         else {
-
-            this._initFromFile( );
+            inNode = audioNode.inNode || audioNode;
+            outNode = audioNode.outNode || audioNode;
+            allNodes = audioNode.allNodes;
         }
-    };
 
-    $.NoiseModule.defaults  = {
+        // increase module counter
+        this.moduleCounter++;
 
-        /* Node Type :
-            noise           { white, pink, brown }
-            oscillator      { sine, square, sawtooth, triangle }
-            liveinput
-            radionode
-            soundcloudnode
-            biquadfilter        { lowpass, highpass, bandpass, lowshelf, highshelf, peaking, notch, allpass }
-            equalizer
-            delay
-            kingtubbynode
-            convolver       {  }
-            dynamicscompressor
-            gain
-            stereopannernode
-            waveshapernode
-            periodicwave
-            analyser        { sinewave, frequencybars }
-            recorder
-        */
-        modules         : [
-            { name: "WhiteNoise", nodeType: "noise", type: "white", options: { started: false } },
-            { name: "Gain", nodeType: "gain", type: "", options: { gainGain: 0.7 } }
-        ],
+        // register audio node
+        let moduleItem = {
+            id: this.moduleCounter,
+            name: module.name,
+            inNode: inNode,
+            outNode: outNode,
+            allNodes: allNodes,
+            module: module,
+            audioNode: audioNode,
+            moduleImpl: moduleImpl,
+            factory: factory,
+        };
 
-        connections     : [
-            { srcNode: "WhiteNoise", destNode: "Gain", connected: true },
-            { srcNode: "Gain", destNode: "output", connected: true }
-        ],
+        return moduleItem;
+    },
 
-        /* TODO: Move to UI */
-        fileMode        : false,
-
-        moduleDefaults  : {
-
-            started         : true,
-            lockPosition    : false,
-
-            /* TODO: Move to UI */
-            position        : { x: 80, y: 80 },
+    _createModulesUI: function() {
+        if (!this.options.containerElId) {
+            console.error("Container Element ID is missing");
+            return;
         }
-    };
 
-    $.NoiseModule.prototype = {
+        let $containerEl = document.getElementById(this.options.containerElId);
+        if (!$containerEl) {
+            console.error("Could not locate element", this.options.containerElId);
+            return;
+        }
 
-        _init                           : function ( options ) {
+        let _self = this;
 
-            // the options
-            this.options        = $.extend( true, {}, $.NoiseModule.defaults, options );
-
-            // initialize counters
-            this.moduleCounter          = 0;
-            this.moduleInstaces         = [];
-            this.registeredFactories    = [];
-
-            // register all node implementations
-            this._registerModuleFactories( );
-
-            // remove all containers
-            if ( this.$containerEl ) {
-                this.$containerEl.remove( );
-            }
-
-            // create audio context
-            this._createAudioContext();
-
-            // create modules
-            this._createModules();
-
-            let settings = this.export();
-            console.log("settings", settings);
-        },
-
-        _registerModuleFactories        : function ( ) {
-
-            if (!this.options._nodeRegistrationConfig) {
-                console.error("Could not find Node Registration Configuration for the NoiseModule");
-                return;
-            }
-
-            this.registeredFactories = this.options._nodeRegistrationConfig( );
-        },
-
-        _findModuleInstanseByName       : function ( moduleName ) {
-
-            const instanceArr =
-                this.moduleInstaces
-                    .filter(i => i.name === moduleName);
-
-            return instanceArr.length === 1 ? instanceArr[ 0 ] : void(0);
-        },
-
-        _createAudioContext             : function ( ) {
-
-            let _self = this;
-
-            let audioContext;
-
-            if (typeof AudioContext !== "undefined") {
-                audioContext = new AudioContext();
-            }
-            else if (typeof webkitAudioContext !== "undefined") {
-                audioContext = new webkitAudioContext();
-            }
-            else {
-                throw new Error('AudioContext not supported. :(');
-            }
-
-            this.audioContext = audioContext;
-
-            console.log( 'AudioContext state is', this.audioContextState());
-
-            this.audioContext.addEventListener( 'statechange', function( e ) {
-                console.log( 'AudioContext state changed to', _self.audioContextState() );
-            } );
-        },
-
-        audioContextState               : function ( ) {
-            if ( !this.audioContext ) {
-                return void(0);
-            }
-
-            return this.audioContext.state;
-        },
-
-        resumeAudioContext              : function ( ) {
-
-            if ( this.audioContextState() === 'running' ) {
-                return;
-            }
-
-            /* TODO: Error in Chrome: https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio */
-            this.audioContext.resume().then(() => {
-                console.log('Playback resumed successfully');
+        this.moduleInstaces
+            .forEach(i => {
+                let uiBuilder = i.factory.createUI(_self, i);
+                let $moduleEl = uiBuilder.create();
+                appendElementToTarget($moduleEl, $containerEl);
             });
-        },
+    },
 
-        _createModules                  : function ( ) {
+    _createConnection: function(connection) {
+        let srcModule = this._findModule(connection.srcNode);
+        if (!srcModule) {
+            console.error("Could not locate Source Module for Connection", connection);
+            return;
+        }
 
-            // create container for all modules
-            var template        = `
-              <section id="noise-module-container" class="noise-module-container">
-              </section>`;
+        if (connection.connected === false || 
+            srcModule.options.started === false) {
+            return;
+        }
 
-            this.$containerEl   = $( template );
-            this.$el.prepend( this.$containerEl );
+        let srcAudio = this._findAudioNode(connection.srcNode);
+        if (!srcAudio) {
+            console.error("Could not locate Source Audio for Connection", connection);
+            return;
+        }
 
-            let _self = this;
+        if (connection.destNode === "output") {
+            this.connectNodes(srcAudio.outNode, this.audioContext.destination);
+            return;
+        }
 
-            // create all modules
-            this.moduleInstaces =
-                this.options.modules.map( m => _self._createModule( m ) );
+        let destAudio = this._findAudioNode(connection.destNode);
+        if (!destAudio) {
+            console.error("Could not locate Source Audio for Connection", connection);
+            return;
+        }
 
+        this.connectNodes(srcAudio.outNode, destAudio.inNode);
+    },
 
-            // create module connections
-            this.options.connections
-                .forEach( c => _self._createConnection( c ) );
-        },
+    _findModule: function(moduleName) {
+        const moduleArr =
+            this.options.modules
+                .filter(m => m.name === moduleName);
 
-        _createModule                   : function ( module ) {
+        return moduleArr.length === 1 ? moduleArr[0] : void(0);
+    },
 
-            // Find Factory for module
-            let factory  = this.registeredFactories[ module.nodeType ];
+    _findModuleInstanseByName: function(moduleName) {
+        const instanceArr =
+            this.moduleInstaces
+                .filter(i => i.name === moduleName);
 
-            if ( !factory ) {
-                console.error("Could not find factory for module:", module);
-                return;
+        return instanceArr.length === 1 ? instanceArr[0] : void(0);
+    },
+
+    _findAudioNode: function(moduleName) {
+        const instance = this._findModuleInstanseByName(moduleName);
+        if (!instance) {
+            return void(0);
+        }
+
+        return { 
+            inNode: instance.inNode, 
+            outNode: instance.outNode 
+        };
+    },
+
+    connectNodes: function(srcNode, destNode) {
+        if (!srcNode || !destNode) {
+            console.error( "Could not create connection. Source and Destination should exist.", srcNode, destNode);
+            return;
+        }
+
+        srcNode.connect(destNode);
+    },
+
+    _disconnectNodes: function(srcNode, destNode) {
+        if (!srcNode || !destNode) {
+            console.error("Could not disconnect connection. Source and Destination should exist.", srcNode, destNode);
+            return;
+        }
+
+        srcNode.disconnect(destNode);
+    },
+
+    updateAudioNode: function(moduleName, audioInNode, audioOutNode) {
+        let instance = this._findModuleInstanseByName(moduleName);
+        if (!instance) {
+            return;
+        }
+
+        instance.inNode  = audioInNode;
+        instance.outNode = audioOutNode || audioInNode;
+    },
+
+    connectAllDestinations: function(module) {
+        let _self = this;
+
+        this.options.connections
+            .filter(c => c.srcNode === module.name)
+            .forEach(c => {
+                let srcNode = _self._findAudioNode(c.srcNode);
+                let destNode = _self._findAudioNode(c.destNode);
+
+                _self.connectNodes(srcNode.outNode, destNode.inNode);
+            });
+    },
+
+    disconnectAllDestinations: function(module) {
+        let _self = this;
+
+        this.options.connections
+            .filter(c => c.srcNode === module.name)
+            .forEach(c => {
+                let srcNode = _self._findAudioNode(c.srcNode);
+                let destNode = _self._findAudioNode(c.destNode);
+
+                _self._disconnectNodes(srcNode.outNode, destNode.inNode);
+            });
+    },
+};
+
+let extend = function() {
+    for (let i = 1; i < arguments.length; i++) {
+        if (!arguments[i]) {
+            continue;
+        }
+        for (let key in arguments[i]) {
+            if (arguments[i].hasOwnProperty(key)) {
+                arguments[0][key] = arguments[i][key];
             }
-
-            // Create new instance for the module
-            let moduleImpl  = factory.create( this );
-
-            let moduleDefaultOptions =
-                $.extend( true, {}, this.options.moduleDefaults, moduleImpl.defaultOptions() );
-
-            module.options =
-                $.extend( true, {}, moduleDefaultOptions, module.options );
-
-            var audioNode = moduleImpl.createModuleAudioNode( module );
-
-            var inNode;
-            var outNode;
-            var allNodes;
-
-            if (!audioNode) {
-
-                inNode      = undefined;
-                outNode     = undefined;
-                allNodes    = undefined;
-            }
-            else {
-
-                inNode      = audioNode.inNode || audioNode;
-                outNode     = audioNode.outNode || audioNode;
-                allNodes    = audioNode.allNodes;
-            }
-
-            // increase module counter
-            this.moduleCounter++;
-
-            // register audio node
-            var moduleItem = {
-                id          : this.moduleCounter,
-                name        : module.name,
-                inNode      : inNode,
-                outNode     : outNode,
-                allNodes    : allNodes,
-                module      : module,
-                audioNode   : audioNode,
-                moduleImpl  : moduleImpl
-            };
-
-            moduleItem.moduleImpl._self = moduleItem;
-
-            return moduleItem;
-        },
-
-        _createConnection               : function ( connection ) {
-
-            var srcModule   = this._findModule( connection.srcNode );
-
-            if ( connection.connected === false ||
-                 srcModule.options.started === false ) {
-                return;
-            }
-
-            var srcAudio    = this._findAudioNode( connection.srcNode );
-            var srcNode     = srcAudio.outNode;
-            var destNode;
-
-            if ( connection.destNode === "output" ) {
-
-                this._connectNodeToDestination( srcNode );
-            }
-            else {
-
-                var destAudio   = this._findAudioNode( connection.destNode );
-                destNode = destAudio.inNode;
-
-                this.connectNodes( srcNode, destNode );
-            };
-
-        },
-
-        _findModule                     : function ( moduleName ) {
-
-            const moduleArr =
-                this.options.modules
-                    .filter( m => m.name === moduleName );
-
-            return moduleArr.length === 1 ? moduleArr[ 0 ] : void(0);
-        },
-
-        _findModuleConnections          : function ( module, direction ) {
-
-            const askedNodeDir    = direction == 'in' ? 'destNode' : 'srcNode';
-            const givenNodeDir    = direction == 'in' ? 'srcNode' : 'destNode';
-
-            const conns =
-                this.options.connections
-                    .filter( c => c[ askedNodeDir ] === module.name )
-                    .map( c => c[ givenNodeDir ] );
-
-            return conns;
-        },
-
-        _findAudioNode                  : function ( moduleName ) {
-
-            const instance = this._findModuleInstanseByName( moduleName );
-
-            if ( !instance ) {
-                return void(0);
-            }
-
-            return { inNode: instance.inNode, outNode: instance.outNode };
-        },
-
-        _updateAudioNode                : function ( moduleName, audioInNode, audioOutNode ) {
-
-            let instance = this._findModuleInstanseByName( moduleName );
-
-            if ( !instance ) {
-                return void(0);
-            }
-
-            instance.inNode  = audioInNode;
-            instance.outNode = audioOutNode || audioInNode;
-        },
-
-        _connectNodeToDestination       : function ( node ) {
-
-            this.connectNodes ( node, this.audioContext.destination );
-        },
-
-        connectNodes                    : function ( srcNode, destNode ) {
-
-            if ( !srcNode || !destNode ) {
-
-                console.error( "Could not create connection. Source and Destination should exist.", srcNode, destNode );
-                return;
-            }
-
-            srcNode.connect ( destNode );
-        },
-
-        _disconnectNodes                : function ( srcNode, destNode ) {
-
-            if ( !srcNode || !destNode ) {
-
-                console.error( "Could not disconnect connection. Source and Destination should exist.", srcNode, destNode );
-                return;
-            }
-
-            srcNode.disconnect ( destNode );
-        },
-
-        _connectAllDestinations         : function ( module ) {
-
-            let _self = this;
-
-            this.options.connections
-                .filter( c => c.srcNode === module.name )
-                .forEach( c => {
-
-                    let srcNode     = _self._findAudioNode( c.srcNode ).outNode;
-                    let destNode    = _self._findAudioNode( c.destNode ).inNode;
-
-                    _self.connectNodes( srcNode, destNode );
-                });
-        },
-
-        _disconnectAllDestinations      : function ( module ) {
-
-            let _self = this;
-
-            this.options.connections
-                .filter( c => c.srcNode === module.name )
-                .forEach( c => {
-
-                    let srcNode     = _self._findAudioNode( c.srcNode ).outNode;
-                    let destNode    = _self._findAudioNode( c.destNode ).inNode;
-
-                    _self._disconnectNodes( srcNode, destNode );
-                });
-        },
-
-        buildModuleOptions              : function ( moduleOptions ) {
-
-            let options = {};
-
-            options.started         = moduleOptions.started;
-            options.lockPosition    = moduleOptions.lockPosition;
-            options.position        = moduleOptions.position;
-
-            return options;
-        },
-
-        _exportModuleOptions            : function ( moduleImpl ) {
-
-            let options;
-
-            if ( moduleImpl.exportOptions ) {
-                options = moduleImpl.exportOptions();
-            }
-            else {
-                options = moduleImpl.defaultOptions();
-            }
-
-            return options;
-        },
-
-        _exportModuleSettings           : function ( moduleInstace ) {
-
-            let impl    = moduleInstace.moduleImpl;
-            let mod     = moduleInstace.module;
-
-            let data    = {};
-
-            data.name       = mod.name;
-            data.nodeType   = mod.nodeType;
-
-            if ( mod.type ) {
-                data.type   = mod.type;
-            }
-
-            data.options    = this._exportModuleOptions( impl );
-
-            return data;
-        },
-
-        export                          : function ( ) {
-
-            let _self       = this;
-            let settings    = {};
-
-            settings.modules =
-                this.moduleInstaces
-                    .map( m => _self._exportModuleSettings( m ) );
-
-            settings.connections =
-                this.options.connections
-                    .map(c => Object.assign( {}, c ));
-
-            return settings;
-        },
-
-        _requestGET                     : function ( url, callback ) {
-
-            var request = new XMLHttpRequest( );
-
-            request.onreadystatechange = function( ) {
-
-                if (request.readyState === 4 &&
-                    request.status === 200) {
-                    callback( request.responseText );
-                }
-            };
-
-            request.open( "GET", url, true );
-            request.send( null );
-
-        },
-
-    };
-
-} )( window, navigator, jQuery );
+        }
+    }
+    return arguments[0];
+}

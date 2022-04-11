@@ -8,17 +8,17 @@ body {
 	color: #4c4c4c;
 }
 
-.noise-module {
+.noise-module-node {
 	border-radius: 5px;
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 	margin: 10px;
 	display: inline-block;
-	position: absolute;
+	/* position: absolute; */
 	/* position: relative; */
     z-index: 9;
 }
 
-.noise-module header.nm-header {
+.noise-module-node header {
     background-color: #F8F8F8;
     border-bottom: 1px solid #DBDBDB;
     /* font-size: 9px; */
@@ -28,9 +28,8 @@ body {
     z-index: 10;
 }
 
-.noise-module .nm-header-title {
+.noise-module-node header h6 {
 	text-decoration: none;
-	/* border-bottom: 1px solid #dbdbdb; */
 	border-radius: 5px 5px 0 0;
 	padding-bottom: 5px;
 	font-size: 11px;
@@ -40,29 +39,7 @@ body {
 	text-transform: uppercase;
 }
 
-.noise-module img.nm-bypass {
-	background: url("../img/bypass_16.png") 0 0 no-repeat;
-	height: 16px;
-	width: 16px;
-	text-indent: -999em;
-	position: absolute;
-	left: 8px;
-	top: 8px;
-	cursor: pointer;
-}
-
-.noise-module img.nm-reset {
-	background: url("../img/reset_16.png") 0 0 no-repeat;
-	height: 16px;
-	width: 16px;
-	text-indent: -999em;
-	position: absolute;
-	right: 8px;
-	top: 8px;
-	cursor: pointer;
-}
-
-.noise-module .nm-content {
+.noise-module-node section {
 	background: #fff;
 	width: 162px;
 	overflow: hidden;
@@ -70,69 +47,7 @@ body {
 	position: relative;
 }
 
-.noise-module .nm-content-title {
-	text-decoration: none;
-	border-bottom: 1px solid #dbdbdb;
-	border-radius: 5px 5px 0 0;
-	padding-bottom: 5px;
-	font-size: 11px;
-	margin: 0 0 11px;
-	text-align: center;
-	text-transform: uppercase;
-}
-
-.noise-module .nm-header.bypassed {
-	text-decoration: line-through;
-}
-
-.nm-slider-info {
-	font-size: 10px;
-	margin-bottom: 1px;
-	overflow: hidden;
-	padding-bottom: 3.4px;
-	position: relative;
-}
-
-.nm-label {
-	font-size: 10px;
-	display: inline;
-	float: left;
-	text-transform: uppercase;
-	width: 49%;
-}
-
-.nm-label.info {
-	width: 98%;
-}
-
-.nm-label.info.link {
-	cursor: pointer;
-}
-
-.nm-label.nm-list {
-	list-style-type: none;
-	padding: 0px;
-	margin-top: 0px;
-	margin-bottom: 0px;
-}
-
-.nm-slider-info .nm-label {
-	display: inline;
-	float: left;
-	text-transform: uppercase;
-	width: 49%;
-}
-
-.nm-slider-info .nm-value {
-	display: inline;
-	float: right;
-	font-weight: bold;
-	text-align: right;
-	text-transform: uppercase;
-	width: 49%;
-}
-
-.noise-module .nm-content input[type="range"] {
+.noise-module-node section input[type="range"] {
     -webkit-appearance: none;
     background-color: #303030;
     height: 2px;
@@ -144,7 +59,32 @@ body {
     width: 100%;
 }
 
-.noise-module .nm-content img.nm-play-button {
+.noise-module-node div.nm-slider-info {
+	font-size: 10px;
+	margin-bottom: 1px;
+	overflow: hidden;
+	padding-bottom: 3.4px;
+	position: relative;
+}
+
+.noise-module-node .nm-slider-info span.nm-label {
+	font-size: 10px;
+	display: inline;
+	float: left;
+	text-transform: uppercase;
+	width: 49%;
+}
+
+.noise-module-node .nm-slider-info span.nm-value {
+	display: inline;
+	float: right;
+	font-weight: bold;
+	text-align: right;
+	text-transform: uppercase;
+	width: 49%;
+}
+
+.noise-module-node section img.nm-play-button {
 	display: block;
 	margin: 0 auto;
 	height: 48px;
@@ -152,31 +92,31 @@ body {
 	cursor: pointer;
 }
 
-.noise-module .nm-content img.nm-play-button.play {
+.noise-module-node section img.nm-play-button.play {
     background-image: url("../img/play_48.png");
 }
 
-.noise-module .nm-content img.nm-play-button.stop {
+.noise-module-node section img.nm-play-button.stop {
     background-image: url("../img/stop_48.png");
 }
 
-.noise-module .nm-content img.nm-play-button.pause {
+.noise-module-node section img.nm-play-button.pause {
     background-image: url("../img/pause_48.png");
 }
 
-.noise-module .nm-content canvas {
+.noise-module-node section canvas {
 	background-image: url("../img/blueprint-dark.png");
 	display: inline-block;
 	width: 100%;
 }
 
 
-.noise-module .nm-content .pre-amp input[type="range"],
-.noise-module .nm-content .eq-band input[type="range"] {
+.noise-module-node section .pre-amp input[type="range"],
+.noise-module-node section .eq-band input[type="range"] {
 	/*transform: rotate(90deg);*/
 }
 
-.noise-module footer.nm-footer {
+.noise-module-node footer {
     background-color: #F8F8F8;
     border-top: 1px solid #DBDBDB;
     font-size: 9px;
@@ -184,47 +124,4 @@ body {
     border-radius: 0px 0px 5px 5px;
     overflow: hidden;
     padding: 0em 0.4em 0.1em;
-}
-
-.noise-module .nm-footer .nm-direction {
-	display: inline;
-	text-transform: lowercase;
-	height: 100%
-}
-
-.noise-module .nm-footer .direction-in {
-	float: left;
-	width: 49%;
-}
-
-.noise-module .nm-footer .direction-out {
-	float: right;
-	text-align: right;
-	width: 49%;
-}
-
-.noise-module .nm-footer img {
-	background-image: url("../img/right_16.png");
-	height: 16px;
-	width: 16px;
-	text-indent: -999em;
-	position: relative;
-	display: inline-block;
-	cursor: pointer;
-}
-
-.noise-module.begin-out-connection .nm-footer img.icon-out {
-	background-color: red;
-}
-
-.noise-module.begin-in-connection .nm-footer img.icon-in {
-	background-color: green;
-}
-
-.noise-module .nm-footer .nm-direction .nm-list {
-	list-style-type: none;
-	padding: 0px;
-	margin-top: 0px;
-	margin-bottom: 0px;
-	position: relative;
 }
