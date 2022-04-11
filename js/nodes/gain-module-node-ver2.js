@@ -18,7 +18,7 @@ GainModuleNode = function(noiseModule) {
 };
 
 GainModuleNode.defaults = {
-    gainGain: 0.7
+    gain: 0.7
 }
 
 GainModuleNode.prototype = {
@@ -27,7 +27,7 @@ GainModuleNode.prototype = {
     },
 
     createModuleAudioNode: function(module) {
-        return this.createGain(module.options.gainGain);
+        return this.createGain(module.options.gain);
     },
 
     createGain: function(value) {

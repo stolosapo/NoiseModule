@@ -4,7 +4,7 @@ let noiseModuleInit = function(containerElId) {
     config.containerElId = containerElId;
     
     config.modules = [
-        { name: "WhiteNoise", nodeType: "noise", type: "white", options: { started: false } },
+        { name: "WhiteNoise", nodeType: "noise", options: { type: "white", started: false } },
         { name: "NoiseRadio", nodeType: "noiseradionode", options: { audioIdSelector: undefined } },
         { name: "LiveInput", nodeType: "liveinput", options: { started: false } },
         { name: "KingTubby", nodeType: "kingtubbynode", options: {
@@ -42,7 +42,7 @@ let noiseModuleInit = function(containerElId) {
                 { description: '16 KHz', type: 'highshelf', frequency: 16000, detune: 0, Q: 1, gain: 0 }
             ]
         }},
-        { name: "Gain", nodeType: "gain", options: { gainGain: 0.7 } },
+        { name: "Gain", nodeType: "gain", options: { gain: 0.7 } },
         { name: "Recorder", nodeType: "recorder", options: { } },
         { name: "Analyser", nodeType: "analyser", options: {
             // { sinewave, frequencybars }

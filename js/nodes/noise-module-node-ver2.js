@@ -18,6 +18,8 @@ NoiseModuleNode = function(noiseModule) {
 };
 
 NoiseModuleNode.defaults = {
+    /* { white, pink, brown } */
+    type: "white",
     started: false
 };
 
