@@ -2,7 +2,7 @@ WaveShaperModuleNodeFactory = function () {
 };
 
 WaveShaperModuleNodeFactory.prototype = {
-    typeName: "waveshapernode",
+    typeName: "waveshaper",
 
     create: function(noiseModule) {
         return new WaveShaperModuleNode(noiseModule);

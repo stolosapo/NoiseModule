@@ -1,19 +1,19 @@
 let noiseModuleInit = function(containerElId) {
-    let config = NoiseModule.defaults;
+    let config = {};
 
     config.containerElId = containerElId;
     
     config.modules = [
         { name: "WhiteNoise", nodeType: "noise" },
-        { name: "NoiseRadio", nodeType: "noiseradionode" },
+        { name: "NoiseRadio", nodeType: "noiseradio" },
         { name: "LiveInput", nodeType: "liveinput" },
-        { name: "KingTubby", nodeType: "kingtubbynode" },
+        { name: "KingTubby", nodeType: "kingtubby" },
         { name: "SineWave", nodeType: "oscillator" },
         { name: "BiquadFilter", nodeType: "biquadfilter" },
         { name: "Delay", nodeType: "delay" },
         { name: "DynamicsCompressor", nodeType: "dynamicscompressor" },
-        { name: "WaveShaper", nodeType: "waveshapernode" },
-        { name: "Panner", nodeType: "stereopannernode" },
+        { name: "WaveShaper", nodeType: "waveshaper" },
+        { name: "Panner", nodeType: "stereopanner" },
         // { name: "Convolver", nodeType: "convolver" },
         { name: "Eq", nodeType: "equalizer" },
         { name: "Gain", nodeType: "gain" },

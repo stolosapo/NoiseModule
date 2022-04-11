@@ -7,7 +7,7 @@ const ALL_NODES_FACTORIES = function() {
     let noiseFactory = new NoiseModuleNodeFactory();
     let oscFactory = new OscilatorModuleNodeFactory();
     let liveFactory = new LiveInputModuleNodeFactory();
-    let radioFactory = new NoiseRadioModuleNodeFactory();
+    let noiseRadioFactory = new NoiseRadioModuleNodeFactory();
     let delayFactory = new DelayModuleNodeFactory();
     let convolverFactory = new ConvolverModuleNodeFactory();
     let compressorFactory = new DynamicsCompressorModuleNodeFactory();
@@ -25,7 +25,7 @@ const ALL_NODES_FACTORIES = function() {
     config[noiseFactory.typeName] = noiseFactory;
     config[oscFactory.typeName] = oscFactory;
     config[liveFactory.typeName] = liveFactory;
-    config[radioFactory.typeName] = radioFactory;
+    config[noiseRadioFactory.typeName] = noiseRadioFactory;
     config[delayFactory.typeName] = delayFactory;
     config[convolverFactory.typeName] = convolverFactory;
     config[compressorFactory.typeName] = compressorFactory;
@@ -49,25 +49,23 @@ NoiseModule.defaults = {
         noise           { white, pink, brown }
         oscillator      { sine, square, sawtooth, triangle }
         liveinput
-        radionode
-        soundcloudnode
-        biquadfilter        { lowpass, highpass, bandpass, lowshelf, highshelf, peaking, notch, allpass }
+        noiseradio
+        biquadfilter    { lowpass, highpass, bandpass, lowshelf, highshelf, peaking, notch, allpass }
         equalizer
         delay
-        kingtubbynode
+        kingtubby
         convolver       {  }
         dynamicscompressor
         gain
-        stereopannernode
-        waveshapernode
-        periodicwave
+        stereopanner
+        waveshaper
         analyser        { sinewave, frequencybars }
         recorder
     */
     modules: [
         /* Example:
-        { name: "WhiteNoise", nodeType: "noise", options: { type: "white", started: false } },
-        { name: "Gain", nodeType: "gain", options: { gain: 0.7 } }
+        { name: "WhiteNoise", nodeType: "noise" },
+        { name: "Gain", nodeType: "gain" }
         */
     ],
 
@@ -114,16 +112,8 @@ NoiseModule.prototype = {
         return audioContext;
     },
 
-    _audioContextState: function() {
-        if (!this.audioContext) {
-            return void(0);
-        }
-
-        return this.audioContext.state;
-    },
-
     resumeAudioContext: function() {
-        if (this._audioContextState() === 'running') {
+        if (!this.audioContext || this.audioContext.state === 'running') {
             return;
         }
 
@@ -274,14 +264,6 @@ NoiseModule.prototype = {
             inNode: instance.inNode, 
             outNode: instance.outNode 
         };
-    },
-
-    _getElementById: function(elementId) {
-        if (!elementId) {
-            return;
-        }
-
-        return document.getElementById(elementId);
     },
 
     connectNodes: function(srcNode, destNode) {

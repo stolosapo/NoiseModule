@@ -2,7 +2,7 @@ StereoPannerModuleNodeFactory = function () {
 }
 
 StereoPannerModuleNodeFactory.prototype = {
-    typeName: "stereopannernode",
+    typeName: "stereopanner",
 
     create: function(noiseModule) {
         return new StereoPannerModuleNode(noiseModule);

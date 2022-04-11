@@ -2,7 +2,7 @@ NoiseRadioModuleNodeFactory = function () {
 }
 
 NoiseRadioModuleNodeFactory.prototype = {
-    typeName: "noiseradionode",
+    typeName: "noiseradio",
 
     create: function (noiseModule) {
         return new NoiseRadioModuleNode(noiseModule);

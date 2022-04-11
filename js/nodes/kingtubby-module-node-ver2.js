@@ -3,7 +3,7 @@ KingTubbyModuleNodeFactory = function(gainModuleFactory) {
 };
 
 KingTubbyModuleNodeFactory.prototype = {
-    typeName: "kingtubbynode",
+    typeName: "kingtubby",
 
     create: function(noiseModule) {
         let gainModuleNode = this.gainModuleFactory.create(noiseModule);
