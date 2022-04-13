@@ -1,46 +1,59 @@
-StereoPannerModuleNodeFactory = function () {
+NoiseRadioModuleNodeFactory = function () {
 }
 
-StereoPannerModuleNodeFactory.prototype = {
-    typeName: "stereopanner",
+NoiseRadioModuleNodeFactory.prototype = {
+    typeName: "noiseradio",
 
-    create: function(noiseModule) {
-        return new StereoPannerModuleNode(noiseModule);
+    create: function (noiseModule) {
+        return new NoiseRadioModuleNode(noiseModule);
     },
 
     createUI: function(noiseModule, moduleItem) {
-        return new StereoPannerModuleNodeUI(noiseModule, moduleItem);
+        return new NoiseRadioModuleNodeUI(noiseModule, moduleItem);
     }
 }
 
-StereoPannerModuleNode = function(noiseModule) {
+NoiseRadioModuleNode = function(noiseModule) {
     this.noiseModule = noiseModule;
 };
 
-StereoPannerModuleNode.defaults = {
-    pan: 0
+NoiseRadioModuleNode.defaults = {
+    audioIdSelector: undefined,
 };
 
-StereoPannerModuleNode.prototype = {
+NoiseRadioModuleNode.prototype = {
     defaultOptions: function() {
-        return StereoPannerModuleNode.defaults;
+        return NoiseRadioModuleNode.defaults;
     },
 
     createModuleAudioNode: function(module) {
-        var node = this.noiseModule.audioContext.createStereoPanner();
+        let audio = this._getNoiseRadioAudioElement(module);
 
-        node.pan.value = module.options.pan;
+        if (!audio) {
+            console.error("Could not locate NoiseRadio audio element");
+            return;
+        };
 
-        return node;
+        let source = this.noiseModule.audioContext.createMediaElementSource(audio);
+
+        return source;
+    },
+
+    _getNoiseRadioAudioElement: function(module) {
+        if (!module.options.audioIdSelector) {
+            return void(0);
+        }
+
+        document.getElementById(module.options.audioIdSelector);
     },
 };
 
-StereoPannerModuleNodeUI = function(noiseModule, moduleItem) {
+NoiseRadioModuleNodeUI = function(noiseModule, moduleItem) {
     this.noiseModule = noiseModule;
     this.moduleItem = moduleItem;
 }
 
-StereoPannerModuleNodeUI.prototype = {
+NoiseRadioModuleNodeUI.prototype = {
     create: function() {
         const moduleId = "module" + this.moduleItem.id;
 
@@ -68,33 +81,11 @@ StereoPannerModuleNodeUI.prototype = {
 
     $_content: function() {
         let $section = document.createElement("section");
-
-        let $panSlider = createSliderWrapper(
-            createSliderControl(
-                this.moduleItem.audioNode["pan"].value,
-                -1,
-                1,
-                0.01,
-                this._sliderChanged("pan"),
-            ),
-            "pan",
-            "pan",
-            "",
-        );
-
-        appendElementToTarget($panSlider, $section);
         return $section;
-    },
-
-    _sliderChanged: function(property) {
-        let _self = this;
-        return function(e) {
-            _self.moduleItem.audioNode[property].value = this.value;
-        }
     },
 
     $_footer: function() {
         let $footer = document.createElement("footer");
         return $footer;
     }
-}
+};

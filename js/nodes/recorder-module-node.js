@@ -1,175 +1,184 @@
-( function( window, navigator, $, undefined ) {
+RecorderModuleNodeFactory = function() {
+};
 
-    /* RecorderModuleNode: Class for 'recorder' node */
+RecorderModuleNodeFactory.prototype = {
+    typeName: "recorder",
 
-    $.RecorderModuleNodeFactory             = function () {
-    };
+    create: function(noiseModule) {
+        return new RecorderModuleNode(noiseModule);
+    },
 
-    $.RecorderModuleNodeFactory.prototype   = {
+    createUI: function(noiseModule, moduleItem) {
+        return new RecorderModuleNodeUI(noiseModule, moduleItem);
+    },
+};
 
-        typeName    : "recorder",
+RecorderModuleNode = function(noiseModule) {
+    this.noiseModule = noiseModule;
+    this.mediaRecorder = undefined;
+    this.stopCallback = undefined;
+    this.chunks = [];
+    this.mediaRecordings = [];
+};
 
-        create      : function ( noiseModule ) {
+RecorderModuleNode.defaults = {
+};
 
-            return new $.RecorderModuleNode( noiseModule );
-        }
-    };
+RecorderModuleNode.prototype = {
+    defaultOptions: function() {
+        return RecorderModuleNode.defaults;
+    },
 
-    $.RecorderModuleNode           = function ( noiseModule ) {
+    createModuleAudioNode: function(module) {
+        let _self = this;
 
-        this.nm = noiseModule;
-    };
+        let recorder = this.noiseModule.audioContext.createMediaStreamDestination();
+        let mediaRecorder = new MediaRecorder(recorder.stream);
+        mediaRecorder.ignoreMutedMedia = true;
 
-    $.RecorderModuleNode.defaults     = {
+        this.mediaRecorder = mediaRecorder;
 
-        recorderChunks          : [ ],
-        recorderStopCallback    : undefined,
-        recorderMediaRecorder   : undefined,
-        recorderMediaRecordings : [ ]
-    };
+        // push each chunk (blobs) in an array
+        mediaRecorder.ondataavailable = function(e) {
+            _self.chunks.push(e.data);
+        };
 
-    $.RecorderModuleNode.prototype = {
+        // Make blob out of our blobs, and open it.
+        mediaRecorder.onstop = function(e) {
+            let blob = new Blob(_self.chunks, { 'type' : 'audio/ogg; codecs=opus' });
+            let audioURL = window.URL.createObjectURL(blob);
 
-        defaultOptions                : function ( ) {
-            return $.RecorderModuleNode.defaults;
-        },
+            _self.mediaRecordings.push(audioURL);
 
-        createModuleAudioNode         : function ( module ) {
-
-            let recorder        = this.nm.audioContext.createMediaStreamDestination( );
-
-            let mediaRecorder   = new MediaRecorder( recorder.stream );
-            mediaRecorder.ignoreMutedMedia = true;
-
-            module.options.recorderMediaRecorder = mediaRecorder;
-
-
-            // push each chunk (blobs) in an array
-            mediaRecorder.ondataavailable   = function( e ) {
-
-                module.options.recorderChunks.push( e.data );
+            if (_self.stopCallback) {
+                _self.stopCallback(module);
             };
+        };
 
+        return recorder;
+    },    
+};
 
-            // Make blob out of our blobs, and open it.
-            mediaRecorder.onstop        = function( e ) {
+RecorderModuleNodeUI = function(noiseModule, moduleItem) {
+    this.noiseModule = noiseModule;
+    this.moduleItem = moduleItem;
+}
 
-                let blob = new Blob(module.options.recorderChunks, { 'type' : 'audio/ogg; codecs=opus' });
+RecorderModuleNodeUI.prototype = {
+    create: function() {
+        const moduleId = "module" + this.moduleItem.id;
 
-                let audioURL = window.URL.createObjectURL(blob);
+        let $section = document.createElement("section");
+        $section.id = moduleId;
+        $section.name = this.moduleItem.module.name;
+        $section.classList.add("noise-module-node");
+        $section.classList.add(this.moduleItem.module.nodeType);
 
-                module.options.recorderMediaRecordings.push( audioURL );
+        appendElementToTarget(this.$_header(), $section);
+        appendElementToTarget(this.$_content(), $section);
+        appendElementToTarget(this.$_footer(), $section);
 
-                if (module.options.recorderStopCallback != undefined) {
+        return $section;
+    },
 
-                    module.options.recorderStopCallback( module );
-                };
+    $_header: function() {
+        let $name = document.createElement("h6");
+        $name.innerText = this.moduleItem.module.name;
+
+        let $header = document.createElement("header");
+        appendElementToTarget($name, $header);
+        return $header;
+    },
+
+    $_content: function() {
+        let moduleImpl = this.moduleItem.moduleImpl;
+
+        let $section = document.createElement("section");
+
+        let $status = document.createElement("span");
+        $status.classList.add("nm-label");
+        $status.classList.add("info");
+        $status.innerText = "Status:";
+
+        let $list = document.createElement("ul");
+        $list.classList.add("nm-label");
+        $list.classList.add("nm-list");
+
+        let $play = createPlayPauseButton(
+            this.noiseModule, 
+            this.moduleItem.module, 
+            this._recorderPlayPauseClickEvent($status)
+        );
+
+        let $stop = this._createStopButton($status);
+
+        moduleImpl.stopCallback = function(module) {
+            $list.innerHTML = "";
+
+            moduleImpl.mediaRecordings.forEach((rec, index) => {
+                $a = document.createElement("a");
+                $a.setAttribute("href", rec);
+                $a.setAttribute("target", "_blank");
+                $a.innerText = "track" + (index + 1);
+
+                $li = document.createElement("li");
+                appendElementToTarget($a, $li);
+                appendElementToTarget($li, $list);
+            });
+        };
+
+        appendElementToTarget($play, $section);
+        appendElementToTarget($stop, $section);
+        appendElementToTarget($status, $section);
+        appendElementToTarget($list, $section);
+        return $section;
+    },
+
+    _createStopButton: function($statusEl) {
+        let _self = this;
+        let moduleImpl = this.moduleItem.moduleImpl;
+
+        let $button = document.createElement("img");
+        $button.classList.add("nm-play-button");
+        $button.classList.add("stop");
+
+        $button.addEventListener('click', function(e) {
+            _self.noiseModule.resumeAudioContext();
+    
+            let mediaRecorder = moduleImpl.mediaRecorder;
+    
+            if (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused') {
+                mediaRecorder.stop();
+                $statusEl.innerText = "Status: " + mediaRecorder.state + "...";
             };
+        });
+    
+        return $button;
+    },
 
-            return recorder;
+    _recorderPlayPauseClickEvent: function($statusEl) {
+        let moduleImpl = this.moduleItem.moduleImpl;
 
-        },
-
-        createModuleDiv               : function ( module, audioNode ) {
-
-            let $container      = this.nm.ui.createContentContainer( );
-
-            let stopImgClass    = [ 'stop' ];
-            let spanTemp        = '<span class="nm-label info"></span>';
-            let $span           = $( spanTemp );
-
-            let listTemp        = '<ul class="nm-label nm-list"></ul>';
-            let $list           = $( listTemp );
-
-            $span.text( 'Status:' );
-
-            let $play = this.nm.ui.createPlayPauseButton( module, audioNode, this._recorderPlayPauseClickEvent );
-            let $stop = this.nm.ui.createCustomButton( module, audioNode, stopImgClass, this._recorderStopClickEvent );
-
-            module.options.recorderStopCallback = function( module ) {
-
-                $list.empty( );
-
-                module.options.recorderMediaRecordings.forEach( (rec, index) => {
-
-                    let $a = $( '<a>' );
-                    $a.attr( 'href', rec );
-                    $a.attr( 'target', '_blank' );
-                    $a.text( 'track ' + (index + 1) );
-
-                    $list.append( $('<li>').append( $a ) );
-                } );
-            };
-
-            this.nm.ui.appendElementToTarget( $play, $container );
-            this.nm.ui.appendElementToTarget( $stop, $container );
-            this.nm.ui.appendElementToTarget( $span, $container );
-            this.nm.ui.appendElementToTarget( $list, $container );
-
-            return $container;
-        },
-
-        resetModuleSettings           : function ( module, audioNode ) {
-
-        },
-
-        exportOptions         : function ( ) {
-
-            let options     = this._self.module.options;
-            let settings    = this.nm.buildModuleOptions( options );
-
-            return settings;
-        },
-
-        _recorderPlayPauseClickEvent  : function ( self, $moduleEl, module, audioNode, playPause ) {
-
-            let mediaRecorder   = module.options.recorderMediaRecorder;
-            let $span       = $( $moduleEl ).find( '.nm-label.info' );
-
-
+        return function($button, e) {
+            let mediaRecorder = moduleImpl.mediaRecorder;  
+    
             if (mediaRecorder.state === 'inactive') {
-
-                module.options.recorderChunks = [ ];
-
-                mediaRecorder.start( );
+                moduleImpl.chunks = [];
+                mediaRecorder.start();
             }
             else if (mediaRecorder.state === 'paused') {
-
-                mediaRecorder.resume( );
+                mediaRecorder.resume();
             }
             else if (mediaRecorder.state === 'recording') {
-
-                mediaRecorder.pause( );
+                mediaRecorder.pause();
             };
+    
+            $statusEl.innerText = "Status: " + mediaRecorder.state + "...";
+        }
+    },
 
-            $span.text( "Status: " + mediaRecorder.state + "..." );
-
-        },
-
-        _recorderStopClickEvent       : function ( self, $moduleEl, module, audioNode ) {
-
-            let pauseClass      = 'pause';
-            let playClass       = 'play';
-
-            let mediaRecorder   = module.options.recorderMediaRecorder;
-            let $span       = $moduleEl.find( '.nm-label.info' );
-            let $img        = $moduleEl.find( '.nm-play-button.pause' );
-
-            if (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused') {
-
-                mediaRecorder.stop( );
-
-                if ( $img.length > 0 ) {
-
-                    $img.removeClass( pauseClass );
-                    $img.addClass( playClass );
-                }
-
-                $span.text( "Status: stopped" );
-            };
-
-        },
-
-    };
-
-} )( window, navigator, jQuery );
+    $_footer: function() {
+        let $footer = document.createElement("footer");
+        return $footer;
+    }
+};

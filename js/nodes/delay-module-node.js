@@ -1,73 +1,100 @@
-( function( window, navigator, $, undefined ) {
+DelayModuleNodeFactory = function () {
+}
 
-    /* DelayModuleNode: Class for 'delay' node */
+DelayModuleNodeFactory.prototype = {
+    typeName: "delay",
 
-    $.DelayModuleNodeFactory             = function () {
-    };
+    create: function (noiseModule) {
+        return new DelayModuleNode(noiseModule);
+    },
 
-    $.DelayModuleNodeFactory.prototype   = {
+    createUI: function(noiseModule, moduleItem) {
+        return new DelayModuleNodeUI(noiseModule, moduleItem);
+    }
+}
 
-        typeName    : "delay",
+DelayModuleNode = function(noiseModule) {
+    this.noiseModule = noiseModule;
+};
 
-        create      : function ( noiseModule ) {
+DelayModuleNode.defaults = {
+    delayTime: 0.2
+};
 
-            return new $.DelayModuleNode( noiseModule );
+DelayModuleNode.prototype = {
+    defaultOptions: function() {
+        return DelayModuleNode.defaults;
+    },
+
+    createModuleAudioNode: function(module) {
+        let node = this.noiseModule.audioContext.createDelay ();
+
+        node.delayTime.value = module.options.delayTime;
+
+        return node;
+    },
+};
+
+DelayModuleNodeUI = function(noiseModule, moduleItem) {
+    this.noiseModule = noiseModule;
+    this.moduleItem = moduleItem;
+}
+
+DelayModuleNodeUI.prototype = {
+    create: function() {
+        const moduleId = "module" + this.moduleItem.id;
+
+        let $section = document.createElement("section");
+        $section.id = moduleId;
+        $section.name = this.moduleItem.module.name;
+        $section.classList.add("noise-module-node");
+        $section.classList.add(this.moduleItem.module.nodeType);
+
+        appendElementToTarget(this.$_header(), $section);
+        appendElementToTarget(this.$_content(), $section);
+        appendElementToTarget(this.$_footer(), $section);
+
+        return $section;
+    },
+
+    $_header: function() {
+        let $name = document.createElement("h6");
+        $name.innerText = this.moduleItem.module.name;
+
+        let $header = document.createElement("header");
+        appendElementToTarget($name, $header);
+        return $header;
+    },
+
+    $_content: function() {
+        let $section = document.createElement("section");
+
+        let $slider = createSliderWrapper(
+                createSliderControl(
+                this.moduleItem.audioNode["delayTime"].value,
+                0,
+                1,
+                0.01,
+                this._sliderChanged("delayTime"),
+            ),
+            "delayTime",
+            "delayTime",
+            "Sec",
+        );
+
+        appendElementToTarget($slider, $section);
+        return $section;
+    },
+
+    _sliderChanged: function(property) {
+        let _self = this;
+        return function(e) {
+            _self.moduleItem.audioNode[property].value = this.value;
         }
-    };
+    },
 
-    $.DelayModuleNode              = function ( noiseModule ) {
-
-        this.nm = noiseModule;
-
-    };
-
-    $.DelayModuleNode.defaults     = {
-
-        delayTime   : 0.2
-    };
-
-    $.DelayModuleNode.prototype    = {
-
-        defaultOptions        : function ( ) {
-            return $.DelayModuleNode.defaults;
-        },
-
-        createModuleAudioNode : function ( module ) {
-
-            let node = this.nm.audioContext.createDelay ();
-
-            node.delayTime.value = module.options.delayTime;
-
-            return node;
-
-        },
-
-        createModuleDiv       : function ( module, audioNode ) {
-
-            let $container  = this.nm.ui.createContentContainer( );
-            let $timeDiv    = this.nm.ui.createSimpleSliderControl( audioNode, 'delayTime', 0, 10, 0.01, "Sec" );
-
-            this.nm.ui.appendElementToTarget( $timeDiv, $container );
-
-            return $container;
-        },
-
-        resetModuleSettings   : function ( module, audioNode ) {
-
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'delayTime', module.options.delayTime );
-
-        },
-
-        exportOptions        : function ( ) {
-
-            let options     = this._self.module.options;
-            let settings    = this.nm.buildModuleOptions( options );
-
-            settings.delayTime  = this._self.outNode.delayTime.value;
-
-            return settings;
-        },
-
-    };
-
-} )( window, navigator, jQuery );
+    $_footer: function() {
+        let $footer = document.createElement("footer");
+        return $footer;
+    }
+}

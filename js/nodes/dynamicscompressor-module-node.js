@@ -1,103 +1,180 @@
-( function( window, navigator, $, undefined ) {
+DynamicsCompressorModuleNodeFactory = function () {
+}
 
-    /* DynamicsCompressorModuleNode: Class for 'dynamicscompressor' node */
+DynamicsCompressorModuleNodeFactory.prototype = {
+    typeName: "dynamicscompressor",
 
-    $.DynamicsCompressorModuleNodeFactory             = function () {
-    };
+    create: function (noiseModule) {
+        return new DynamicsCompressorModuleNode(noiseModule);
+    },
 
-    $.DynamicsCompressorModuleNodeFactory.prototype   = {
+    createUI: function(noiseModule, moduleItem) {
+        return new DynamicsCompressorModuleNodeUI(noiseModule, moduleItem);
+    }
+}
 
-        typeName    : "dynamicscompressor",
+DynamicsCompressorModuleNode = function(noiseModule) {
+    this.noiseModule = noiseModule;
+};
 
-        create      : function ( noiseModule ) {
+DynamicsCompressorModuleNode.defaults = {
+    threshold: -25,
+    knee: 30,
+    ratio: 12,
+    reduction: -20,
+    attack: 0.003,
+    release: 0.25
+};
 
-            return new $.DynamicsCompressorModuleNode( noiseModule );
+DynamicsCompressorModuleNode.prototype = {
+    defaultOptions: function() {
+        return DynamicsCompressorModuleNode.defaults;
+    },
+
+    createModuleAudioNode: function(module) {
+        let node = this.noiseModule.audioContext.createDynamicsCompressor();
+
+        node.threshold.value = module.options.threshold;
+        node.knee.value = module.options.knee;
+        node.ratio.value = module.options.ratio;
+        node.reduction.value = module.options.reduction;
+        node.attack.value = module.options.attack;
+        node.release.value = module.options.release;
+
+        return node;
+    },
+};
+
+DynamicsCompressorModuleNodeUI = function(noiseModule, moduleItem) {
+    this.noiseModule = noiseModule;
+    this.moduleItem = moduleItem;
+}
+
+DynamicsCompressorModuleNodeUI.prototype = {
+    create: function() {
+        const moduleId = "module" + this.moduleItem.id;
+
+        let $section = document.createElement("section");
+        $section.id = moduleId;
+        $section.name = this.moduleItem.module.name;
+        $section.classList.add("noise-module-node");
+        $section.classList.add(this.moduleItem.module.nodeType);
+
+        appendElementToTarget(this.$_header(), $section);
+        appendElementToTarget(this.$_content(), $section);
+        appendElementToTarget(this.$_footer(), $section);
+
+        return $section;
+    },
+
+    $_header: function() {
+        let $name = document.createElement("h6");
+        $name.innerText = this.moduleItem.module.name;
+
+        let $header = document.createElement("header");
+        appendElementToTarget($name, $header);
+        return $header;
+    },
+
+    $_content: function() {
+        let $section = document.createElement("section");
+
+        let $thresholdSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["threshold"].value,
+                -36,
+                0,
+                0.01,
+                this._sliderChanged("threshold"),
+            ),
+            "threshold",
+            "threshold",
+            "DB",
+        );
+
+        let $kneeSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["knee"].value,
+                0,
+                40,
+                0.01,
+                this._sliderChanged("knee"),
+            ),
+            "knee",
+            "knee",
+            "DB",
+        );
+
+        let $ratioSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["ratio"].value,
+                1,
+                20,
+                0.1,
+                this._sliderChanged("ratio"),
+            ),
+            "ratio",
+            "ratio",
+            "Sec",
+        );
+
+        let $reductionSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["reduction"].value,
+                -20,
+                0,
+                0.01,
+                this._sliderChanged("reduction"),
+            ),
+            "reduction",
+            "reduction",
+            "DB",
+        );
+
+        let $attackSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["attack"].value,
+                0,
+                1,
+                0.001,
+                this._sliderChanged("attack"),
+            ),
+            "attack",
+            "attack",
+            "Sec",
+        );
+
+        let $releaseSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["release"].value,
+                0,
+                1,
+                0.001,
+                this._sliderChanged("release"),
+            ),
+            "release",
+            "release",
+            "Sec",
+        );
+
+        appendElementToTarget($thresholdSlider, $section);
+        appendElementToTarget($kneeSlider, $section);
+        appendElementToTarget($ratioSlider, $section);
+        appendElementToTarget($reductionSlider, $section);
+        appendElementToTarget($attackSlider, $section);
+        appendElementToTarget($releaseSlider, $section);
+        return $section;
+    },
+
+    _sliderChanged: function(property) {
+        let _self = this;
+        return function(e) {
+            _self.moduleItem.audioNode[property].value = this.value;
         }
-    };
+    },
 
-    $.DynamicsCompressorModuleNode              = function ( noiseModule ) {
-
-        this.nm = noiseModule;
-
-    };
-
-    $.DynamicsCompressorModuleNode.defaults     = {
-
-        compressorThreshold : -25,
-        compressorKnee      : 30,
-        compressorRatio     : 12,
-        compressorReduction : -20,
-        compressorAttack    : 0.003,
-        compressorRelease   : 0.25
-    };
-
-    $.DynamicsCompressorModuleNode.prototype    = {
-
-        defaultOptions        : function ( ) {
-            return $.DynamicsCompressorModuleNode.defaults;
-        },
-
-        createModuleAudioNode : function ( module ) {
-
-            let node = this.nm.audioContext.createDynamicsCompressor ();
-
-            node.threshold.value = module.options.compressorThreshold;
-            node.knee.value = module.options.compressorKnee;
-            node.ratio.value = module.options.compressorRatio;
-            node.reduction.value = module.options.compressorReduction;
-            node.attack.value = module.options.compressorAttack;
-            node.release.value = module.options.compressorRelease;
-
-            return node;
-
-        },
-
-        createModuleDiv       : function ( module, audioNode ) {
-
-            let $container      = this.nm.ui.createContentContainer( );
-            let $thresholdDiv   = this.nm.ui.createSimpleSliderControl( audioNode, 'threshold', -36, 0, 0.01, "DB" );
-            let $kneeDiv        = this.nm.ui.createSimpleSliderControl( audioNode, 'knee', 0, 40, 0.01, "DB" );
-            let $ratioDiv       = this.nm.ui.createSimpleSliderControl( audioNode, 'ratio', 1, 50, 0.1, "Sec" );
-            let $reductionDiv   = this.nm.ui.createSimpleSliderControl( audioNode, 'reduction', -20, 0, 0.01, "DB" );
-            let $attackDiv      = this.nm.ui.createSimpleSliderControl( audioNode, 'attack', 0, 1, 0.001, "Sec" );
-            let $releaseDiv     = this.nm.ui.createSimpleSliderControl( audioNode, 'release', 0, 2, 0.01, "Sec" );
-
-            this.nm.ui.appendElementToTarget( $thresholdDiv, $container );
-            this.nm.ui.appendElementToTarget( $kneeDiv, $container );
-            this.nm.ui.appendElementToTarget( $ratioDiv, $container );
-            this.nm.ui.appendElementToTarget( $reductionDiv, $container );
-            this.nm.ui.appendElementToTarget( $attackDiv, $container );
-            this.nm.ui.appendElementToTarget( $releaseDiv, $container );
-
-            return $container;
-        },
-
-        resetModuleSettings   : function ( module, audioNode ) {
-
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'threshold', module.options.compressorThreshold );
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'knee', module.options.compressorKnee );
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'ratio', module.options.compressorRatio );
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'reduction', module.options.compressorReduction );
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'attack', module.options.compressorAttack );
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'release', module.options.compressorRelease );
-
-        },
-
-        exportOptions         : function ( ) {
-
-            let options     = this._self.module.options;
-            let settings    = this.nm.buildModuleOptions( options );
-            let node        = this._self.outNode;
-
-            settings.compressorThreshold = node.threshold.value;
-            settings.compressorKnee = node.knee.value;
-            settings.compressorRatio = node.ratio.value;
-            settings.compressorReduction = node.reduction.value;
-            settings.compressorAttack = node.attack.value;
-            settings.compressorRelease = node.release.value;
-
-            return settings;
-        },
-    };
-
-} )( window, navigator, jQuery );
+    $_footer: function() {
+        let $footer = document.createElement("footer");
+        return $footer;
+    }
+}

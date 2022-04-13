@@ -1,97 +1,161 @@
-( function( window, navigator, $, undefined ) {
+BiquadFilterModuleNodeFactory = function () {
+}
 
-    /* BiquadFilterModuleNode: Class for 'biquadfilter' node */
+BiquadFilterModuleNodeFactory.prototype = {
+    typeName: "biquadfilter",
 
-    $.BiquadFilterModuleNodeFactory             = function () {
-    };
+    create: function (noiseModule) {
+        return new BiquadFilterModuleNode(noiseModule);
+    },
 
-    $.BiquadFilterModuleNodeFactory.prototype   = {
+    createUI: function(noiseModule, moduleItem) {
+        return new BiquadFilterModuleNodeUI(noiseModule, moduleItem);
+    }
+}
 
-        typeName    : "biquadfilter",
+BiquadFilterModuleNode = function(noiseModule) {
+    this.noiseModule = noiseModule;
+};
 
-        create      : function ( noiseModule ) {
+BiquadFilterModuleNode.defaults  = {
+    // { lowpass, highpass, bandpass, lowshelf, highshelf, peaking, notch, allpass }
+    type: "lowpass",
+    frequency: 440,
+    detune: 0,
+    Q: 1,
+    gain: 0
+};
 
-            return new $.BiquadFilterModuleNode( noiseModule );
+BiquadFilterModuleNode.prototype = {
+    defaultOptions: function() {
+        return BiquadFilterModuleNode.defaults;
+    },
+
+    createModuleAudioNode: function(module) {
+        return this.createBiquadFilter(
+            module.options.type,
+            module.options.frequency,
+            module.options.detune,
+            module.options.Q,
+            module.options.gain,
+        );
+    },
+
+    createBiquadFilter: function(type, frequency, detune, Q, gain) {
+        let node = this.noiseModule.audioContext.createBiquadFilter();
+
+        node.type = type;
+        node.frequency.value = frequency;
+        node.detune.value = detune;
+        node.Q.value = Q;
+        node.gain.value = gain;
+
+        return node;
+    }
+};
+
+BiquadFilterModuleNodeUI = function(noiseModule, moduleItem) {
+    this.noiseModule = noiseModule;
+    this.moduleItem = moduleItem;
+}
+
+BiquadFilterModuleNodeUI.prototype = {
+    create: function() {
+        const moduleId = "module" + this.moduleItem.id;
+
+        let $section = document.createElement("section");
+        $section.id = moduleId;
+        $section.name = this.moduleItem.module.name;
+        $section.classList.add("noise-module-node");
+        $section.classList.add(this.moduleItem.module.nodeType);
+
+        appendElementToTarget(this.$_header(), $section);
+        appendElementToTarget(this.$_content(), $section);
+        appendElementToTarget(this.$_footer(), $section);
+
+        return $section;
+    },
+
+    $_header: function() {
+        let $name = document.createElement("h6");
+        $name.innerText = this.moduleItem.module.name;
+
+        let $header = document.createElement("header");
+        appendElementToTarget($name, $header);
+        return $header;
+    },
+
+    $_content: function() {
+        let $section = document.createElement("section");
+
+        let $frequencySlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["frequency"].value,
+                0,
+                8000,
+                1,
+                this._sliderChanged("frequency"),
+            ),
+            "frequency",
+            "freq",
+            "Hz",
+        );
+
+        let $detuneSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["detune"].value,
+                -1200,
+                1200,
+                1,
+                this._sliderChanged("detune"),
+            ),
+            "detune",
+            "detune",
+            "cents",
+        );
+
+        let $QSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["Q"].value,
+                1,
+                100,
+                0.1,
+                this._sliderChanged("Q"),
+            ),
+            "Q",
+            "Q",
+            "",
+        )
+
+        let $gainSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["gain"].value,
+                0,
+                1,
+                0.01,
+                this._sliderChanged("gain"),
+            ),
+            "gain",
+            "gain",
+            "",
+        );
+
+        appendElementToTarget($frequencySlider, $section);
+        appendElementToTarget($detuneSlider, $section);
+        appendElementToTarget($QSlider, $section);
+        appendElementToTarget($gainSlider, $section);
+        return $section;
+    },
+
+    _sliderChanged: function(property) {
+        let _self = this;
+        return function(e) {
+            _self.moduleItem.audioNode[property].value = this.value;
         }
-    };
+    },
 
-    $.BiquadFilterModuleNode           = function ( noiseModule ) {
-
-        this.nm = noiseModule;
-    };
-
-    $.BiquadFilterModuleNode.defaults  = {
-
-        biquadFilterFrequency   : 440,
-        biquadFilterDetune      : 0,
-        biquadFilterQ           : 1,
-        biquadFilterGain        : 0
-    };
-
-    $.BiquadFilterModuleNode.prototype = {
-
-        defaultOptions        : function ( ) {
-            return $.BiquadFilterModuleNode.defaults;
-        },
-
-        createModuleAudioNode : function ( module ) {
-
-            return this.createBiquadFilter( module );
-        },
-
-        createModuleDiv       : function ( module, audioNode ) {
-
-            let $container  = this.nm.ui.createContentContainer( );
-
-            let $freqDiv    = this.nm.ui.createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
-            let $detuDiv    = this.nm.ui.createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
-            let $qDiv   = this.nm.ui.createSimpleSliderControl( audioNode, 'Q', 1, 100, 0.1, "" );
-            let $gainDiv    = this.nm.ui.createSimpleSliderControl( audioNode, 'gain', 0, 1, 0.01, "" );
-
-            this.nm.ui.appendElementToTarget( $freqDiv, $container );
-            this.nm.ui.appendElementToTarget( $detuDiv, $container );
-            this.nm.ui.appendElementToTarget( $qDiv, $container );
-            this.nm.ui.appendElementToTarget( $gainDiv, $container );
-
-            return $container;
-        },
-
-        resetModuleSettings   : function ( module, audioNode ) {
-
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'frequency', module.options.biquadFilterFrequency );
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'detune', module.options.biquadFilterDetune );
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'Q', module.options.biquadFilterQ );
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'gain', module.options.biquadFilterGain );
-
-        },
-
-        exportOptions         : function ( ) {
-
-            let options     = this._self.module.options;
-            let settings    = this.nm.buildModuleOptions( options );
-
-            settings.gainGain = this._self.outNode.gain.value;
-
-            settings.biquadFilterFrequency = this._self.outNode.frequency.value;
-            settings.biquadFilterDetune = this._self.outNode.detune.value;
-            settings.biquadFilterQ = this._self.outNode.Q.value;
-            settings.biquadFilterGain = this._self.outNode.gain.value;
-
-            return settings;
-        },
-
-        createBiquadFilter    : function ( module, type, frequency, detune, Q, gain ) {
-
-            var node = this.nm.audioContext.createBiquadFilter();
-
-            node.type = type || module.type;
-            node.frequency.value = frequency || module.options.biquadFilterFrequency;
-            node.detune.value = detune || module.options.biquadFilterDetune;
-            node.Q.value = Q || module.options.biquadFilterQ;
-            node.gain.value = gain === undefined ? module.options.biquadFilterGain : gain;
-
-            return node;
-        }
-    };
-
-} )( window, navigator, jQuery );
+    $_footer: function() {
+        let $footer = document.createElement("footer");
+        return $footer;
+    }
+};

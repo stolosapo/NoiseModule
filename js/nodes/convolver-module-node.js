@@ -1,79 +1,86 @@
-( function( window, navigator, $, undefined ) {
+ConvolverModuleNodeFactory = function () {
+}
 
-    /* ConvolverModuleNode: Class for 'convolver' node */
+ConvolverModuleNodeFactory.prototype = {
+    typeName: "convolver",
 
-    $.ConvolverModuleNodeFactory             = function () {
-    };
+    create: function (noiseModule) {
+        return new ConvolverModuleNode(noiseModule);
+    },
 
-    $.ConvolverModuleNodeFactory.prototype   = {
+    createUI: function(noiseModule, moduleItem) {
+        return new ConvolverModuleNodeUI(noiseModule, moduleItem);
+    }
+}
 
-        typeName    : "convolver",
+ConvolverModuleNode = function(noiseModule) {
+    this.noiseModule = noiseModule;
+};
 
-        create      : function ( noiseModule ) {
+ConvolverModuleNode.defaults  = {
+};
 
-            return new $.ConvolverModuleNode( noiseModule );
-        }
-    };
+ConvolverModuleNode.prototype    = {
+    defaultOptions: function() {
+        return ConvolverModuleNode.defaults;
+    },
 
-    $.ConvolverModuleNode              = function ( noiseModule ) {
+    createModuleAudioNode: function(module) {
+        let node = this.noiseModule.audioContext.createConvolver();
+        return node;
+    },
+};
 
-        this.nm = noiseModule;
+ConvolverModuleNodeUI = function(noiseModule, moduleItem) {
+    this.noiseModule = noiseModule;
+    this.moduleItem = moduleItem;
+}
 
-    };
+ConvolverModuleNodeUI.prototype = {
+    create: function() {
+        const moduleId = "module" + this.moduleItem.id;
 
-    $.ConvolverModuleNode.defaults     = {
-    };
+        let $section = document.createElement("section");
+        $section.id = moduleId;
+        $section.name = this.moduleItem.module.name;
+        $section.classList.add("noise-module-node");
+        $section.classList.add(this.moduleItem.module.nodeType);
 
-    $.ConvolverModuleNode.prototype    = {
+        appendElementToTarget(this.$_header(), $section);
+        appendElementToTarget(this.$_content(), $section);
+        appendElementToTarget(this.$_footer(), $section);
 
-        defaultOptions        : function ( ) {
-            return $.ConvolverModuleNode.defaults;
-        },
+        return $section;
+    },
 
-        createModuleAudioNode : function ( module ) {
+    $_header: function() {
+        let $name = document.createElement("h6");
+        $name.innerText = this.moduleItem.module.name;
 
-            let node = this.nm.audioContext.createConvolver( );
+        let $header = document.createElement("header");
+        appendElementToTarget($name, $header);
+        return $header;
+    },
 
-            console.log(node);
+    $_content: function() {
+        let audioNode = this.moduleItem.audioNode;
+        let $section = document.createElement("section");
 
-            return node;
+        let $span = document.createElement("span");
+        $span.classList.add("nm-label");
+        $span.textContent = "normalize" + audioNode.normalize;
 
-        },
+        $span.addEventListener("click", function(e) {
+            audioNode.normalize = !audioNode.normalize;
+            $span.textContent = "normalize" + audioNode.normalize;
+        })
 
-        createModuleDiv       : function ( module, audioNode ) {
+        appendElementToTarget($span, $section);
+        return $section;
+    },
 
-            let $container  = this.nm.ui.createContentContainer( );
-
-            let spanTemplate    = '<span class="nm-label info link"></span>'
-            let $normSpan       = $( spanTemplate );
-
-            $normSpan.text( 'normalize: ' + audioNode.normalize );
-
-            $normSpan[0].addEventListener( 'click', function( e ) {
-
-                audioNode.normalize = !audioNode.normalize;
-
-                $normSpan.text( 'normalize: ' + audioNode.normalize );
-
-            } );
-
-            this.nm.ui.appendElementToTarget( $normSpan, $container );
-
-            return $container;
-        },
-
-        resetModuleSettings   : function ( module, audioNode ) {
-
-        },
-
-        exportOptions         : function ( ) {
-
-            let options     = this._self.module.options;
-            let settings    = this.nm.buildModuleOptions( options );
-
-            return settings;
-        },
-
-    };
-
-} )( window, navigator, jQuery );
+    $_footer: function() {
+        let $footer = document.createElement("footer");
+        return $footer;
+    }
+};

@@ -1,75 +1,104 @@
-( function( window, navigator, $, undefined ) {
+GainModuleNodeFactory = function () {
+}
 
-    /* GainModuleNode: Class for 'gain' node */
+GainModuleNodeFactory.prototype = {
+    typeName: "gain",
 
-    $.GainModuleNodeFactory             = function () {
-    };
+    create: function (noiseModule) {
+        return new GainModuleNode(noiseModule);
+    },
 
-    $.GainModuleNodeFactory.prototype   = {
+    createUI: function(noiseModule, moduleItem) {
+        return new GainModuleNodeUI(noiseModule, moduleItem);
+    }
+}
 
-        typeName    : "gain",
+GainModuleNode = function(noiseModule) {
+    this.nm = noiseModule;
+};
 
-        create      : function ( noiseModule ) {
+GainModuleNode.defaults = {
+    gain: 0.7
+}
 
-            return new $.GainModuleNode( noiseModule );
+GainModuleNode.prototype = {
+    defaultOptions: function() {
+        return GainModuleNode.defaults;
+    },
+
+    createModuleAudioNode: function(module) {
+        return this.createGain(module.options.gain);
+    },
+
+    createGain: function(value) {
+        let gain = this.nm.audioContext.createGain();
+
+        gain.gain.value = value;
+
+        return gain;
+    }
+}
+
+GainModuleNodeUI = function(noiseModule, moduleItem) {
+    this.noiseModule = noiseModule;
+    this.moduleItem = moduleItem;
+}
+
+GainModuleNodeUI.prototype = {
+    create: function() {
+        const moduleId = "module" + this.moduleItem.id;
+
+        let $section = document.createElement("section");
+        $section.id = moduleId;
+        $section.name = this.moduleItem.module.name;
+        $section.classList.add("noise-module-node");
+        $section.classList.add(this.moduleItem.module.nodeType);
+
+        appendElementToTarget(this.$_header(), $section);
+        appendElementToTarget(this.$_content(), $section);
+        appendElementToTarget(this.$_footer(), $section);
+
+        return $section;
+    },
+
+    $_header: function() {
+        let $name = document.createElement("h6");
+        $name.innerText = this.moduleItem.module.name;
+
+        let $header = document.createElement("header");
+        appendElementToTarget($name, $header);
+        return $header;
+    },
+
+    $_content: function() {
+        let $section = document.createElement("section");
+
+        let $slider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["gain"].value,
+                0,
+                1,
+                0.01,
+                this._gainChanged(),
+            ),
+            "gain",
+            "gain",
+            "",
+        );
+
+        appendElementToTarget($slider, $section);
+        return $section;
+    },
+
+    _gainChanged: function() {
+        let _self = this;
+        return function(e) {
+            _self.moduleItem.audioNode["gain"].value = this.value;
         }
-    };
+    },
 
-    $.GainModuleNode           = function ( noiseModule ) {
-
-        this.nm = noiseModule;
-    };
-
-    $.GainModuleNode.defaults  = {
-
-        gainGain    : 0.7
-
-    };
-
-    $.GainModuleNode.prototype = {
-
-        defaultOptions        : function ( ) {
-            return $.GainModuleNode.defaults;
-        },
-
-        createModuleAudioNode : function ( module ) {
-
-            return this.createGain( module );
-        },
-
-        createModuleDiv       : function ( module, audioNode ) {
-
-            let $container  = this.nm.ui.createContentContainer( );
-            let $gain       = this.nm.ui.createSimpleSliderControl( audioNode, "gain", 0, 1, 0.01, "" );
-
-            this.nm.ui.appendElementToTarget( $gain, $container );
-
-            return $container;
-        },
-
-        resetModuleSettings   : function ( module, audioNode ) {
-
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, "gain", module.options.gainGain );
-        },
-
-        exportOptions         : function ( ) {
-
-            let options     = this._self.module.options;
-            let settings    = this.nm.buildModuleOptions( options );
-
-            settings.gainGain = this._self.outNode.gain.value;
-
-            return settings;
-        },
-
-        createGain            : function ( module, value ) {
-
-            var gain = this.nm.audioContext.createGain ();
-
-            gain.gain.value = value || module.options.gainGain;
-
-            return gain;
-        }
-    };
-
-} )( window, navigator, jQuery );
+    $_footer: function() {
+        let $footer = document.createElement("footer");
+        return $footer;
+    }
+}

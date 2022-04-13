@@ -1,163 +1,207 @@
-( function( window, navigator, $, undefined ) {
+KingTubbyModuleNodeFactory = function(gainModuleFactory) {
+    this.gainModuleFactory = gainModuleFactory;
+};
 
-    /* KingTubbyModuleNode: Class for 'kingtubbynode' node */
+KingTubbyModuleNodeFactory.prototype = {
+    typeName: "kingtubby",
 
-    $.KingTubbyModuleNodeFactory             = function ( gainModuleFactory ) {
+    create: function(noiseModule) {
+        let gainModuleNode = this.gainModuleFactory.create(noiseModule);
+        return new KingTubbyModuleNode(noiseModule, gainModuleNode);
+    },
 
-        this.gainModuleFactory = gainModuleFactory;
-    };
+    createUI: function(noiseModule, moduleItem) {
+        return new KingTubbyModuleNodeUI(noiseModule, moduleItem);
+    }
+}
 
-    $.KingTubbyModuleNodeFactory.prototype   = {
+KingTubbyModuleNode = function(noiseModule, gainModuleNode) {
+    this.noiseModule = noiseModule;
+    this.gainNode = gainModuleNode;
+};
 
-        typeName    : "kingtubbynode",
+KingTubbyModuleNode.defaults = {
+    preAmpInGain: 1,
+    preAmpOutGain: 1,
+    delayTime: 0.5,
+    gain: 0.8,
+    cutOffFreq: 1000
+}
 
-        create      : function ( noiseModule ) {
+KingTubbyModuleNode.prototype = {
+    defaultOptions: function() {
+        return KingTubbyModuleNode.defaults;
+    },
 
-            let gainModuleNode = this.gainModuleFactory.create( noiseModule );
+    createModuleAudioNode: function(module) {
+        let preAmp = this.gainNode.createGain(module.options.preAmpInGain);
+        let outputGain = this.gainNode.createGain(module.options.preAmpOutGain);
 
-            return new $.KingTubbyModuleNode( noiseModule, gainModuleNode );
+        let delay = this.noiseModule.audioContext.createDelay();
+        delay.delayTime.value = module.options.delayTime;
+        delay._id = 1;
+
+        let feedback = this.gainNode.createGain(module.options.gain);
+        feedback._id = 2;
+
+        let filter = this.noiseModule.audioContext.createBiquadFilter();
+        filter.frequency.value = module.options.cutOffFreq;
+        filter._id = 3;
+
+        let nodes = [];
+        nodes.push(preAmp);
+        nodes.push(delay);
+        nodes.push(feedback);
+        nodes.push(filter);
+        nodes.push(outputGain);
+
+        this.noiseModule.connectNodes(delay, feedback);
+        this.noiseModule.connectNodes(feedback, filter);
+        this.noiseModule.connectNodes(filter, delay);
+
+        this.noiseModule.connectNodes(preAmp, delay);
+        this.noiseModule.connectNodes(preAmp, outputGain);
+        this.noiseModule.connectNodes(delay, outputGain);
+
+        return { 
+            inNode: preAmp, 
+            outNode: outputGain, 
+            allNodes: nodes,
+        };
+    },
+};
+
+KingTubbyModuleNodeUI = function(noiseModule, moduleItem) {
+    this.noiseModule = noiseModule;
+    this.moduleItem = moduleItem;
+}
+
+KingTubbyModuleNodeUI.prototype = {
+    create: function() {
+        const moduleId = "module" + this.moduleItem.id;
+
+        let $section = document.createElement("section");
+        $section.id = moduleId;
+        $section.name = this.moduleItem.module.name;
+        $section.classList.add("noise-module-node");
+        $section.classList.add(this.moduleItem.module.nodeType);
+
+        appendElementToTarget(this.$_header(), $section);
+        appendElementToTarget(this.$_content(), $section);
+        appendElementToTarget(this.$_footer(), $section);
+
+        return $section;
+    },
+
+    $_header: function() {
+        let $name = document.createElement("h6");
+        $name.innerText = this.moduleItem.module.name;
+
+        let $header = document.createElement("header");
+        appendElementToTarget($name, $header);
+        return $header;
+    },
+
+    $_content: function() {
+        let audioNode = this.moduleItem.audioNode;
+
+        let delay = audioNode.allNodes[1]
+        let feedback = audioNode.allNodes[2];
+        let filter = audioNode.allNodes[3];
+
+        let inGain = audioNode.inNode;
+        let outGain = audioNode.outNode;
+
+        let $section = document.createElement("section");
+
+        let $inGainSlider = createSliderWrapper(
+            createSliderControl(
+                inGain["gain"].value,
+                0,
+                2,
+                0.1,
+                this._sliderChanged(inGain, "gain"),
+            ),
+            "gain",
+            "preAmp In",
+            "",
+        );
+        $inGainSlider.classList.add("pre-amp");
+        $inGainSlider.classList.add("in");
+
+        let $outGainSlider = createSliderWrapper(
+            createSliderControl(
+                outGain["gain"].value,
+                0,
+                2,
+                0.1,
+                this._sliderChanged(outGain, "gain"),
+            ),
+            "gain",
+            "preAmp Out",
+            "",
+        );
+        $outGainSlider.classList.add("pre-amp");
+        $outGainSlider.classList.add("out");
+
+        let $delaySlider = createSliderWrapper(
+            createSliderControl(
+                delay["delayTime"].value,
+                0,
+                1,
+                0.01,
+                this._sliderChanged(delay, "delayTime"),
+            ),
+            "delayTime",
+            "delay",
+            "Sec",
+        );
+        $delaySlider.classList.add("delay");
+
+        let $feedbackSlider = createSliderWrapper(
+            createSliderControl(
+                feedback["gain"].value,
+                0,
+                1,
+                0.01,
+                this._sliderChanged(feedback, "gain"),
+            ),
+            "gain",
+            "feedback",
+            "",
+        );
+        $feedbackSlider.classList.add("feedback");
+
+        let $filterSlider = createSliderWrapper(
+            createSliderControl(
+                filter["frequency"].value,
+                0,
+                8000,
+                1,
+                this._sliderChanged(filter, "frequency"),
+            ),
+            "frequency",
+            "cutoff",
+            "Hz",
+        );
+        $filterSlider.classList.add("biquadfilter");
+
+        appendElementToTarget($inGainSlider, $section);
+        appendElementToTarget($delaySlider, $section);
+        appendElementToTarget($feedbackSlider, $section);
+        appendElementToTarget($filterSlider, $section);
+        appendElementToTarget($outGainSlider, $section);
+        return $section;
+    },
+
+    _sliderChanged: function(node, property) {
+        return function(e) {
+            node[property].value = this.value;
         }
-    };
+    },
 
-    $.KingTubbyModuleNode              = function ( noiseModule, gainModuleNode ) {
-
-        this.nm = noiseModule;
-        this.gainNode = gainModuleNode;
-    };
-
-    $.KingTubbyModuleNode.defaults     = {
-
-        kingTubbyPreAmpInGain     : 1,
-        kingTubbyPreAmpOutGain    : 1,
-        kingTubbyDelayTime        : 0.5,
-        kingTubbyGain             : 0.8,
-        kingTubbyCutOffFreq       : 1000
-    };
-
-    $.KingTubbyModuleNode.prototype    = {
-
-        defaultOptions        : function ( ) {
-            return $.KingTubbyModuleNode.defaults;
-        },
-
-        createModuleAudioNode : function ( module ) {
-
-
-            let preAmp       = this.gainNode.createGain( module, module.options.kingTubbyPreAmpInGain );
-            let outputGain   = this.gainNode.createGain( module, module.options.kingTubbyPreAmpOutGain );
-
-            let delay        = this.nm.audioContext.createDelay( );
-            delay.delayTime.value    = module.options.kingTubbyDelayTime;
-            delay._id        = 1;
-
-            let feedback     = this.gainNode.createGain( module, module.options.kingTubbyGain );
-            feedback._id     = 2;
-
-            let filter       = this.nm.audioContext.createBiquadFilter( );
-            filter.frequency.value  = module.options.kingTubbyCutOffFreq;
-            filter._id       = 3;
-
-            let nodes = [ ];
-            nodes.push( preAmp );
-            nodes.push( delay );
-            nodes.push( feedback );
-            nodes.push( filter );
-            nodes.push( outputGain );
-
-            this.nm.connectNodes( delay, feedback );
-            this.nm.connectNodes( feedback, filter );
-            this.nm.connectNodes( filter, delay );
-
-            this.nm.connectNodes( preAmp, delay );
-            this.nm.connectNodes( preAmp, outputGain );
-            this.nm.connectNodes( delay, outputGain );
-
-            return { inNode: preAmp, outNode: outputGain, allNodes: nodes };
-        },
-
-        createModuleDiv       : function ( module, audioNode ) {
-
-            let $container  = this.nm.ui.createContentContainer( );
-
-            let delay       = audioNode.allNodes[ 1 ]
-            let feedback    = audioNode.allNodes[ 2 ];
-            let filter      = audioNode.allNodes[ 3 ];
-
-            let $inGainDiv  = this.nm.ui.createSliderControl( audioNode.inNode, 'gain', 'preAmp In', 0, 2, 0.1, '' );
-            $inGainDiv.addClass( 'pre-amp' );
-            $inGainDiv.addClass( 'in' );
-
-            let $outGainDiv = this.nm.ui.createSliderControl( audioNode.outNode, 'gain', 'preAmp Out', 0, 2, 0.1, '' );
-            $outGainDiv.addClass( 'pre-amp' );
-            $outGainDiv.addClass( 'out' );
-
-            let $delayDiv       = this.nm.ui.createSliderControl( delay, 'delayTime', 'delay', 0, 10, 0.01, "Sec" );
-            $delayDiv.addClass( 'delay' );
-
-            let $feedbackDiv    = this.nm.ui.createSliderControl( feedback, 'gain', 'feedback', 0, 1, 0.01, "" );
-            $feedbackDiv.addClass( 'feedback' );
-
-            let $freqDiv        = this.nm.ui.createSliderControl( filter, 'frequency', 'cutoff', 0, 8000, 1, "Hz" );
-            $freqDiv.addClass( 'biquadfilter' );
-
-            this.nm.ui.appendElementToTarget( $inGainDiv, $container );
-            this.nm.ui.appendElementToTarget( $delayDiv, $container );
-            this.nm.ui.appendElementToTarget( $feedbackDiv, $container );
-            this.nm.ui.appendElementToTarget( $freqDiv, $container );
-            this.nm.ui.appendElementToTarget( $outGainDiv, $container );
-
-            return $container;
-        },
-
-        resetModuleSettings   : function ( module, audioNode ) {
-
-            let delay       = audioNode.allNodes[ 1 ]
-            let feedback    = audioNode.allNodes[ 2 ];
-            let filter      = audioNode.allNodes[ 3 ];
-
-            let inClasses   = [ 'gain', 'pre-amp', 'in' ];
-            let outClasses  = [ 'gain', 'pre-amp', 'out' ];
-
-            this.nm.ui.resetSliderSettingByClasses( this.$div, audioNode.inNode, 'gain', inClasses, module.options.kingTubbyPreAmpInGain );
-            this.nm.ui.resetSliderSettingByClasses( this.$div, audioNode.outNode, 'gain', outClasses, module.options.kingTubbyPreAmpOutGain );
-
-            this.nm.ui.resetSliderSettingByClasses( this.$div, delay, 'delayTime', [ 'delayTime', 'delay' ], module.options.kingTubbyDelayTime );
-            this.nm.ui.resetSliderSettingByClasses( this.$div, feedback, 'gain', [ 'gain', 'feedback' ], module.options.kingTubbyGain );
-            this.nm.ui.resetSliderSettingByClasses( this.$div, filter, 'frequency', [ 'frequency', 'biquadfilter' ], module.options.kingTubbyCutOffFreq );
-
-        },
-
-        exportOptions         : function ( ) {
-
-            let options     = this._self.module.options;
-            let settings    = this.nm.buildModuleOptions( options );
-
-            let inNode      = this._self.inNode;
-            let outNode     = this._self.outNode;
-            let allNodes    = this._self.allNodes;
-
-            function getNode(id) {
-                let arr = allNodes.filter(n => n._id === id);
-
-                if (arr.length != 1) {
-                    return void(0);
-                }
-
-                return arr[0];
-            }
-
-            let delay = getNode(1);
-            let feedback = getNode(2);
-            let filter = getNode(3);
-
-            settings.kingTubbyPreAmpInGain = inNode.gain.value;
-            settings.kingTubbyPreAmpOutGain = outNode.gain.value;
-            settings.kingTubbyDelayTime = delay ? delay.delayTime.value : options.kingTubbyDelayTime;
-            settings.kingTubbyGain = feedback ? feedback.gain.value : options.kingTubbyGain;
-            settings.kingTubbyCutOffFreq = filter ? filter.frequency.value : options.kingTubbyCutOffFreq;
-
-            return settings;
-        },
-    };
-
-} )( window, navigator, jQuery );
+    $_footer: function() {
+        let $footer = document.createElement("footer");
+        return $footer;
+    }
+}

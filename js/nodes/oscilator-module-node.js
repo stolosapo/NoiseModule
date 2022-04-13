@@ -1,84 +1,125 @@
-( function( window, navigator, $, undefined ) {
+OscilatorModuleNodeFactory = function () {
+}
 
-    /* OscilatorModuleNode: Class for 'oscilator' node */
+OscilatorModuleNodeFactory.prototype = {
+    typeName: "oscillator",
 
-    $.OscilatorModuleNodeFactory             = function () {
-    };
+    create: function (noiseModule) {
+        return new OscilatorModuleNode(noiseModule);
+    },
 
-    $.OscilatorModuleNodeFactory.prototype   = {
-
-        typeName    : "oscillator",
-
-        create      : function ( noiseModule ) {
-
-            return new $.OscilatorModuleNode( noiseModule );
-        }
+    createUI: function(noiseModule, moduleItem) {
+        return new OscilatorModuleNodeUI(noiseModule, moduleItem);
     }
+}
 
-    $.OscilatorModuleNode              = function ( noiseModule ) {
+OscilatorModuleNode = function(noiseModule) {
+    this.noiseModule = noiseModule;
+};
 
-        this.nm = noiseModule;
-    };
+OscilatorModuleNode.defaults = {
+    // { sine, square, sawtooth, triangle }
+    type: "sine",
+    started: false,
+    frequency: 440,
+    detune: 0
+};
 
-    $.OscilatorModuleNode.defaults     = {
+OscilatorModuleNode.prototype = {
+    defaultOptions: function() {
+        return OscilatorModuleNode.defaults;
+    },
 
-        started             : false,
+    createModuleAudioNode: function(module ) {
+        let wave = this.noiseModule.audioContext.createOscillator();
 
-        oscillatorFrequency : 440,
-        oscillatorDetune    : 0
-    };
+        wave.type = module.options.type;
+        wave.frequency.value = module.options.frequency;
+        wave.detune.value = module.options.detune;
 
-    $.OscilatorModuleNode.prototype    = {
+        wave.start(0);
 
-        defaultOptions        : function ( ) {
-            return $.OscilatorModuleNode.defaults;
-        },
+        return wave;
+    },
+};
 
-        createModuleAudioNode : function ( module ) {
+OscilatorModuleNodeUI = function(noiseModule, moduleItem) {
+    this.noiseModule = noiseModule;
+    this.moduleItem = moduleItem;
+}
 
-            let wave = this.nm.audioContext.createOscillator();
+OscilatorModuleNodeUI.prototype = {
+    create: function() {
+        const moduleId = "module" + this.moduleItem.id;
 
-            wave.type = module.type;
-            wave.frequency.value = module.options.oscillatorFrequency;
-            wave.detune.value = module.options.oscillatorDetune;
+        let $section = document.createElement("section");
+        $section.id = moduleId;
+        $section.name = this.moduleItem.module.name;
+        $section.classList.add("noise-module-node");
+        $section.classList.add(this.moduleItem.module.nodeType);
 
-            wave.start( 0 );
+        appendElementToTarget(this.$_header(), $section);
+        appendElementToTarget(this.$_content(), $section);
+        appendElementToTarget(this.$_footer(), $section);
 
-            return wave;
-        },
+        return $section;
+    },
 
-        createModuleDiv       : function ( module, audioNode ) {
+    $_header: function() {
+        let $name = document.createElement("h6");
+        $name.innerText = this.moduleItem.module.name;
 
-            let $container  = this.nm.ui.createContentContainer( );
+        let $header = document.createElement("header");
+        appendElementToTarget($name, $header);
+        return $header;
+    },
 
-            let $freqDiv    = this.nm.ui.createSimpleSliderControl( audioNode, 'frequency', 0, 8000, 1, "Hz" );
-            let $detuDiv    = this.nm.ui.createSimpleSliderControl( audioNode, 'detune', -1200, 1200, 1, "cents" );
-            let $button     = this.nm.ui.createPlayStopButton( module, audioNode );
+    $_content: function() {
+        let $section = document.createElement("section");
 
-            this.nm.ui.appendElementToTarget( $freqDiv, $container );
-            this.nm.ui.appendElementToTarget( $detuDiv, $container );
-            this.nm.ui.appendElementToTarget( $button, $container );
+        let $frequencySlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["frequency"].value,
+                0,
+                8000,
+                1,
+                this._sliderChanged("frequency"),
+            ),
+            "frequency",
+            "frequency",
+            "Hz",
+        );
 
-            return $container;
-        },
+        let $detuneSlider = createSliderWrapper(
+            createSliderControl(
+                this.moduleItem.audioNode["detune"].value,
+                -1200,
+                1200,
+                1,
+                this._sliderChanged("detune"),
+            ),
+            "detune",
+            "detune",
+            "cents",
+        );
 
-        resetModuleSettings   : function ( module, audioNode ) {
+        let $button = createPlayStopButton(this.noiseModule, this.moduleItem.module);
 
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'frequency', module.options.oscillatorFrequency );
-            this.nm.ui.resetSliderSetting( this.$div, audioNode, 'detune', module.options.oscillatorDetune );
-        },
+        appendElementToTarget($frequencySlider, $section);
+        appendElementToTarget($detuneSlider, $section);
+        appendElementToTarget($button, $section);
+        return $section;
+    },
 
-        exportOptions           : function ( ) {
+    _sliderChanged: function(property) {
+        let _self = this;
+        return function(e) {
+            _self.moduleItem.audioNode[property].value = this.value;
+        }
+    },
 
-            let options     = this._self.module.options;
-            let settings    = this.nm.buildModuleOptions( options );
-            let wave        = this._self.outNode;
-
-            settings.oscillatorFrequency = wave.frequency.value;
-            settings.oscillatorDetune =  wave.detune.value;
-
-            return settings;
-        },
-    };
-
-} )( window, navigator, jQuery );
+    $_footer: function() {
+        let $footer = document.createElement("footer");
+        return $footer;
+    }
+};
