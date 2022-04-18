@@ -41,5 +41,6 @@ let noiseModuleInit = function(containerElId) {
 
     let noiseModule = new NoiseModule(config);
     noiseModule.start();
+    noiseModule.buildUI();
     console.log(noiseModule);
 }

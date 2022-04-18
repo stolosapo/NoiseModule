@@ -96,9 +96,6 @@ NoiseModule.prototype = {
 
         // create modules
         this._createModules();
-
-        // create modules UI
-        this._createModulesUI();
     },
 
     _createAudioContext: function() {
@@ -186,7 +183,7 @@ NoiseModule.prototype = {
         return moduleItem;
     },
 
-    _createModulesUI: function() {
+    buildUI: function() {
         if (!this.options.containerElId) {
             console.error("Container Element ID is missing");
             return;
