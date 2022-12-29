@@ -44,7 +44,7 @@ NoiseRadioModuleNode.prototype = {
             return void(0);
         }
 
-        document.getElementById(module.options.audioIdSelector);
+        return document.getElementById(module.options.audioIdSelector);
     },
 };
 
