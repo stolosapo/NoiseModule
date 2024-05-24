@@ -87,6 +87,7 @@ NoiseModule.prototype = {
         // initialize members
         this.moduleCounter = 0;
         this.moduleInstaces = [];
+        this.currentConnections = [];
         this.registeredFactories = this.options.nodesFactories();
     },
 
@@ -178,6 +179,7 @@ NoiseModule.prototype = {
             audioNode: audioNode,
             moduleImpl: moduleImpl,
             factory: factory,
+            bypassConnections: [],
         };
 
         return moduleItem;
@@ -196,12 +198,20 @@ NoiseModule.prototype = {
         }
 
         let _self = this;
+        let lastRect;
 
         this.moduleInstaces
             .forEach(i => {
                 let uiBuilder = i.factory.createUI(_self, i);
                 let $moduleEl = uiBuilder.create();
+                // dragElement($moduleEl);
                 appendElementToTarget($moduleEl, $containerEl);
+                
+                if (lastRect) {
+                    $moduleEl.style.left = (lastRect.left + lastRect.width + 10) + "px";
+                }
+                
+                lastRect = $moduleEl.getBoundingClientRect();
             });
     },
 
@@ -224,7 +234,7 @@ NoiseModule.prototype = {
         }
 
         if (connection.destNode === "output") {
-            this.connectNodes(srcAudio.outNode, this.audioContext.destination);
+            this.connectNodes(srcAudio.outNode, this._outputNode());
             return;
         }
 
@@ -265,13 +275,40 @@ NoiseModule.prototype = {
         };
     },
 
+    _outputNode: function() {
+        return this.audioContext.destination;
+    },
+
+    _findModuleElementPositions: function() {
+        return this.moduleInstaces
+            .map(i => {
+                const $el = document.getElementById("module" + i.id);
+                const rect = $el.getBoundingClientRect();
+                
+                return {
+                    $el,
+                    rect
+                };
+            });
+    },
+
+    _connectionExists: function(srcNode, destNode) {
+        return this.currentConnections.filter(c => c.srcNode === srcNode && c.destNode === destNode).length > 0;
+    },
+
     connectNodes: function(srcNode, destNode) {
         if (!srcNode || !destNode) {
             console.error( "Could not create connection. Source and Destination should exist.", srcNode, destNode);
             return;
         }
 
+        if (this._connectionExists(srcNode, destNode)) {
+            console.warn("Connection already exists", srcNode, destNode);
+            return;
+        }
+
         srcNode.connect(destNode);
+        this.currentConnections.push({srcNode, destNode});
     },
 
     _disconnectNodes: function(srcNode, destNode) {
@@ -280,7 +317,13 @@ NoiseModule.prototype = {
             return;
         }
 
+        if (!this._connectionExists(srcNode, destNode)) {
+            console.warn("Connection doesn't exists", srcNode, destNode);
+            return;
+        }
+
         srcNode.disconnect(destNode);
+        this.currentConnections = this.currentConnections.filter(c => !(c.srcNode === srcNode && c.destNode === destNode));
     },
 
     updateAudioNode: function(moduleName, audioInNode, audioOutNode) {
@@ -318,6 +361,75 @@ NoiseModule.prototype = {
                 _self._disconnectNodes(srcNode.outNode, destNode.inNode);
             });
     },
+
+    _clearBypassConnections: function(module) {
+        if (!module.bypassConnections) {
+            return;
+        }
+        
+        let _self = this;
+
+        // First disconnect connections
+        module.bypassConnections.forEach(c => {
+            _self._disconnectNodes(c.srcNode, c.destNode);
+        });
+
+        // Clear collection
+        module.bypassConnections = [];
+    },
+
+    byPassModule: function(module) {
+        let _self = this;
+
+        // Clear already existed bypass connections
+        this._clearBypassConnections(module);
+
+        // Find the sources of this module
+        const srcNodes = this.currentConnections
+            .filter(c => c.destNode === module.inNode)
+            .map(c => c.srcNode);
+
+        // Find the destinations of this module
+        const destNodes = this.currentConnections
+            .filter(c => c.srcNode === module.outNode)
+            .map(c => c.destNode);
+
+        // Disconnect all source nodes of the module
+        srcNodes.forEach(srcNode => _self._disconnectNodes(srcNode, module.inNode));
+
+        // Disconnect all target nodes from module
+        destNodes.forEach(destNode => _self._disconnectNodes(module.outNode, destNode));
+
+        // Connect all combinations of sources and targets
+        srcNodes.forEach(srcNode => {
+            destNodes.forEach(destNode => {
+                _self.connectNodes(srcNode, destNode);
+                module.bypassConnections.push({srcNode, destNode});
+            });
+        });
+
+        console.log("By passs", module, this.currentConnections);
+    },
+
+    reAttachModule: function(module) {
+        let _self = this;
+
+        // Clear already existed bypass connections
+        this._clearBypassConnections(module);
+
+        // Connect the sources of this module
+        const srcNodes = this.options.connections
+            .filter(c => c.destNode === module.inNode)
+            .forEach(c => _self.connectNodes(c.srcNode, c.destNode));
+
+        // Connect the targets of this module
+        const destNodes = this.options.connections
+            .filter(c => c.srcNode === module.outNode)
+            .map(c => _self.connectNodes(c.srcNode, c.destNode));
+
+
+        console.log("Re-Attach", module, this.currentConnections);
+    }
 };
 
 let extend = function() {

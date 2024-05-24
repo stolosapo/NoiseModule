@@ -104,6 +104,16 @@ body {
     background-image: url("../img/pause_48.png");
 }
 
+.noise-module-node header img.nm-bypass-button {
+	background: url("../img/bypass_16.png") 0 0 no-repeat;
+	height: 16px;
+	width: 16px;
+	position: relative;
+	left: 8px;
+	top: 8px;
+	cursor: pointer;
+}
+
 .noise-module-node section canvas {
 	background-image: url("../img/blueprint-dark.png");
 	display: inline-block;

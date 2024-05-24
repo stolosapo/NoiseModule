@@ -94,10 +94,13 @@ KingTubbyModuleNodeUI.prototype = {
     },
 
     $_header: function() {
+        const $byPassButton = createByPassButton(this.noiseModule, this.moduleItem);
+
         let $name = document.createElement("h6");
         $name.innerText = this.moduleItem.module.name;
 
         let $header = document.createElement("header");
+        appendElementToTarget($byPassButton, $header);
         appendElementToTarget($name, $header);
         return $header;
     },
