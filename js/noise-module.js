@@ -179,7 +179,7 @@ NoiseModule.prototype = {
             audioNode: audioNode,
             moduleImpl: moduleImpl,
             factory: factory,
-            bypassConnections: [],
+            bypassNode: undefined,
         };
 
         return moduleItem;
@@ -362,73 +362,65 @@ NoiseModule.prototype = {
             });
     },
 
-    _clearBypassConnections: function(module) {
-        if (!module.bypassConnections) {
-            return;
-        }
-        
-        let _self = this;
-
-        // First disconnect connections
-        module.bypassConnections.forEach(c => {
-            _self._disconnectNodes(c.srcNode, c.destNode);
-        });
-
-        // Clear collection
-        module.bypassConnections = [];
-    },
-
     byPassModule: function(module) {
         let _self = this;
 
-        // Clear already existed bypass connections
-        this._clearBypassConnections(module);
+        // If already bypassed don't do anything
+        if (module.bypassNode) {
+            console.warn("Module already bypassed", module);
+            return;
+        }
 
-        // Find the sources of this module
-        const srcNodes = this.currentConnections
+        // Create by pass node
+        const bypassGain = this.audioContext.createGain();
+
+        // Connect bypass node and disconnect current module from source 
+        this.currentConnections
             .filter(c => c.destNode === module.inNode)
-            .map(c => c.srcNode);
-
-        // Find the destinations of this module
-        const destNodes = this.currentConnections
-            .filter(c => c.srcNode === module.outNode)
-            .map(c => c.destNode);
-
-        // Disconnect all source nodes of the module
-        srcNodes.forEach(srcNode => _self._disconnectNodes(srcNode, module.inNode));
-
-        // Disconnect all target nodes from module
-        destNodes.forEach(destNode => _self._disconnectNodes(module.outNode, destNode));
-
-        // Connect all combinations of sources and targets
-        srcNodes.forEach(srcNode => {
-            destNodes.forEach(destNode => {
-                _self.connectNodes(srcNode, destNode);
-                module.bypassConnections.push({srcNode, destNode});
+            .forEach(c => {
+                _self.connectNodes(c.srcNode, bypassGain);
+                _self._disconnectNodes(c.srcNode, c.destNode);
             });
-        });
 
-        console.log("By passs", module, this.currentConnections);
+        // Connect bypass node and disconnect current module from destination
+        this.currentConnections
+            .filter(c => c.srcNode === module.outNode)
+            .forEach(c => {
+                _self.connectNodes(bypassGain, c.destNode);
+                _self._disconnectNodes(c.srcNode, c.destNode);
+            });
+
+        // Keep bypassGain
+        module.bypassNode = bypassGain;
     },
 
     reAttachModule: function(module) {
         let _self = this;
 
-        // Clear already existed bypass connections
-        this._clearBypassConnections(module);
+        // If not bypassed don't do anything
+        if (!module.bypassNode) {
+            console.warn("Module is not bypassed", module);
+            return;
+        }
 
-        // Connect the sources of this module
-        const srcNodes = this.options.connections
-            .filter(c => c.destNode === module.inNode)
-            .forEach(c => _self.connectNodes(c.srcNode, c.destNode));
+        // Connect current module and disconnect bypass node from source 
+        this.currentConnections
+            .filter(c => c.destNode === module.bypassNode)
+            .forEach(c => {
+                _self.connectNodes(c.srcNode, module.inNode);
+                _self._disconnectNodes(c.srcNode, c.destNode);
+            });
 
-        // Connect the targets of this module
-        const destNodes = this.options.connections
-            .filter(c => c.srcNode === module.outNode)
-            .map(c => _self.connectNodes(c.srcNode, c.destNode));
+        // Connect current module and disconnect bypass node from destination
+        this.currentConnections
+            .filter(c => c.srcNode === module.bypassNode)
+            .forEach(c => {
+                _self.connectNodes(module.outNode, c.destNode);
+                _self._disconnectNodes(c.srcNode, c.destNode);
+            });
 
-
-        console.log("Re-Attach", module, this.currentConnections);
+        // Reset bypassNode
+        module.bypassNode = undefined;
     }
 };
 
