@@ -1,70 +1,45 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" >
-	<head>
-		<title>The First Kube :: NoiseModule</title> 
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>The First Kube :: NoiseModule</title>
 
-		<link rel="stylesheet" type="text/css" href="css/noise-module.css" />
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="css/noise-module.css" />
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-		<script src="js/noise-module.js"></script>
+        <script src="js/ui-helper.js"></script>
+        <script src="js/nodes/gain-module-node.js"></script>
+        <script src="js/nodes/noise-module-node.js"></script>
+        <script src="js/nodes/biquadfilter-module-node.js"></script>
+        <script src="js/nodes/oscilator-module-node.js"></script>
+        <script src="js/nodes/delay-module-node.js"></script>
+        <script src="js/nodes/dynamicscompressor-module-node.js"></script>
+        <script src="js/nodes/stereopanner-module-node.js"></script>
+        <script src="js/nodes/waveshaper-module-node.js"></script>
+        <script src="js/nodes/equalizer-module-node.js"></script>
+        <script src="js/nodes/convolver-module-node.js"></script>
+        <script src="js/nodes/analyser-module-node.js"></script>
+        <script src="js/nodes/noise-radio-module-node.js"></script>
+        <script src="js/nodes/kingtubby-module-node.js"></script>
+        <script src="js/nodes/liveinput-module-node.js"></script>
+        <script src="js/nodes/recorder-module-node.js"></script>
+        <script src="js/noise-module.js"></script>
+        <script src="js/example.js"></script>
+    </head>
 
-		<script type="text/javascript">	
-			
-			$(document).ready(function() {
+    <body>
+        <main>
+            <audio id="thefirstkube" crossorigin="anonymous" controls controlslist autoplay="false">
+                <source src="https://stream.thefirstkube.net/stream.mp3" type="audio/mpeg" />
+            </audio>
 
-				var urlParams 	= new URLSearchParams( window.location.search );
-				var fileMode 	= false;
+            <section id="noise-module-container" class="noise-module-container">
+            </section>
 
-				if (urlParams.has( 'fileMode' )) {
-					fileMode 	= urlParams.get( 'fileMode' );
-				}
+            <button id="start">Start it!!</button>
+        </main>
 
-				/* Create a new Singleton Noise Module */
-				$( 'body' ).noiseModule( {
-
-					fileMode: fileMode,
-
-					modules 				: [
-
-						{ name: "WhiteNoise", nodeType: "noise", type: "white", options: { started: false } },
-						{ name: "Gain", nodeType: "gain", type: "", options: { gainGain: 0.5 } },
-
-						{ name: "SineWave", nodeType: "oscillator", type: "sine", options: { started: false } },
-
-						{ name: "LiveInput", nodeType: "liveinput", type: "", options: { started: false } },
-						{ name: "Eq", nodeType: "equalizer" },
-
-
-						{ name: "Master", nodeType: "gain", type: "" },
-						{ name: "MasterAnalyser", nodeType: "analyser", type: "frequencybars" }
-
-					],
-
-					connections				: [
-
-						{ srcNode: "WhiteNoise", destNode: "Gain" },
-						{ srcNode: "Gain", destNode: "Master" },
-
-						{ srcNode: "SineWave", destNode: "Eq" },
-
-						{ srcNode: "LiveInput", destNode: "Eq" },
-						{ srcNode: "Eq", destNode: "Master" },
-
-						{ srcNode: "Master", destNode: "MasterAnalyser" },
-
-						{ srcNode: "MasterAnalyser", destNode: "output" }
-
-					],
-
-				} );
-					
-			});
-
-		</script>
-
-	</head>
-
-	<body>
-
-	</body>
+        <script type="text/javascript">
+            noiseModuleInit("noise-module-container");
+        </script>
+    </body>
 </html>
